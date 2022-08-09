@@ -229,10 +229,10 @@ iframe {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px;
-  width: calc((100% - 50px) / 2);
-  height: 60px;
-  border-radius: 200px;
+  padding: 10px;
+  width: 100%;
+  height: 50px;
+  border-radius: 10px;
   box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
   -webkit-box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
@@ -254,7 +254,7 @@ iframe {
   z-index: -1;
   width: 100%;
   height: 100%;
-  border-radius: 50px;
+  border-radius: 10px;
   top: 0;
   left: 0;
   background: #d19cff;
