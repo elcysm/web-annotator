@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% block head %}
+	<title>Đăng kí</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+
+	{% block styles %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/Linearicons-Free-v1.0.0/icon-font.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/bootstrap/css/bootstrap.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/animate/animate.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/css-hamburgers/hamburgers.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/animsition/css/animsition.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/select2/select2.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.css')}}" >
+	{% endblock %}
+
+	{% endblock %}
+</head>
+<body>
+	{% block content %}
+	<div class="limiter bg-gra-01" >
+		<div class="container-login100">
+	   
+            {% if (success != "") %}
+				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
+					<strong>Success!</strong> {{success}}
+				</div>
+                {% endif %}
+
+			<div class="wrap-login100 p-l-70 p-r-70 p-t-30 p-b-30">
+					<span class="login100-form-title p-b-10">
+						ĐĂNG KÍ THÀNH CÔNG
+					</span>	
+                
+				<p class="text-center">Chúc mừng bạn đăng kí thành công tài khoản!</p>
+
+				<div class="p-t-10 p-b-9 text-center">
+					<span class="txt1">
+						Email: <span class="text-danger font-weight-bold">{{email}}</span>
+					</span>
+				</div>     
+
+				<div class="w-full text-center m-t-10">
+					<a href="/login" class="txt2 bo1">
+						Đăng nhập
+						<i class="fa fa-arrow-right"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+
+	<div id="dropDownSelect1"></div>
+	{% block scripts %}
+    <script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/animsition/js/animsition.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/popper.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/bootstrap.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/select2/select2.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/daterangepicker/moment.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/countdowntime/countdowntime.js')}}"></script>
+	<script src="{{url_for('.static', filename='main.js')}}"></script>
+    {% endblock %}
+	{% endblock %}
+</body>
+</html>
