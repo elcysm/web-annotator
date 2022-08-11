@@ -3,7 +3,11 @@ function keepData(){
     // document.getElementsByClassName(".username").innerHTML = "Hello";
     $(".username").val("Hiii");
 }
+function add_modal(){
 
+    $('#addModal').modal('toggle'); 
+
+}
 function develop(){
     alert("Chức năng này đang phát triển!")
 }

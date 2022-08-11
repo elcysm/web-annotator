@@ -9,6 +9,7 @@
 	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
 
 	{% block styles %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}" >
@@ -28,29 +29,24 @@
 	<div class="limiter bg-gra-01" >
 		<div class="container-login100">
 	   
-            {% if (success != "") %}
-				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
-					<strong>Success!</strong> {{success}}
-				</div>
-            {% endif %}
+            
 
 			<div class="wrap-login100 p-l-70 p-r-70 p-t-30 p-b-30">
-					<span class="login100-form-title p-b-10">
-						TRANG CHỦ
+                    <span class="login100-form-title p-b-10 text-danger">
+                        503
+                    </span>	
+					<span class="p-b-10">
+						You don't have permission to access this page!
 					</span>	
 
-				<div class="p-t-10 p-b-9 text-center">
-					<span class="txt1">
-						Xin chào <span class="text-success font-weight-bold">{{result}}</span>
-					</span>
-				</div>     
-
 				<div class="w-full text-center m-t-10">
-					<a href="/logout" class="txt2 bo1">
-						Đăng Xuất
+					<a href="/" class="txt2 bo1">
+						Back
 						<i class="fa fa-arrow-right"></i>
 					</a>
 				</div>
+
+				
 			</div>
 		</div>
 	</div>

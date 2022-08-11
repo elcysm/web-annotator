@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 	{% block head %}
-	<title>Đăng nhập</title>
+	<title>Trang chủ</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
 
 	{% block styles %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}" >
@@ -28,95 +29,39 @@
 	<div class="limiter bg-gra-01" >
 		<div class="container-login100">
 	   
-			{% if (error != "") %}
-				<div style="opacity:0;" class="alert alert-danger alert-dismissible fade show" role="alert" id="fade">
-					<strong>Error!</strong> {{error}}
-				</div>
-			{% endif %}
-
-			{% if (success != "") %}
+            {% if (success != "") %}
 				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
 					<strong>Success!</strong> {{success}}
 				</div>
-			{% endif %}
+            {% endif %}
 
-				<div  class="alert alert-warning alert-dismissible fade show facebookhide hide" role="alert" id="fade">
-				<strong>Warning!</strong> Chức năng này đang phát triển!
+			<div class="wrap-login100 p-l-70 p-r-70 p-t-30 p-b-30">
+					<span class="login100-form-title p-b-10">
+						TRANG CHỦ
+					</span>	
+
+				<div class="p-t-10 p-b-9 text-center">
+					<span class="txt1">
+						Xin chào <span class="text-success font-weight-bold">{{result}}</span>
+					</span>
+				</div>     
+
+				<div class="w-full text-center m-t-10">
+					<a href="/logout" class="txt2 bo1">
+						Đăng Xuất
+						<i class="fa fa-arrow-right"></i>
+					</a>
 				</div>
 
-			<div class="wrap-login100 p-l-70 p-r-70 p-t-73 p-b-30">
-				<form class="login100-form validate-form flex-sb flex-w" method="post" >
-					<span class="login100-form-title p-b-10">
-						ĐĂNG NHẬP
-					</span>	
-					<div class="p-t-30 p-b-9">
-						<span class="txt1">
-							Tên đăng nhập hoặc Email:
-						</span>
-					</div>
-					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
-						{% if username %}
-						<input class="input100 username" type="text" value="{{username}}" name="username">
-						{% else %}
-						<input class="input100 username" type="text" name="username">
-						{% endif %}
-						
-						<span class="focus-input100"></span>
-					</div>
-					
-					<div class="p-t-10 p-b-9">
-						<span class="txt1" >
-							Mật khẩu:
-						</span>
-						
-						<a href="/forgot_password" class="txt2 bo1 m-l-5">
-							Quên mật khẩu?
-						</a>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate = "Mật khẩu không được để trống">
-						{% if password %}
-						<input class="input100" type="password" value="{{password}}" name="password" >
-						{% else %}
-						<input class="input100" type="password" name="password" >
-						{% endif %}
-						<span class="focus-input100"></span>
-					</div>
-					
-
-					<div class="container-login100-form-btn m-t-20 m-b-20 text-center">
-						<button class="btn-grad login-button ">
-							Submit
-						</button>
-						
-					</div>
-					<!-- <div class="container text-center">
-					<span class="bo1">Hoặc</span>
-					</div>
-					<div class="container-login100-form-btn m-t-20 m-b-20 text-center">
-						<a href="/callback" class="btn-google ">
-							<img src="{{url_for('.static', filename='icon-google.png')}}" alt="GOOGLE">
-							Google
-						</a>
-						
-					</div> -->
-					<!-- <div class="w-full text-center ">
-						<span class="txt2">
-							Bạn chưa có tài khoản?
-						</span>
-						<a href="/register" class="txt2 bo1">
-							Đăng kí
-						</a>
-					</div> -->
-				</form>
+				
 			</div>
 		</div>
 	</div>
 	
-	<div id="dropDownSelect1"></div>
 
+	<div id="dropDownSelect1"></div>
 	{% block scripts %}
-	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+    <script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/animsition/js/animsition.min.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/popper.js')}}"></script>
@@ -126,7 +71,7 @@
 	<script src="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/countdowntime/countdowntime.js')}}"></script>
 	<script src="{{url_for('.static', filename='main.js')}}"></script>
-	{% endblock %}
+    {% endblock %}
 	{% endblock %}
 </body>
 </html>
