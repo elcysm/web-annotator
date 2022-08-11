@@ -43,7 +43,7 @@ def login():
    password = request.form['password']
    passwordhash = hashlib.md5(password.encode()).hexdigest()
    session['username'] = username
-   connection = sqlite3.connect(dirname + '\data.db')
+   connection = sqlite3.connect(dirname + '\Data.db')
    cursor = connection.cursor()
    query = "SELECT username FROM user WHERE username = '{name}' AND password = '{passw}'".format(name = username, passw = passwordhash)
    cursor.execute(query)
