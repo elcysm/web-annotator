@@ -8,7 +8,7 @@ import os
 import hashlib
 import random
 import string
-from nltk.tokenize import word_tokenize, sent_tokenize
+from underthesea import word_tokenize, sent_tokenize
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -99,9 +99,7 @@ def user_index():
         else:
             return redirect(url_for('admin_index'))
     else:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
 
 # admin login   ----------------------------------------------------------------
 @app.route('/admin')
@@ -114,9 +112,7 @@ def admin_index():
         else:
             return render_template('503.html')
     else:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
 
 ################################ LOGIN BY LINK #################################
 
@@ -154,13 +150,14 @@ def get_invitation():
         error="",
         success="")
     else:
-        username = session['username']
-        user_role = select_role(username)[0]
+        user_admin = session['username']
+        user_role = select_role(user_admin)[0]
         if check_role(user_role)==True:
             username = generate_username()
             password = generate_password()
             return render_template('invitation.html',
                 username=username,
+                user_admin=user_admin,
                 password=password)
         else:
             return render_template('503.html')
@@ -187,6 +184,7 @@ def post_invitation():
     session['link'] = link
     return redirect(url_for('register_successfully', email=email, link=link, success="Gửi thành công")) 
 
+# invitation success    --------------------------------------------------------
 @app.route('/admin/invitation/success', methods=['GET'])
 def register_successfully():
     email = request.args['email']
@@ -256,6 +254,8 @@ def connect_to_db():
     conn = sqlite3.connect(dirname + '\data.db')
     return conn
 
+# ----------------------------- SELECT -----------------------------------------
+
 # select role by username   ----------------------------------------------------
 def select_role(username):
     connection = connect_to_db()
@@ -289,6 +289,17 @@ def check_account_exist():
         return True
     return False
 
+# select data_id by sentence  -------------------------------------------------
+def select_data_id(sent):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT id FROM Data WHERE sent = '{sent}'".format(sent = sent)
+    cursor.execute(query)
+    result = cursor.fetchone()
+    return result
+
+# ------------------------------- INSERT ---------------------------------------
+
 # insert annotator  ------------------------------------------------------------
 def insert_annotator(username, email, password):
     connection = connect_to_db()
@@ -307,7 +318,111 @@ def insert_data_owner(username, email, password):
     cursor.execute(query2)
     connection.commit()
 
-############################### HANDLE DATA INPUT ##############################
+# ### CREATE NEW PROJECT ###
+def insert_project(project_name):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO Project VALUES ('{name}')".format(name = project_name)
+    cursor.execute(query)
+    connection.commit()
+
+# ### INSERT INPUT DATA ###
+
+# insert sentence to database   ------------------------------------------------
+def insert_sentences(data, project_id):
+    sent_list = data_to_sentences(data)
+
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    for sent in sent_list:
+        query = "INSERT INTO Data VALUES ('{text}', '{proj_id}')".format(text = sent, proj_id = project_id)
+        cursor.execute(query)
+        connection.commit()
+
+        insert_tokenize(sent)
+
+# insert tokenize to database   ------------------------------------------------
+def insert_tokenize(sent):
+    word_list = sentence_to_tokens(sent)
+    
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    data_id = select_data_id(sent)
+    for word in word_list:
+        query = "INSERT INTO Tokenize VALUES ('{dt_id}','{token}')".format(dt_id = data_id, token = word)
+        cursor.execute(query)
+        connection.commit()
+
+# ### INSERT TAG ###
+
+# insert tag NER    ------------------------------------------------------------
+def insert_tag_ner(tag_ner):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TagNER VALUES ('{tag}')".format(tag = tag_ner)
+    cursor.execute(query)
+    connection.commit()
+
+# insert tag POS    ------------------------------------------------------------
+def insert_tag_pos(tag_pos):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TagPOS VALUES ('{tag}')".format(tag = tag_pos)
+    cursor.execute(query)
+    connection.commit()
+
+# insert tag Parsing    --------------------------------------------------------
+def insert_tag_parsing(tag_parsing):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TagParsing VALUES ('{tag}')".format(tag = tag_parsing)
+    cursor.execute(query)
+    connection.commit()
+
+# insert tag Text Classification    --------------------------------------------
+def insert_tag_text_class(tag_text_class):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TagTextClass VALUES ('{tag}')".format(tag = tag_text_class)
+    cursor.execute(query)
+    connection.commit()
+
+# ### INSERT REVIEW ###
+
+# insert review NER ------------------------------------------------------------
+def insert_ner(token_id, tag_ner, username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO NER VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_ner, user = username)
+    cursor.execute(query)
+    connection.commit()
+
+# insert review POS ------------------------------------------------------------
+def insert_pos(token_id, tag_pos, username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO POS VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_pos, user = username)
+    cursor.execute(query)
+    connection.commit()
+    
+# insert review Parsing --------------------------------------------------------
+def insert_parsing(token_id_1, token_id_2, tag_parsing, username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO Parsing VALUES ('{tk_id_1}', '{tk_id_2}', '{tag}', '{user}')".format(tk_id_1 = token_id_1, tk_id_2 = token_id_2, tag = tag_parsing, user = username)
+    cursor.execute(query)
+    connection.commit()
+
+# insert review Text Classification --------------------------------------------
+def insert_text_class(data_id, tag_text_class, username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TextClass VALUES ('{dt_id}', '{tag}', '{user}')".format(dt_id = data_id, tag = tag_text_class, user = username)
+    cursor.execute(query)
+    connection.commit()
+
+############################### HANDLE INPUT DATA ##############################
 
 # split data to sentences   ----------------------------------------------------
 def data_to_sentences(data):
