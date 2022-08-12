@@ -120,12 +120,13 @@ def post_invitation():
         recipients = [email],
         )
     
-    link = ROOT_DOMAIN+'/login/username={username}&password={password}'.format(username=username, password=password)
+    link = ROOT_DOMAIN + '/login/username={username}&password={password}'.format(username=username, password=password)
     msg.html = render_template('welcome.html', username=username, password=password, link=link)
     mail.send(msg)
-
-    return render_template('email_verify.html', email=email, success="Đăng kí thành công")
-
+    session['email'] = email
+    session['link'] = link
+    return redirect(url_for('register_successfully', email=email, link=link, success="Gửi thành công"))
+ 
 @app.route('/login/username=<username>&password=<password>', methods=['GET'])
 def get_api_login(username, password):
     return render_template('login.html', username=username, password=password)
@@ -194,6 +195,12 @@ def register():
             return render_template('email_verify.html', email=email, success="Đăng kí thành công")
         else:
             return render_template('register.html', error="Username hoặc email đã tồn tại!")
+
+@app.route('/admin/invitation/success', methods=['GET'])
+def register_successfully():
+    email = request.args['email']
+    link = request.args['link']
+    return render_template('sent_successfully.html', email=email, link=link, success="Gửi thành công")
 
 # function
 def generate_password():

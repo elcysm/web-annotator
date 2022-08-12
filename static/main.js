@@ -8,6 +8,21 @@ function add_modal(){
     $('#addModal').modal('toggle'); 
 
 }
+
+function copyToClipboard() {
+    var copyText = document.getElementById("link").value;
+    navigator.clipboard.writeText(copyText).then(() => {
+        document.getElementById("copy").innerHTML = "Copied!"; 
+        document.getElementById("check").classList.remove('d-none');
+        $('[data-toggle="tooltip"]').tooltip('toggle');
+    });
+  }
+
+function mySubmitFunction(e) {
+    e.preventDefault();
+    return false;
+}
+
 function develop(){
     alert("Chức năng này đang phát triển!")
 }
