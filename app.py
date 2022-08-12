@@ -21,7 +21,7 @@ MAIL_PASSWORD = 'eblqqukvfjguceyp'
 ROOT_DOMAIN = 'http://127.0.0.1:5000'
 EMAIL_SUBJECT = 'Thư mời đánh giá'
 
-#
+# config Mail
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = MAIL_USERNAME
@@ -30,6 +30,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
+# handle error 404
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html')
@@ -169,31 +170,51 @@ def logout():
 
 @app.route('/register', methods=['GET'])
 def get_register():
-    return render_template('register.html', error="")
+    if 'username' not in session:
+        return render_template('login.html',
+        error="",
+        success="")
+    else:
+        username = session['username']
+        user_role = select_role(username)[0]
+        if check_role(user_role)==True:
+            return render_template('register.html', error="")
+        else:
+            return render_template('503.html')
 
 @app.route('/register', methods=['POST'])
 def register():
-   username = request.form['username']
-   email = request.form['email']
-   password = request.form['password']
-   re_password = request.form['re_password']
-   if password != re_password:
-        return render_template('register.html', error="Mật khẩu không khớp")
-   else:
-        connection = connect_to_db()
-        cursor = connection.cursor()
-        query1 = "SELECT * FROM user WHERE username = '{name}' OR email = '{email}'".format(name = username, email = email)
-        cursor.execute(query1)
-        result = cursor.fetchone()
-        connection.commit()
-        if result == None:
-            passwordhash = hashlib.md5(password.encode()).hexdigest()
-            query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}','1')".format(name = username, mail = email, passw = passwordhash)
-            cursor.execute(query2)
-            connection.commit()
-            return render_template('email_verify.html', email=email, success="Đăng kí thành công")
+    if 'username' not in session:
+        return render_template('login.html',
+        error="",
+        success="")
+    else:
+        username = session['username']
+        user_role = select_role(username)[0]
+        if check_role(user_role)==True:
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            re_password = request.form['re_password']
+            if password != re_password:
+                return render_template('register.html', error="Mật khẩu không khớp")
+            else:
+                connection = connect_to_db()
+                cursor = connection.cursor()
+                query1 = "SELECT * FROM user WHERE username = '{name}' OR email = '{email}'".format(name = username, email = email)
+                cursor.execute(query1)
+                result = cursor.fetchone()
+                connection.commit()
+                if result == None:
+                    passwordhash = hashlib.md5(password.encode()).hexdigest()
+                    query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}','1')".format(name = username, mail = email, passw = passwordhash)
+                    cursor.execute(query2)
+                    connection.commit()
+                    return render_template('email_verify.html', email=email, success="Đăng kí thành công")
+                else:
+                    return render_template('register.html', error="Username hoặc email đã tồn tại!")
         else:
-            return render_template('register.html', error="Username hoặc email đã tồn tại!")
+            return render_template('503.html')
 
 # function
 def generate_password():
