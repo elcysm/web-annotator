@@ -28,13 +28,13 @@
 	<div class="limiter bg-gra-01" >
 		<div class="container-login100">
 	   
-			{% if (error != "") %}
+			{% if error %}
 				<div style="opacity:0;" class="alert alert-danger alert-dismissible fade show" role="alert" id="fade">
 					<strong>Error!</strong> {{error}}
 				</div>
 			{% endif %}
 
-			{% if (success != "") %}
+			{% if success %}
 				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
 					<strong>Success!</strong> {{success}}
 				</div>

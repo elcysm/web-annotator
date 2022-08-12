@@ -495,7 +495,6 @@ iframe {
 
 .navbar-logo{
 	padding: 15px;
-	color: rgb(255, 0, 0);
 }
 .navbar-mainbg{
 	background-color: #ffffff;
@@ -705,9 +704,7 @@ iframe {
 .hide {
   visibility: hidden;
 }
-nav .nav-link:active {
-  background-color:red;
-}
+
 /*//////////////////////////////////////////////////////////////////
 [ Responsive ]*/
 @media (max-width: 768px) {

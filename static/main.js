@@ -123,8 +123,9 @@ function develop(){
 var current = location.pathname;
 $('.nav .nav-link').each(function(){
     var $this = $(this);
-    // if the current path is like this link, make it active
-    if($this.attr('href').indexOf(current) !== -1){
+    // alert($this.attr('href'))
+    if ($this.attr('href') === current){
+        // alert("fds")
         $this.addClass('active');
     }
 })

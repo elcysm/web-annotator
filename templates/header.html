@@ -1,0 +1,34 @@
+<nav id="navbar-example2" class="navbar navbar-light bg-light sticky-top px-3 " id="navbarSupportedContent">
+    <a class="navbar-brand font-weight-bold " href="#">Phòng 302</a>
+    <ul class="nav nav-pills" >
+      <li class="nav-item ">
+        <a class="nav-link" href="/posts"><i class="fa fa-tachometer"></i>Trang chủ</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/add_user1"><i class="fa fa-cutlery"></i>Hôm nay ăn gì?</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/add_student"><i class="fa fa-calendar"></i>Lịch trực nhật</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="javascript:void(0);"><i class="fa fa-money"></i>Tổng kết thu chi</a>
+      </li>
+      <li class="nav-item dropdown">
+
+        <a class="btn dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown"  aria-expanded="false">
+            <img class="my-profile-picture" style="object-fit: cover;" src="<%= user.avatar %>">
+            <span class="text-primary"> {{username}}</span> 
+        </a>
+        <!-- <a class=" dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            
+        </a> -->
+        <ul class="dropdown-menu">
+            <li>  <a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Thông tin cá nhân</button></a></li> 
+            <li><hr class="dropdown-divider"></li>
+            <li>  <a  href="/logout"> <button class="dropdown-item" ><i class="fa fa-sign-out  m-r-15"></i>Đăng xuất</button></a></li>
+          
+        </ul>
+      </li>
+    </ul>
+    
+</nav>
