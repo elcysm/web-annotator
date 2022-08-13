@@ -8,8 +8,7 @@ import os
 import hashlib
 import random
 import string
-from underthesea import word_tokenize as vi_word_token, sent_tokenize as vi_sent_token
-from nltk import word_tokenize as eng_word_token, sent_tokenize as eng_sent_token
+# from underthesea import word_tokenize, sent_tokenize
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -192,6 +191,50 @@ def register_successfully():
     link = request.args['link']
     return render_template('sent_successfully.html', email=email, link=link, success="Gửi thành công")
 
+# create new project    --------------------------------------------------------
+@app.route('/admin/new_project', methods=['GET'])
+def get_new_project():
+    if 'username' not in session:
+        return render_template('login.html',
+        error="",
+        success="")
+    else:
+        user_admin = session['username']
+        user_role = select_role(user_admin)[0]
+        if check_role(user_role)==True:
+            return render_template('new_project.html', user_admin=user_admin)
+        else:
+            return render_template('503.html')
+
+# create new project    --------------------------------------------------------
+@app.route('/admin/new_project', methods=['POST'])
+def post_new_project():
+    if 'username' not in session:
+        return render_template('login.html',
+        error="",
+        success="")
+    else:
+        user_admin = session['username']
+        user_role = select_role(user_admin)[0]
+        if check_role(user_role)==True:
+            project_name = request.form['project_name']
+            language = request.form['language']
+            file_upload = request.form['file_upload']
+            task = request.form['task']
+            method = request.form['method']
+            label_get = request.form['label']
+            label = label_get.split(", ")
+
+            # insert
+            insert_project(project_name, language, task, method)
+            insert_label(task, label)
+
+            select_project_id(project_name)
+            return redirect(url_for('admin_index'))
+
+        else:
+            return render_template('503.html')
+
 ################################### ADMIN REGISTER ############################# 
 
 # admin register get    --------------------------------------------------------
@@ -217,9 +260,6 @@ def register():
             return render_template('email_verify.html', email=email, success="Đăng kí thành công")
     else:
         return render_template('503.html')
-
-# add new project   ------------------------------------------------------------
-
 
 ###################################### FUNCTION ################################
 
@@ -302,6 +342,15 @@ def select_data_id(sent):
     result = cursor.fetchone()
     return result
 
+# select project_id by name ----------------------------------------------------
+def select_project_id(name):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT id FROM Project WHERE name = '{name}'".format(name = name)
+    cursor.execute(query)
+    result = cursor.fetchone()
+    return result
+
 # ------------------------------- INSERT ---------------------------------------
 
 # insert annotator  ------------------------------------------------------------
@@ -323,10 +372,10 @@ def insert_data_owner(username, email, password):
     connection.commit()
 
 # ### CREATE NEW PROJECT ###
-def insert_project(project_name):
+def insert_project(project_name, language, task, method):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO Project VALUES ('{name}')".format(name = project_name)
+    query = "INSERT INTO Project (name, language, task, method) VALUES ('{name}', '{lang}', '{tsk}', '{mthd}')".format(name = project_name, lang = language, tsk = task, mthd = method)
     cursor.execute(query)
     connection.commit()
 
@@ -340,7 +389,7 @@ def insert_sentences(data, project_id):
     cursor = connection.cursor()
 
     for sent in sent_list:
-        query = "INSERT INTO Data VALUES ('{text}', '{proj_id}')".format(text = sent, proj_id = project_id)
+        query = "INSERT INTO Data (sent, project_id) VALUES ('{text}', '{proj_id}')".format(text = sent, proj_id = project_id)
         cursor.execute(query)
         connection.commit()
 
@@ -354,7 +403,7 @@ def insert_tokenize(sent):
     cursor = connection.cursor()
     data_id = select_data_id(sent)
     for word in word_list:
-        query = "INSERT INTO Tokenize VALUES ('{dt_id}','{token}')".format(dt_id = data_id, token = word)
+        query = "INSERT INTO Tokenize (data_id, word) VALUES ('{dt_id}','{token}')".format(dt_id = data_id, token = word)
         cursor.execute(query)
         connection.commit()
 
@@ -364,7 +413,7 @@ def insert_tokenize(sent):
 def insert_tag_ner(tag_ner):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagNER VALUES ('{tag}')".format(tag = tag_ner)
+    query = "INSERT INTO TagNER (tag) VALUES ('{tag}')".format(tag = tag_ner)
     cursor.execute(query)
     connection.commit()
 
@@ -372,7 +421,7 @@ def insert_tag_ner(tag_ner):
 def insert_tag_pos(tag_pos):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagPOS VALUES ('{tag}')".format(tag = tag_pos)
+    query = "INSERT INTO TagPOS (tag) VALUES ('{tag}')".format(tag = tag_pos)
     cursor.execute(query)
     connection.commit()
 
@@ -380,7 +429,7 @@ def insert_tag_pos(tag_pos):
 def insert_tag_parsing(tag_parsing):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagParsing VALUES ('{tag}')".format(tag = tag_parsing)
+    query = "INSERT INTO TagParsing (tag) VALUES ('{tag}')".format(tag = tag_parsing)
     cursor.execute(query)
     connection.commit()
 
@@ -388,9 +437,24 @@ def insert_tag_parsing(tag_parsing):
 def insert_tag_text_class(tag_text_class):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagTextClass VALUES ('{tag}')".format(tag = tag_text_class)
+    query = "INSERT INTO TagTextClass (tag) VALUES ('{tag}')".format(tag = tag_text_class)
     cursor.execute(query)
     connection.commit()
+
+# insert tag by task
+def insert_label(task, label):
+    if task == "textclass":
+        for tag in label:
+            insert_tag_text_class(tag)
+    if task == "parsing":
+        for tag in label:
+            insert_tag_parsing(tag)
+    if task == "pos":
+        for tag in label:
+            insert_tag_pos(tag)
+    if task == "ner":
+        for tag in label:
+            insert_tag_ner(tag)
 
 # ### INSERT REVIEW ###
 
@@ -398,7 +462,7 @@ def insert_tag_text_class(tag_text_class):
 def insert_ner(token_id, tag_ner, username):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO NER VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_ner, user = username)
+    query = "INSERT INTO NER (token_id, tag, username) VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_ner, user = username)
     cursor.execute(query)
     connection.commit()
 
@@ -406,7 +470,7 @@ def insert_ner(token_id, tag_ner, username):
 def insert_pos(token_id, tag_pos, username):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO POS VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_pos, user = username)
+    query = "INSERT INTO POS (token_id, tag, username) VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_pos, user = username)
     cursor.execute(query)
     connection.commit()
     
@@ -414,7 +478,7 @@ def insert_pos(token_id, tag_pos, username):
 def insert_parsing(token_id_1, token_id_2, tag_parsing, username):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO Parsing VALUES ('{tk_id_1}', '{tk_id_2}', '{tag}', '{user}')".format(tk_id_1 = token_id_1, tk_id_2 = token_id_2, tag = tag_parsing, user = username)
+    query = "INSERT INTO Parsing (token_id_1, token_id_2, tag, username) VALUES ('{tk_id_1}', '{tk_id_2}', '{tag}', '{user}')".format(tk_id_1 = token_id_1, tk_id_2 = token_id_2, tag = tag_parsing, user = username)
     cursor.execute(query)
     connection.commit()
 
@@ -422,26 +486,20 @@ def insert_parsing(token_id_1, token_id_2, tag_parsing, username):
 def insert_text_class(data_id, tag_text_class, username):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TextClass VALUES ('{dt_id}', '{tag}', '{user}')".format(dt_id = data_id, tag = tag_text_class, user = username)
+    query = "INSERT INTO TextClass (data_id, tag, username) VALUES ('{dt_id}', '{tag}', '{user}')".format(dt_id = data_id, tag = tag_text_class, user = username)
     cursor.execute(query)
     connection.commit()
 
 ############################### HANDLE INPUT DATA ##############################
 
 # split data to sentences   ----------------------------------------------------
-def data_to_sentences(data, language):
-    if language == vi:
-        sent_list = vi_sent_token(data)
-    else:
-        sent_list = eng_sent_token(data)
+def data_to_sentences(data):
+    sent_list = sent_tokenize(data)
     return sent_list
 
 # split sentence to tokenizes   ------------------------------------------------
-def sentence_to_tokens(sent, language):
-    if language == vi:
-        word_list = vi_word_token(sent)
-    else:
-        sent_list = eng_word_token(data)
+def sentence_to_tokens(sent):
+    word_list = word_tokenize(sent)
     return word_list
 
 app.run(debug=True)
