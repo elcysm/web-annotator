@@ -8,7 +8,7 @@ import os
 import hashlib
 import random
 import string
-from underthesea import word_tokenize, sent_tokenize
+# from underthesea import word_tokenize, sent_tokenize
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -190,6 +190,19 @@ def register_successfully():
     email = request.args['email']
     link = request.args['link']
     return render_template('sent_successfully.html', email=email, link=link, success="Gửi thành công")
+
+
+# new project   --------------------------------------------------------
+@app.route('/admin/new_project', methods=['GET'])
+def get_new_project():
+    user_admin = session['username']
+    return render_template('new_project.html', user_admin=user_admin)
+
+# new project  --------------------------------------------------------
+@app.route('/admin/new_project', methods=['POST'])
+def post_new_project():
+    user_admin = session['username']
+    return render_template('AFASD.html', user_admin=user_admin)
 
 ################################### ADMIN REGISTER ############################# 
 

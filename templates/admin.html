@@ -26,7 +26,7 @@
 </head>
 <body>
 	{% block content %}
-	<div class="limiter bg-gra-01" >
+	<div class="container-center"> 
 		<nav id="navbar-example2" class="navbar navbar-light bg-light fixed-top px-3" id="navbarSupportedContent">
 			<a class="navbar-brand font-weight-bold " href="#">Phòng 302</a>
 			<ul class="nav nav-pills" >
@@ -57,7 +57,7 @@
 		</nav>
 
 
-		<div class="container-login100">
+		<div class="d-flex justify-content-center align-items-center">
 	   
             {% if (success != "") %}
 				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
@@ -77,9 +77,9 @@
 				</div>     
 
 				<div class="w-full text-center m-t-10">
-					<a href="/logout" class="txt2 bo1">
-						Đăng Xuất
-						<i class="fa fa-arrow-right"></i>
+					<a href="/admin/new_project" class="txt2 bo1">
+						New Project
+						<i class="fa fa-plus"></i>
 					</a>
 				</div>
 
