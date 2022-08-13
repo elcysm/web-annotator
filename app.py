@@ -8,7 +8,8 @@ import os
 import hashlib
 import random
 import string
-from underthesea import word_tokenize, sent_tokenize
+from underthesea import word_tokenize as vi_word_token, sent_tokenize as vi_sent_token
+from nltk import word_tokenize as eng_word_token, sent_tokenize as eng_sent_token
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -216,6 +217,9 @@ def register():
             return render_template('email_verify.html', email=email, success="Đăng kí thành công")
     else:
         return render_template('503.html')
+
+# add new project   ------------------------------------------------------------
+
 
 ###################################### FUNCTION ################################
 
@@ -425,13 +429,19 @@ def insert_text_class(data_id, tag_text_class, username):
 ############################### HANDLE INPUT DATA ##############################
 
 # split data to sentences   ----------------------------------------------------
-def data_to_sentences(data):
-    sent_list = sent_tokenize(data)
+def data_to_sentences(data, language):
+    if language == vi:
+        sent_list = vi_sent_token(data)
+    else:
+        sent_list = eng_sent_token(data)
     return sent_list
 
 # split sentence to tokenizes   ------------------------------------------------
-def sentence_to_tokens(sent):
-    word_list = word_tokenize(sent)
+def sentence_to_tokens(sent, language):
+    if language == vi:
+        word_list = vi_word_token(sent)
+    else:
+        sent_list = eng_word_token(data)
     return word_list
 
 app.run(debug=True)
