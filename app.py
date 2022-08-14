@@ -8,7 +8,8 @@ import os
 import hashlib
 import random
 import string
-# from underthesea import word_tokenize, sent_tokenize
+import pandas as pd
+from nltk import word_tokenize, sent_tokenize
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -25,6 +26,7 @@ LIFETIME_SESSION = 5
 ############################### ROLE ###########################################
 ANNOTATOR_ROLE = '0'
 DATA_OWNER_ROLE = '1'
+UPLOAD_FOLDER = 'static/upload'
 
 # config Mail   ----------------------------------------------------------------
 app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -33,6 +35,8 @@ app.config['MAIL_USERNAME'] = MAIL_USERNAME
 app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config['UPLOAD_FOLDER'] =  UPLOAD_FOLDER
+
 mail = Mail(app)
 
 # handle error 404  ------------------------------------------------------------
@@ -78,9 +82,9 @@ def login():
     password = request.form['password']
     passwordhash = hashlib.md5(password.encode()).hexdigest()
     session['username'] = username
-    result = select_role_by_username_password(username, password)[1]
+    result = select_role_by_username_password(username, password)
     if result != None:
-        user_role =  result[0]
+        user_role = result[1]
         if check_role(user_role)==True:
             return redirect(url_for('admin_index'))
         else:
@@ -93,11 +97,12 @@ def login():
 def user_index():
     if 'username' in session:
         username = session['username']
-        user_role = select_role(username)[0]
-        if check_role(user_role)==False:
-            return render_template('user.html', result=username, success="Đăng nhập thành công")
-        else:
-            return redirect(url_for('admin_index'))
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==False:
+                return render_template('user.html', result=username, success="Đăng nhập thành công")
+            else:
+                return redirect(url_for('admin_index'))
     else:
         return redirect(url_for('index'))
 
@@ -106,11 +111,12 @@ def user_index():
 def admin_index():
     if 'username' in session:
         username = session['username']
-        user_role = select_role(username)[0]
-        if check_role(user_role)==True:
-            return render_template('admin.html', result=username, success="Đăng nhập thành công")
-        else:
-            return render_template('503.html')
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                return render_template('admin.html', result=username, success="Đăng nhập thành công")
+            else:
+                return render_template('503.html')
     else:
         return redirect(url_for('index'))
 
@@ -119,16 +125,36 @@ def admin_index():
 # login by link from data owner ------------------------------------------------
 @app.route('/login/username=<username>&password=<password>', methods=['GET'])
 def get_api_login(username, password):
-    return render_template('login.html', username=username, password=password)
+    if 'username' not in session:
+         return render_template('login.html', username=username, password=password)
+    else:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role != None:
+            if check_role(user_role[0])==True:
+                return redirect(url_for('admin_index'))
+            else:
+                return redirect(url_for('user_index'))
+        else:
+            return redirect(url_for('get_register')) 
+   
 
 # login by link from data owner ------------------------------------------------
 @app.route('/login/username=<username>&password=<password>', methods=['POST'])
 def post_api_login(username, password):
-    result = select_role_by_username_password(username, password)[0]
 
-    if result != None:
-        session['username'] = username 
-        return redirect(url_for('user_index'))
+    usernameform = request.form['username']
+    passwordform = request.form['password']
+
+    if usernameform == username and passwordform == password:
+        result = select_role_by_username_password(username, password)
+        if result != None:
+            session['username'] = username
+            user_role = result[1]
+            if check_role(user_role)==True:
+                return redirect(url_for('admin_index'))
+            else:
+                return redirect(url_for('user_index'))
     else:
         return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
 
@@ -151,16 +177,18 @@ def get_invitation():
         success="")
     else:
         user_admin = session['username']
-        user_role = select_role(user_admin)[0]
-        if check_role(user_role)==True:
-            username = generate_username()
-            password = generate_password()
-            return render_template('invitation.html',
-                username=username,
-                user_admin=user_admin,
-                password=password)
-        else:
-            return render_template('503.html')
+        user_role = select_role(user_admin)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                username = generate_username()
+                password = generate_password()
+                return render_template('invitation.html',
+                    username=username,
+                    user_admin=user_admin,
+                    password=password)
+            else:
+                return render_template('503.html')
+        return redirect(url_for('index'))
 
 # invitation post   ------------------------------------------------------------
 @app.route('/admin/invitation', methods=['POST'])
@@ -200,11 +228,12 @@ def get_new_project():
         success="")
     else:
         user_admin = session['username']
-        user_role = select_role(user_admin)[0]
-        if check_role(user_role)==True:
-            return render_template('new_project.html', user_admin=user_admin)
-        else:
-            return render_template('503.html')
+        user_role = select_role(user_admin)
+        if user_role !=None:
+            if check_role(user_role[0])==True:
+                return render_template('new_project.html', user_admin=user_admin)
+            else:
+                return render_template('503.html')
 
 # create new project    --------------------------------------------------------
 @app.route('/admin/new_project', methods=['POST'])
@@ -215,22 +244,38 @@ def post_new_project():
         success="")
     else:
         user_admin = session['username']
-        user_role = select_role(user_admin)[0]
-        if check_role(user_role)==True:
-            project_name = request.form['project_name']
-            language = request.form['language']
-            file_upload = request.form['file_upload']
-            task = request.form['task']
-            method = request.form['method']
-            label_get = request.form['label']
-            label = label_get.split(", ")
+        user_role = select_role(user_admin)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                project_name = request.form['project_name']
+                language = request.form['language']
 
-            # insert
-            insert_project(project_name, language, task, method)
-            insert_label(task, label)
 
-            select_project_id(project_name)
-            return redirect(url_for('admin_index'))
+                task = request.form['task']
+                method = request.form['method']
+                label_get = request.form['label']
+                label = label_get.split(", ")
+
+                # insert
+                insert_project(project_name, language, task, method)
+                insert_label(task, label)
+                project_id = select_project_id(project_name)  
+
+                uploaded_file = request.files['file']
+                if uploaded_file.filename != '':
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+                    uploaded_file.save(file_path) 
+                    csvData = parseCSV(file_path)  
+                    
+                    connection = connect_to_db()
+                    cursor = connection.cursor()
+                    for i, row in csvData.iterrows():
+                        query = "INSERT INTO Data (sent, project_id) VALUES ('{text}', '{proj_id}')".format(text = row[4], proj_id = project_id)
+                        cursor.execute(query)
+                        connection.commit()
+                        insert_tokenize(row[4])
+                        
+                return redirect(url_for('admin_index'))
 
         else:
             return render_template('503.html')
@@ -489,6 +534,17 @@ def insert_text_class(data_id, tag_text_class, username):
     query = "INSERT INTO TextClass (data_id, tag, username) VALUES ('{dt_id}', '{tag}', '{user}')".format(dt_id = data_id, tag = tag_text_class, user = username)
     cursor.execute(query)
     connection.commit()
+
+# Upload CSV File --------------------------------------------
+def parseCSV(filePath):
+    # CVS Column Names
+    # col_names = ['first_name','last_name','address', 'street', 'state' , 'zip']
+    # Use Pandas to parse the CSV file
+    csvData = pd.read_csv(filePath, header=None)
+    # Loop through the Rows
+    return csvData
+    # for i,row in csvData.iterrows():
+    #         print(i,row['first_name'],row['last_name'],row['address'],row['street'],row['state'],row['zip'],)
 
 ############################### HANDLE INPUT DATA ##############################
 
