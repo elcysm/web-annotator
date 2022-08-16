@@ -9,7 +9,8 @@ import hashlib
 import random
 import string
 import pandas as pd
-from nltk import word_tokenize, sent_tokenize
+from underthesea import word_tokenize, sent_tokenize
+
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -100,11 +101,58 @@ def user_index():
         user_role = select_role(username)
         if user_role!= None:
             if check_role(user_role[0])==False:
-                return render_template('user.html', result=username, success="Đăng nhập thành công")
+                project = request.args['project']
+                data_id = select_data_id_by_project_id(project)
+                data = random.choice(data_id)
+                # token = select_token_by_data_id(data)
+
+                task = select_task_by_project_id(project)
+                if task == "textclass":
+                    return redirect(url_for('textclass', project=project, data=data))
+                elif task == "pos":
+                    return redirect(url_for('pos', project = project, data = data))
+                elif task == "parsing":
+                    return redirect(url_for('parsing', project = project, data = data))
+                elif task == "ner":
+                    return redirect(url_for('ner', project = project, data = data))
+                
+                # return render_template('user.html',data= data, token = token, project = project, result=username, success="Đăng nhập thành công")
             else:
                 return redirect(url_for('admin_index'))
     else:
         return redirect(url_for('index'))
+
+# review textclass ------------------------------------------------
+@app.route('/user/review', methods=['GET'])
+def textclass():
+    project = request.args['project']
+    data_id = request.args['data']
+    data = select_sent_by_id(data_id)
+    tag = select_tag_textclass_by_project_id(project)
+    lentag = len(tag)
+    return render_template('textclass.html', project=project, data=data, tag=tag, lentag=lentag)
+
+# review pos ------------------------------------------------
+@app.route('/user/review', methods=['GET'])
+def pos():
+    project = request.args['project']
+    data = request.args['data']
+    return render_template('pos.html', project=project, data=data)
+
+# review ner ------------------------------------------------
+@app.route('/user/review', methods=['GET'])
+def ner():
+    project = request.args['project']
+    data = request.args['data']
+    return render_template('ner.html', project=project, data=data)
+
+# review parsing ------------------------------------------------
+@app.route('/user/review', methods=['GET'])
+def parsing():
+    project = request.args['project']
+    data = request.args['data']
+    return render_template('parsing.html', project=project, data=data)
+
 
 # admin login   ----------------------------------------------------------------
 @app.route('/admin')
@@ -126,6 +174,22 @@ def admin_index():
 @app.route('/login/username=<username>&password=<password>', methods=['GET'])
 def get_api_login(username, password):
     if 'username' not in session:
+        return render_template('login.html', username=username, password=password)
+    else:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role != None:
+            if check_role(user_role[0])==True:
+                return redirect(url_for('admin_index'))
+            else:
+                return redirect(url_for('user_index'))
+        else:
+            return redirect(url_for('get_register')) 
+
+# login by link from data owner ------------------------------------------------
+@app.route('/login/project=<project>&username=<username>&password=<password>', methods=['GET'])
+def get_api_login_1(project, username, password):
+    if 'username' not in session:
          return render_template('login.html', username=username, password=password)
     else:
         username = session['username']
@@ -137,7 +201,6 @@ def get_api_login(username, password):
                 return redirect(url_for('user_index'))
         else:
             return redirect(url_for('get_register')) 
-   
 
 # login by link from data owner ------------------------------------------------
 @app.route('/login/username=<username>&password=<password>', methods=['POST'])
@@ -155,6 +218,24 @@ def post_api_login(username, password):
                 return redirect(url_for('admin_index'))
             else:
                 return redirect(url_for('user_index'))
+    else:
+        return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
+
+@app.route('/login/project=<project>&username=<username>&password=<password>', methods=['POST'])
+def post_api_login_1(project, username, password):
+
+    usernameform = request.form['username']
+    passwordform = request.form['password']
+
+    if usernameform == username and passwordform == password:
+        result = select_role_by_username_password(username, password)
+        if result != None:
+            session['username'] = username
+            user_role = result[1]
+            if check_role(user_role)==True:
+                return redirect(url_for('admin_index'))
+            else:
+                return redirect(url_for('user_index', project = project))
     else:
         return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
 
@@ -182,10 +263,13 @@ def get_invitation():
             if check_role(user_role[0])==True:
                 username = generate_username()
                 password = generate_password()
+                project = select_project()
                 return render_template('invitation.html',
                     username=username,
                     user_admin=user_admin,
-                    password=password)
+                    password=password,
+                    project=project,
+                    len=len(project))
             else:
                 return render_template('503.html')
         return redirect(url_for('index'))
@@ -196,6 +280,7 @@ def post_invitation():
     username = request.form['username']
     email = request.form['email']
     password = request.form['password']
+    project_id = request.form.get('project')
 
     insert_annotator(username, email, password)
 
@@ -204,8 +289,8 @@ def post_invitation():
         sender = MAIL_USERNAME, 
         recipients = [email],
         )
-    link = ROOT_DOMAIN+'/login/username={username}&password={password}'.format(username=username, password=password)
-    msg.html = render_template('welcome.html', username=username, password=password, link=link)
+    link = ROOT_DOMAIN+'/login/project={project_id}&username={username}&password={password}'.format(project_id=project_id, username=username, password=password)
+    msg.html = render_template('welcome.html', username=username, password=password, link=link, project_id = project_id)
     mail.send(msg)
     
     session['email'] = email
@@ -247,6 +332,8 @@ def post_new_project():
         user_role = select_role(user_admin)
         if user_role!= None:
             if check_role(user_role[0])==True:
+                project_id = generate_code()
+
                 project_name = request.form['project_name']
                 language = request.form['language']
 
@@ -257,22 +344,19 @@ def post_new_project():
                 label = label_get.split(", ")
 
                 # insert
-                insert_project(project_name, language, task, method)
-                insert_label(task, label)
-                project_id = select_project_id(project_name)  
+                insert_project(project_id, project_name, language, task, method)
+                insert_label(task, label, project_id)
+                # project_id = select_project_id(project_name)  
 
                 uploaded_file = request.files['file']
                 if uploaded_file.filename != '':
                     file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
                     uploaded_file.save(file_path) 
-                    csvData = parseCSV(file_path)  
+                    data = read_file(file_path)  
                     
-                    connection = connect_to_db()
-                    cursor = connection.cursor()
-                    for i, row in csvData.iterrows():
-                        query = "INSERT INTO Data (sent, project_id) VALUES ('{text}', '{proj_id}')".format(text = row[4], proj_id = project_id)
-                        cursor.execute(query)
-                        connection.commit()
+                    for i, row in data.iterrows():
+                        
+                        insert_sentences(row[4], project_id)
                         insert_tokenize(row[4])
                         
                 return redirect(url_for('admin_index'))
@@ -328,6 +412,16 @@ def generate_username():
     temp = random.sample(all,length)
     username = "".join(temp)
     return 'user_' + username
+
+# generate code ----------------------------------------------------------------
+def generate_code():
+    length = 8
+    lower = string.ascii_lowercase
+    num = string.digits
+    all = lower + num
+    temp = random.sample(all,length)
+    code = "".join(temp)
+    return code
 
 # check role user / admin   ----------------------------------------------------
 def check_role(user_role):
@@ -387,6 +481,26 @@ def select_data_id(sent):
     result = cursor.fetchone()
     return result
 
+# select data_id by project id  ------------------------------------------------
+def select_data_id_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT id FROM Data WHERE project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
+# select data_id by project id  ------------------------------------------------
+def select_sent_by_id(id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT sent FROM Data WHERE id = '{id}'".format(id = id)
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
 # select project_id by name ----------------------------------------------------
 def select_project_id(name):
     connection = connect_to_db()
@@ -394,6 +508,46 @@ def select_project_id(name):
     query = "SELECT id FROM Project WHERE name = '{name}'".format(name = name)
     cursor.execute(query)
     result = cursor.fetchone()
+    return result
+
+# select all project    --------------------------------------------------------
+def select_project():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT id, name FROM Project"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
+# select token by data id   ----------------------------------------------------
+def select_token_by_data_id(id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT word FROM Tokenize where data_id = '{id}'".format(id = id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
+# select task by project id ----------------------------------------------------
+def select_task_by_project_id(id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT task FROM Project WHERE id = '{id}'".format(id = id)
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
+# select tag texclass by project id --------------------------------------------
+def select_tag_textclass_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag FROM TagTextClass where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
     return result
 
 # ------------------------------- INSERT ---------------------------------------
@@ -417,10 +571,10 @@ def insert_data_owner(username, email, password):
     connection.commit()
 
 # ### CREATE NEW PROJECT ###
-def insert_project(project_name, language, task, method):
+def insert_project(project_id, project_name, language, task, method):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO Project (name, language, task, method) VALUES ('{name}', '{lang}', '{tsk}', '{mthd}')".format(name = project_name, lang = language, tsk = task, mthd = method)
+    query = "INSERT INTO Project (id, name, language, task, method) VALUES ('{id}', '{name}', '{lang}', '{tsk}', '{mthd}')".format(id = project_id, name = project_name, lang = language, tsk = task, mthd = method)
     cursor.execute(query)
     connection.commit()
 
@@ -446,7 +600,7 @@ def insert_tokenize(sent):
     
     connection = connect_to_db()
     cursor = connection.cursor()
-    data_id = select_data_id(sent)
+    data_id = select_data_id(sent)[0]
     for word in word_list:
         query = "INSERT INTO Tokenize (data_id, word) VALUES ('{dt_id}','{token}')".format(dt_id = data_id, token = word)
         cursor.execute(query)
@@ -455,51 +609,51 @@ def insert_tokenize(sent):
 # ### INSERT TAG ###
 
 # insert tag NER    ------------------------------------------------------------
-def insert_tag_ner(tag_ner):
+def insert_tag_ner(tag_ner, proj_id):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagNER (tag) VALUES ('{tag}')".format(tag = tag_ner)
+    query = "INSERT INTO TagNER (tag, project_id) VALUES ('{tag}', '{proj_id}')".format(tag = tag_ner, proj_id = proj_id)
     cursor.execute(query)
     connection.commit()
 
 # insert tag POS    ------------------------------------------------------------
-def insert_tag_pos(tag_pos):
+def insert_tag_pos(tag_pos, proj_id):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagPOS (tag) VALUES ('{tag}')".format(tag = tag_pos)
+    query = "INSERT INTO TagPOS (tag, project_id) VALUES ('{tag}', '{proj_id}')".format(tag = tag_pos, proj_id = proj_id)
     cursor.execute(query)
     connection.commit()
 
 # insert tag Parsing    --------------------------------------------------------
-def insert_tag_parsing(tag_parsing):
+def insert_tag_parsing(tag_parsing, proj_id):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagParsing (tag) VALUES ('{tag}')".format(tag = tag_parsing)
+    query = "INSERT INTO TagParsing (tag, project_id) VALUES ('{tag}', '{proj_id}')".format(tag = tag_parsing, proj_id = proj_id)
     cursor.execute(query)
     connection.commit()
 
 # insert tag Text Classification    --------------------------------------------
-def insert_tag_text_class(tag_text_class):
+def insert_tag_text_class(tag_text_class, proj_id):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO TagTextClass (tag) VALUES ('{tag}')".format(tag = tag_text_class)
+    query = "INSERT INTO TagTextClass (tag, project_id) VALUES ('{tag}', '{proj_id}')".format(tag = tag_text_class, proj_id = proj_id)
     cursor.execute(query)
     connection.commit()
 
 # insert tag by task
-def insert_label(task, label):
+def insert_label(task, label, proj_id):
     if task == "textclass":
         for tag in label:
-            insert_tag_text_class(tag)
+            insert_tag_text_class(tag, proj_id)
     if task == "parsing":
         for tag in label:
-            insert_tag_parsing(tag)
+            insert_tag_parsing(tag, proj_id)
     if task == "pos":
         for tag in label:
-            insert_tag_pos(tag)
+            insert_tag_pos(tag, proj_id)
     if task == "ner":
         for tag in label:
-            insert_tag_ner(tag)
+            insert_tag_ner(tag, proj_id)
 
 # ### INSERT REVIEW ###
 
@@ -536,7 +690,7 @@ def insert_text_class(data_id, tag_text_class, username):
     connection.commit()
 
 # Upload CSV File --------------------------------------------
-def parseCSV(filePath):
+def read_file(filePath):
     # CVS Column Names
     # col_names = ['first_name','last_name','address', 'street', 'state' , 'zip']
     # Use Pandas to parse the CSV file

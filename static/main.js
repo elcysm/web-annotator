@@ -9,6 +9,7 @@ function add_modal(){
 
 }
 
+
 function copyToClipboard() {
     var copyText = document.getElementById("link").value;
     navigator.clipboard.writeText(copyText).then(() => {

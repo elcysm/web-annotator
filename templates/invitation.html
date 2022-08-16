@@ -89,7 +89,20 @@
 						
 						<span class="focus-input100"></span>
 					</div>
-					
+					<div class="p-t-30 p-b-9">
+						<span class="txt1">
+							Project:
+						</span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
+						<select class="form-control input100 username" id="sel1" name="project">
+							{%for i in range(0, len)%}
+								<option value="{{project[i][0]}}">{{project[i][1]}}</option>
+							{%endfor%}
+						</select>
+						
+						<span class="focus-input100"></span>
+					</div>
 					<div class="p-t-10 p-b-9">
 						<span class="txt1" >
 							Share link:
@@ -100,7 +113,7 @@
 					</div>
 
 					<div class="wrap-input100 validate-input" >
-						<input class="input100" name="link" readonly value="http://127.0.0.1:5000/login/username={{username}}&password={{password}}" />
+						<input id="link" class="input100" name="link" readonly value="http://127.0.0.1:5000/login/username={{username}}&password={{password}}" />
                         <input class="input100 d-none" name="username" value="{{username}}" />
                         <input class="input100 d-none" name="password"  value="{{password}}" />
 						<span class="focus-input100"></span>
@@ -136,6 +149,13 @@
 	</div>
 	
 	<div id="dropDownSelect1"></div>
+	<script>
+		
+		function on_change_select(){
+			$('#link').attr('name').val("http://127.0.0.1:5000/login/" + $('#select').val() + "username={{username}}&password={{password}}")
+			alert("1");
+		}
+	</script>
 
 	{% block scripts %}
 	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
