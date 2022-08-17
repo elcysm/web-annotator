@@ -9,6 +9,7 @@
 	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
 
 	{% block styles %}
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
@@ -45,7 +46,7 @@
 			</ul>
 		</nav>
 
-
+		<h2>{{task}}</h2>
 		<div class="d-flex justify-content-center align-items-center">
 	   
             {% if (success != "") %}
@@ -53,14 +54,20 @@
 					<strong>Success!</strong> {{success}}
 				</div>
             {% endif %}
+			<form method="post">
+				
+				<h2>{{data}}</h2>
+				<select id="choices-multiple-remove-button" multiple name="review_textclass">
+					
+				{%for i in tag%}
+					<option value="{{i}}">{{i}}</option>
+				{%endfor%}
+				</select>
 
-            <h2>{{data}}</h2>
-            <select>
-                
-            {%for i in range(0, lentag)%}
-                <option>{{tag[i]}}</option>
-            {%endfor%}
-            </select>
+				<button class="btn-grad login-button ">
+					Next
+				</button>
+			</form>
 		</div>
 	</div>
 	
@@ -77,6 +84,7 @@
 	<script src="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/countdowntime/countdowntime.js')}}"></script>
 	<script src="{{url_for('.static', filename='main.js')}}"></script>
+	<script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
     {% endblock %}
 	{% endblock %}
 </body>

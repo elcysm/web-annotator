@@ -45,7 +45,7 @@
 			</ul>
 		</nav>
 
-
+		<h2>{{task}}</h2>
 		<div class="d-flex justify-content-center align-items-center">
 	   
             {% if (success != "") %}
@@ -54,10 +54,13 @@
 				</div>
             {% endif %}
 
-			<h1>{{project}}</h1>
-			<h1>{{data}}</h1>
-            {%for i in range(0, 10)%}
-                <h4>{{token[i]}}</h4>
+            {%for i in token%}
+				<h3>{{i}}</h3>
+                <select id="choices-multiple-remove-button">
+					{%for t in tag%}
+					<option value="{{t}}">{{t}}</option>
+					{%endfor%}
+				</select>
             {%endfor%}
 		</div>
 	</div>

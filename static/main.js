@@ -9,6 +9,17 @@ function add_modal(){
 
 }
 
+$(document).ready(function(){
+    
+     var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+        removeItemButton: true,
+        // maxItemCount:1,
+        // searchResultLimit:1,
+        // renderChoiceLimit:1
+      }); 
+     
+     
+ });
 
 function copyToClipboard() {
     var copyText = document.getElementById("link").value;

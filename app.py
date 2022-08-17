@@ -106,15 +106,9 @@ def user_index():
                 data = random.choice(data_id)
                 # token = select_token_by_data_id(data)
 
-                task = select_task_by_project_id(project)
-                if task == "textclass":
-                    return redirect(url_for('textclass', project=project, data=data))
-                elif task == "pos":
-                    return redirect(url_for('pos', project = project, data = data))
-                elif task == "parsing":
-                    return redirect(url_for('parsing', project = project, data = data))
-                elif task == "ner":
-                    return redirect(url_for('ner', project = project, data = data))
+                # task = select_task_by_project_id(project)
+                return redirect(url_for('review', project=project, data=data))
+                
                 
                 # return render_template('user.html',data= data, token = token, project = project, result=username, success="Đăng nhập thành công")
             else:
@@ -124,35 +118,54 @@ def user_index():
 
 # review textclass ------------------------------------------------
 @app.route('/user/review', methods=['GET'])
-def textclass():
+def review():
     project = request.args['project']
     data_id = request.args['data']
-    data = select_sent_by_id(data_id)
-    tag = select_tag_textclass_by_project_id(project)
-    lentag = len(tag)
-    return render_template('textclass.html', project=project, data=data, tag=tag, lentag=lentag)
+    task = select_task_by_project_id(project)
 
-# review pos ------------------------------------------------
-@app.route('/user/review', methods=['GET'])
-def pos():
+    if task == "textclass":
+        data = select_sent_by_id(data_id)
+        tag = select_tag_textclass_by_project_id(project)
+        return render_template('textclass.html', project=project, data=data, tag=tag, task=task)
+    if task == "pos":
+        tag = select_tag_pos_by_project_id(project)
+        token = select_token_by_data_id(data_id)
+        lentoken = len(token)
+        return render_template('pos.html', project=project, tag=tag, token=token, task=task, lentoken=lentoken)
+    if task == "parsing":
+        tag = select_tag_parsing_by_project_id(project)
+        token = select_token_by_data_id(data_id)
+        return render_template('parsing.html', project=project, tag=tag, token=token, task=task)
+    if task == "ner":
+        tag = select_tag_ner_by_project_id(project)
+        token = select_token_by_data_id(data_id)
+        return render_template('ner.html', project=project, tag=tag, token=token, task=task)
+    
+    # return render_template('textclass.html', project=project, data=data, tag=tag, lentag=lentag)
+    
+# review textclass ------------------------------------------------
+@app.route('/user/review', methods=['POST'])
+def textclass_post():
+    username = session['username']
+    data_id = request.args['data']
     project = request.args['project']
-    data = request.args['data']
-    return render_template('pos.html', project=project, data=data)
+    task = select_task_by_project_id(project)
+    if task == "textclass":
+        review_textclass = request.form.getlist('review_textclass')
+        print(review_textclass)
+        for review in review_textclass:
+            insert_text_class(data_id, review, username)
 
-# review ner ------------------------------------------------
-@app.route('/user/review', methods=['GET'])
-def ner():
-    project = request.args['project']
-    data = request.args['data']
-    return render_template('ner.html', project=project, data=data)
-
-# review parsing ------------------------------------------------
-@app.route('/user/review', methods=['GET'])
-def parsing():
-    project = request.args['project']
-    data = request.args['data']
-    return render_template('parsing.html', project=project, data=data)
-
+        project = request.args['project']
+        data_id = select_data_id_by_project_id(project)
+        data = random.choice(data_id)
+        return redirect(url_for('textclass', project=project, data=data))
+    # if task == "pos":
+    #     #
+    # if task == "parsing":
+    #     #
+    # if task == "ner":
+    #     #
 
 # admin login   ----------------------------------------------------------------
 @app.route('/admin')
@@ -357,7 +370,6 @@ def post_new_project():
                     for i, row in data.iterrows():
                         
                         insert_sentences(row[4], project_id)
-                        insert_tokenize(row[4])
                         
                 return redirect(url_for('admin_index'))
 
@@ -550,6 +562,39 @@ def select_tag_textclass_by_project_id(project_id):
         result.append(id[0])
     return result
 
+# select tag pos by project id  ------------------------------------------------
+def select_tag_pos_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag FROM TagPOS where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
+# select tag ner by project id  ------------------------------------------------
+def select_tag_ner_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag FROM TagNER where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
+# select tag parsing by project id  ------------------------------------------------
+def select_tag_parsing_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag FROM TagParsing where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
 # ------------------------------- INSERT ---------------------------------------
 
 # insert annotator  ------------------------------------------------------------
@@ -588,19 +633,19 @@ def insert_sentences(data, project_id):
     cursor = connection.cursor()
 
     for sent in sent_list:
-        query = "INSERT INTO Data (sent, project_id) VALUES ('{text}', '{proj_id}')".format(text = sent, proj_id = project_id)
+        id = generate_code()
+        query = "INSERT INTO Data (id, sent, project_id) VALUES ('{id}', '{text}', '{proj_id}')".format(id = id, text = sent, proj_id = project_id)
         cursor.execute(query)
         connection.commit()
 
-        insert_tokenize(sent)
+        insert_tokenize(sent, id)
 
 # insert tokenize to database   ------------------------------------------------
-def insert_tokenize(sent):
+def insert_tokenize(sent, data_id):
     word_list = sentence_to_tokens(sent)
     
     connection = connect_to_db()
     cursor = connection.cursor()
-    data_id = select_data_id(sent)[0]
     for word in word_list:
         query = "INSERT INTO Tokenize (data_id, word) VALUES ('{dt_id}','{token}')".format(dt_id = data_id, token = word)
         cursor.execute(query)
@@ -694,7 +739,7 @@ def read_file(filePath):
     # CVS Column Names
     # col_names = ['first_name','last_name','address', 'street', 'state' , 'zip']
     # Use Pandas to parse the CSV file
-    csvData = pd.read_csv(filePath, header=None)
+    csvData = pd.read_csv(filePath, header=None, encoding='utf8')
     # Loop through the Rows
     return csvData
     # for i,row in csvData.iterrows():
