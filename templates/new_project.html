@@ -9,8 +9,9 @@
 	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
 
 	{% block styles %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/Linearicons-Free-v1.0.0/icon-font.min.css')}}" >
@@ -26,38 +27,57 @@
 </head>
 <body>
 	{% block content %}
-	<div class="" >
-		<nav id="navbar-example2" class="navbar navbar-light bg-light fixed-top px-3" id="navbarSupportedContent">
-			<a class="navbar-brand font-weight-bold " href="#">Phòng 302</a>
-			<ul class="nav nav-pills" >
-			  <li class="nav-item ">
-				<a class="nav-link" href="/admin"><i class="fa fa-tachometer"></i>Trang chủ</a>
-			  </li>
-			  <li class="nav-item">
-				<a class="nav-link" href="/admin/invitation"><i class="fa fa-users"></i>Collaborator</a>
-			  </li>
-			  <li class="nav-item">
-				<a class="nav-link" href="/add_student"><i class="fa fa-cloud-upload"></i>Upload Data</a>
-			  </li>
-			  <li class="nav-item">
-				<a class="nav-link" href="javascript:void(0);"><i class="fa fa-money"></i>Tổng kết thu chi</a>
-			  </li>
-			  <li class="nav-item dropdown">
-				<a class="btn dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown"  aria-expanded="false">
-					<img class="my-profile-picture" style="object-fit: cover;" src="https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png">
-					<span class="text-primary font-weight-bold"> {{user_admin}}</span> 
-				</a>
-				<ul class="dropdown-menu">
-					<li>  <a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a></li> 
-					<li><hr class="dropdown-divider"></li>
-					<li>  <a  href="/logout"> <button class="dropdown-item" ><i class="fa fa-sign-out  m-r-15"></i>Logout</button></a></li>
+	<div class="container-bottom" >
+		<nav class="mb-4 navbar navbar-expand-lg bg-light bg-unique ">
+			<a class="navbar-brand font-weight-bold" href="#">Web based Annotator</a>
+			<button class="btn navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-3" aria-controls="navbarSupportedContent-3" aria-expanded="false" aria-label="Toggle navigation">
+				<i class="fa fa-list"></i>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent-3">
+				<!-- <ul class="navbar-nav mr-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="#">Lifestyle <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">Beauty</a>
+					</li>
+					<li class="nav-item dropdown active">
+						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tutorials 
+							</a>
+						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink-3">
+							<a class="dropdown-item" href="#">Make-up</a>
+							<a class="dropdown-item" href="#">Nails</a>
+							<a class="dropdown-item" href="#">DIY</a>
+						</div>
+					</li>
+				</ul> -->
+				<ul class="navbar-nav ml-auto nav-flex-icons nav-pills">
+					<li class="nav-item">
+						<a class="nav-link" href="/admin"><i class="fa fa-tachometer"></i>Trang chủ</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/admin/invitation"><i class="fa fa-users"></i>Collaborator</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/add_student"><i class="fa fa-cloud-upload"></i>Upload Data</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<img class="my-profile-picture" style="object-fit: cover;" src="https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png">
+							<span class="text-primary font-weight-bold"> {{user_admin}}</span> 
+						</a>
+						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
+							<a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
+							<hr class="dropdown-divider">
+							<a  href="/logout"> <button class="dropdown-item" ><i class="fa fa-sign-out  m-r-15"></i>Logout</button></a>
+						</div>
+					</li>
 				</ul>
-			  </li>
-			</ul>
+			</div>
 		</nav>
 
 
-		<div class="container-center">
+		<div class="">
 	   
             <div class="content">
                 <!--content inner-->

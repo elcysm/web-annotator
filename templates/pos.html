@@ -24,10 +24,10 @@
 
 	{% endblock %}
 </head>
-<body>
+<body >
 	{% block content %}
-	<div class="container-center"> 
-		<nav id="navbar-example2" class="navbar navbar-light bg-light fixed-top px-3" id="navbarSupportedContent">
+	<div class="container-bottom"> 
+		<nav id="navbar-example2" class="navbar navbar-light bg-light px-3" id="navbarSupportedContent">
 			<a class="navbar-brand font-weight-bold " href="#">Web based Annotator</a>
 			<ul class="nav nav-pills" >
 			  
@@ -45,23 +45,37 @@
 			</ul>
 		</nav>
 
-		<h2>{{task}}</h2>
-		<div class="d-flex justify-content-center align-items-center">
-	   
-            {% if (success != "") %}
+		
+		<div class="container text-center">
+			<h2>{{task}}</h2>
+            {% if (success) %}
 				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
 					<strong>Success!</strong> {{success}}
 				</div>
             {% endif %}
-
-            {%for i in token%}
-				<h3>{{i}}</h3>
-                <select id="choices-multiple-remove-button">
+			<form method="post">
+			<div class="card d-block">
+				<div class="card-header" >
 					{%for t in tag%}
-					<option value="{{t}}">{{t}}</option>
+					<span onclick="get_tag(this)" class="postag_name btn">{{t}}</span>
 					{%endfor%}
-				</select>
-            {%endfor%}
+				</div>
+
+				<div class="card-body">
+					{%for i in token%}
+					<button onclick="span(this)" class="btn text-token mt-2" type="button">{{i}}
+					<i class="close-button d-none"></i>
+					<input class="btn review d-none" name='token' value="{{i}}"></input> 
+					<input id="postag" class="btn d-none" name='tag' value=""></input> 
+					<span id="pos" class="badge badge-success"></span>
+					<span class="focus-input100"></span>
+					</button>
+					
+					{%endfor%}
+				</div>
+			</div>
+			<button class="btn btn-grad ml-auto js-btn-next" type="submit" title="Next">CREATE</button>
+			</form>
 		</div>
 	</div>
 	

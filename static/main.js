@@ -1,25 +1,62 @@
 function keepData(){
-    // $("#name").val = document.getElementsByName("#username").value = "hello"
-    // document.getElementsByClassName(".username").innerHTML = "Hello";
     $(".username").val("Hiii");
 }
 function add_modal(){
-
     $('#addModal').modal('toggle'); 
+}
 
+
+
+var pos_tag_name = '';
+
+$(document).ready(function(){
+  document.getElementsByClassName('postag_name')[0].classList.add('btn-grad');
+  pos_tag_name = document.getElementsByClassName('postag_name')[0].innerHTML;
+});
+
+function get_tag(btn){
+  pos_tag_name = btn.innerHTML;
+  list_tag = document.getElementsByClassName('postag_name');
+  for(var i=0; i<list_tag.length; i++) {
+    list_tag[i].classList.remove('btn-grad')
+  }
+  btn.classList.add('btn-grad');
+}
+
+function span(btn){
+  
+  if (btn.querySelector('i').classList.value == 'close-button d-none'){
+    btn.classList.add('btn-outline-success');
+    btn.querySelector('span').innerHTML = pos_tag_name;
+    btn.querySelector('input[id="postag"]').value = pos_tag_name;
+    btn.querySelector('i').classList.remove('d-none'); 
+
+  }
+  else{
+    btn.querySelector('i').classList.add('d-none');
+    btn.classList.remove('btn-outline-success');
+    btn.querySelector('span').innerHTML = '';
+    btn.querySelector('input[id="postag"]').value = '';
+  }
+
+ 
 }
 
 $(document).ready(function(){
-    
      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
         removeItemButton: true,
         // maxItemCount:1,
         // searchResultLimit:1,
         // renderChoiceLimit:1
       }); 
-     
-     
  });
+
+ $(document).ready(function() {
+  $('#example').DataTable( {
+      "pageLength": 5,
+      dom: '<"top mt-2 mb-2"i>t<"container-center mb-0 "p>',
+  } );
+} );
 
 function copyToClipboard() {
     var copyText = document.getElementById("link").value;
@@ -133,11 +170,9 @@ function develop(){
 
 
 var current = location.pathname;
-$('.nav .nav-link').each(function(){
+$('.navbar-nav .nav-link').each(function(){
     var $this = $(this);
-    // alert($this.attr('href'))
     if ($this.attr('href') === current){
-        // alert("fds")
         $this.addClass('active');
     }
 })
@@ -316,3 +351,4 @@ const DOMstrings = {
   
   const newAnimationType = 'slideHorz';
   setAnimationType(newAnimationType);
+

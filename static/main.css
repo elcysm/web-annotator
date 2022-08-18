@@ -34,7 +34,9 @@
    cursor: pointer;
  }
 body, html {
+  margin: 0px;
 	height: 100%;
+  position:relative; 
   font-family: "Poppins", sans-serif;
   background: -webkit-gradient(linear, left bottom, left top, from(#ffffff), to(#a18cd1));
   background: -webkit-linear-gradient(bottom, #ffffff 0%, #ddd0fd 100%);
@@ -50,6 +52,17 @@ body, html {
   align-items: center;
 }
 
+.container-bottom{
+  height: 100%;
+  position: relative; 
+  display: block;
+  justify-content: center;
+  align-items: center;
+}
+.invite{
+  border:0px;
+   outline:0px;
+}
 /*---------------------------------------------*/
 a {
 	font-size: 14px;
@@ -207,7 +220,6 @@ iframe {
 .btn-google {
   font-size: 18px;
   line-height: 1.2;
-
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -438,6 +450,10 @@ iframe {
 .login100-form-btn:hover:before {
   opacity: 1;
 }
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+  color: #fff;
+  background-color:rgba(170, 170, 170, 0.152);
+}
 
 
 /*------------------------------------------------------------------
@@ -604,7 +620,7 @@ iframe {
   background-color: rgba(238, 238, 238, 0.479);
 }
 
-.nav .nav-link .active .show{
+.navbar-nav .nav-link .active .show{
   background-color: #fff;
 }
 
@@ -653,6 +669,16 @@ iframe {
   position: fixed;
   top: 0;
   width: 100%;
+}
+
+.close-button{
+  position: absolute;
+  top: -10px;
+  left: -10px;
+}
+
+.text-token{
+  position: relative;
 }
 .my-profile-picture{
   border-radius: 100%;
