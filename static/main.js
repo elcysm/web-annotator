@@ -24,13 +24,11 @@ function get_tag(btn){
 }
 
 function span(btn){
-  
   if (btn.querySelector('i').classList.value == 'close-button d-none'){
     btn.classList.add('btn-outline-success');
     btn.querySelector('span').innerHTML = pos_tag_name;
     btn.querySelector('input[id="postag"]').value = pos_tag_name;
     btn.querySelector('i').classList.remove('d-none'); 
-
   }
   else{
     btn.querySelector('i').classList.add('d-none');
@@ -38,9 +36,23 @@ function span(btn){
     btn.querySelector('span').innerHTML = '';
     btn.querySelector('input[id="postag"]').value = '';
   }
-
- 
 }
+
+
+function span_textclass(btn){
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none'){
+    btn.classList.add('active');
+    text_tag_name =  btn.querySelector('input[id="tag"]').value
+    btn.querySelector('input[id="texttag"]').value = text_tag_name;
+    btn.querySelector('i').classList.remove('d-none'); 
+  }
+  else{
+    btn.querySelector('i').classList.add('d-none');
+    btn.classList.remove('active');
+    btn.querySelector('input[id="texttag"]').value = '';
+  }
+}
+
 
 $(document).ready(function(){
      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {

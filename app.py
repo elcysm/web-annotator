@@ -17,8 +17,8 @@ app.secret_key = "lethanhdat"
 dirname = os.getcwd()
 
 ##########################--- DATA OWNER CUSTOM ---#############################
-MAIL_USERNAME = 'webbasedannotator@gmail.com'
-MAIL_PASSWORD = 'eblqqukvfjguceyp'
+MAIL_USERNAME = 'nnktcbkr@gmail.com'
+MAIL_PASSWORD = 'pcpteiclywtbsnqa'
 ROOT_DOMAIN = 'http://127.0.0.1:5000'
 EMAIL_SUBJECT = 'Thư mời đánh giá'
 LIFETIME_SESSION = 5
@@ -137,8 +137,12 @@ def review():
                             dt = random.choice(temp)
                             if dt not in datas:
                                 datas.append(dt)
+                        
+                        sent = []
+                        for dt in datas:
+                            sent.append(select_sent_by_id(dt))
 
-                        return render_template('textclass.html', project=project, datas=datas, number=number, tag=tag, task=task)
+                        return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task)
                     if task == "pos":
                         tag = select_tag_pos_by_project_id(project)
                         token = select_token_by_data_id(data_id)
@@ -163,28 +167,33 @@ def review():
 @app.route('/user/review', methods=['POST'])
 def textclass_post():
     username = session['username']
-    data_id = request.args['data']
+    # data_id = request.args['data']
     project = request.args['project']
     task = select_task_by_project_id(project)
     
     if task == "textclass":
-        review_textclass = request.form.getlist('review_textclass')
-        print(review_textclass)
-        for review in review_textclass:
-            insert_text_class(data_id, review, username)
+        number = int(request.form['number'])
 
-        project = request.args['project']
-        data_id = select_data_id_by_project_id(project)
-        data = random.choice(data_id)
-        return redirect(url_for('textclass', project=project, data=data))
+        for i in range(0, number):
+            review_textclass = request.form["id_{id}".format(id=str(i))]
+            review_textclass_tag = request.form.getlist("tag_{id}".format(id=str(i)))
+
+            for tag in review_textclass_tag:
+                if tag != '':
+                    insert_text_class(review_textclass, tag, username)
+            
+        return render_template('email_verify.html')
 
     if task == "pos":
         review_token_pos = request.form.getlist('token')
         review_tag_pos = request.form.getlist('tag')
+
         print(review_token_pos, review_tag_pos)
         
         for review in review_token_pos:
             insert_pos(data_id, review, username)
+
+
 
         # project = request.args['project']
         # data_id = select_data_id_by_project_id(project)
