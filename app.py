@@ -178,20 +178,15 @@ def textclass_post():
         review_token_pos = request.form.getlist('token')
         review_tag_pos = request.form.getlist('tag')
         print(review_token_pos, review_tag_pos)
-        return redirect(url_for('review'))
-        # for review in review_textclass:
-        #     insert_text_class(data_id, review, username)
+        
+        for review in review_token_pos:
+            insert_pos(data_id, review, username)
 
         # project = request.args['project']
         # data_id = select_data_id_by_project_id(project)
         # data = random.choice(data_id)
         # return redirect(url_for('pos', project=project, data=data))
-    # if task == "pos":
-    #     #
-    # if task == "parsing":
-    #     #
-    # if task == "ner":
-    #     #
+
 
 # admin login   ----------------------------------------------------------------
 @app.route('/admin')
@@ -301,9 +296,7 @@ def logout():
 @app.route('/admin/invitation', methods=['GET'])
 def get_invitation():
     if 'username' not in session:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
     else:
         user_admin = session['username']
         user_role = select_role(user_admin)
@@ -758,26 +751,26 @@ def insert_label(task, label, proj_id):
 # ### INSERT REVIEW ###
 
 # insert review NER ------------------------------------------------------------
-def insert_ner(token_id, tag_ner, username):
+def insert_ner(data_id, token, tag_ner, username):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO NER (token_id, tag, username) VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_ner, user = username)
+    query = "INSERT INTO NER (data_id, token, tag, username) VALUES ('{dt_id}', '{tk}', '{tag}', '{user}')".format(dt_id = data_id, tk = token, tag = tag_ner, user = username)
     cursor.execute(query)
     connection.commit()
 
 # insert review POS ------------------------------------------------------------
-def insert_pos(token_id, tag_pos, username):
+def insert_pos(data_id, token, tag_pos, username):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO POS (token_id, tag, username) VALUES ('{tk_id}', '{tag}', '{user}')".format(tk_id = token_id, tag = tag_pos, user = username)
+    query = "INSERT INTO POS (data_id, token, tag, username) VALUES ('{dt_id}', '{tk}', '{tag}', '{user}')".format(dt_id = data_id, tk = token, tag = tag_pos, user = username)
     cursor.execute(query)
     connection.commit()
     
 # insert review Parsing --------------------------------------------------------
-def insert_parsing(token_id_1, token_id_2, tag_parsing, username):
+def insert_parsing(data_id, token_1, token_2, tag_parsing, username):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "INSERT INTO Parsing (token_id_1, token_id_2, tag, username) VALUES ('{tk_id_1}', '{tk_id_2}', '{tag}', '{user}')".format(tk_id_1 = token_id_1, tk_id_2 = token_id_2, tag = tag_parsing, user = username)
+    query = "INSERT INTO Parsing (data_id, token_1, token_2, tag, username) VALUES ('{dt_id}', '{tk_1}', '{tk_2}', '{tag}', '{user}')".format(dt_id = data_id, tk_1 = token_1, tk_2 = token_2, tag = tag_parsing, user = username)
     cursor.execute(query)
     connection.commit()
 
