@@ -114,9 +114,26 @@
 						</span>
 					</div>
 					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
-						<select class="input100 invite" id="sel1" name="project">
-							{%for i in range(0, len)%}
+						<!-- <select class="input100 invite" id="sel1" name="project"> -->
+							<!-- {%for i in range(0, len)%}
+								{%if project[i][0] == project_id%} -->
+						<input class="input100 username" readonly type="text" value="{{project_id}}" name="project"></input>
+								<!-- {%else%}
 								<option value="{{project[i][0]}}">{{project[i][1]}}</option>
+								{%endif%}
+							{%endfor%} -->
+						<!-- </select> -->
+						<span class="focus-input100"></span>
+					</div>
+					<div class="p-t-30 p-b-9">
+						<span class="txt1">
+							Numbers of review per person:
+						</span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
+						<select class="input100 invite" id="sel1" name="number">
+							{%for i in range(1, number//5 +1)%}
+								<option value="{{i*5}}">{{i*5}}</option>
 							{%endfor%}
 						</select>
 						<span class="focus-input100"></span>
@@ -159,13 +176,6 @@
 	</div>
 	
 	<div id="dropDownSelect1"></div>
-	<script>
-		
-		function on_change_select(){
-			$('#link').attr('name').val("http://127.0.0.1:5000/login/" + $('#select').val() + "username={{username}}&password={{password}}")
-			alert("1");
-		}
-	</script>
 
 	{% block scripts %}
 	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>

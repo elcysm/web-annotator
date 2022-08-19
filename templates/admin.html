@@ -118,7 +118,7 @@
 									<td><span class="badge badge-light">{{i[3]}}</span></td>
                                     <td><a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a> 
                                         <a onclick="SomeDeleteRowFunction(this);" href="#"><button type="button" class="btn btn-grad btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
-										<a href="/admin/invitation"><button type="button" class="btn btn-grad btn-sm btn-square"><i class="fa fa-download"></i></button></a>
+										<a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-grad btn-sm btn-square"><i class="fa fa-download"></i></button></a>
                                     </td>
                                 </tr>
 								{% endfor %}

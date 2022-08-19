@@ -102,11 +102,9 @@ def user_index():
         if user_role!= None:
             if check_role(user_role[0])==False:
                 project = session['project']
-                data_id = select_data_id_by_project_id(project)
-                data = random.choice(data_id)
                 # token = select_token_by_data_id(data)
                 # task = select_task_by_project_id(project)
-                return redirect(url_for('review', project=project, data=data)) 
+                return redirect(url_for('review', project=project)) 
                 # return render_template('user.html',data= data, token = token, project = project, result=username, success="Đăng nhập thành công")
             else:
                 return redirect(url_for('admin_index'))
@@ -123,13 +121,24 @@ def review():
             if check_role(user_role[0])==False:
                 try: 
                     project = request.args['project']
-                    data_id = request.args['data']
+                    number = int(session['number'])
+                except:
+                    project = session['project']
+                    number = 5
+                finally:
                     task = select_task_by_project_id(project)
-
+                    
                     if task == "textclass":
-                        data = select_sent_by_id(data_id)
+                        # data = select_sent_by_id(data_id)
                         tag = select_tag_textclass_by_project_id(project)
-                        return render_template('textclass.html', project=project, data=data, tag=tag, task=task)
+                        datas = []
+                        temp = select_data_id_by_project_id(project)
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+
+                        return render_template('textclass.html', project=project, datas=datas, number=number, tag=tag, task=task)
                     if task == "pos":
                         tag = select_tag_pos_by_project_id(project)
                         token = select_token_by_data_id(data_id)
@@ -143,11 +152,6 @@ def review():
                         tag = select_tag_ner_by_project_id(project)
                         token = select_token_by_data_id(data_id)
                         return render_template('ner.html', project=project, tag=tag, token=token, task=task)
-                except:
-                    project = session['project']
-                    data_id = select_data_id_by_project_id(project)
-                    data = random.choice(data_id)
-                    return redirect(url_for('review', project=project, data=data)) 
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -162,7 +166,7 @@ def textclass_post():
     data_id = request.args['data']
     project = request.args['project']
     task = select_task_by_project_id(project)
-
+    
     if task == "textclass":
         review_textclass = request.form.getlist('review_textclass')
         print(review_textclass)
@@ -222,8 +226,8 @@ def admin_index():
 #             return redirect(url_for('get_register')) 
 
 # login by link from data owner ------------------------------------------------
-@app.route('/login/project=<project>&username=<username>&password=<password>', methods=['GET'])
-def get_api_login_1(project, username, password):
+@app.route('/login/project=<project>&number=<number>&username=<username>&password=<password>', methods=['GET'])
+def get_api_login_1(project, number, username, password):
     if 'username' not in session:
          return render_template('login.html', username=username, password=password)
     else:
@@ -231,7 +235,7 @@ def get_api_login_1(project, username, password):
         if username_session != username:
             session.pop('username', None)
             session.pop('project', None)
-            return redirect(url_for('get_api_login_1', project=project, username=username, password=password))
+            return redirect(url_for('get_api_login_1', project=project, number=number, username=username, password=password))
         else:
             user_role = select_role(username_session)
             if user_role != None:
@@ -261,8 +265,8 @@ def get_api_login_1(project, username, password):
 #     else:
 #         return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
 
-@app.route('/login/project=<project>&username=<username>&password=<password>', methods=['POST'])
-def post_api_login_1(project, username, password):
+@app.route('/login/project=<project>&number=<number>&username=<username>&password=<password>', methods=['POST'])
+def post_api_login_1(project, number, username, password):
 
     usernameform = request.form['username']
     passwordform = request.form['password']
@@ -271,11 +275,12 @@ def post_api_login_1(project, username, password):
         result = select_role_by_username_password(username, password)
         if result != None:
             session['username'] = username
-            session['project'] = project
             user_role = result[1]
             if check_role(user_role)==True:
                 return redirect(url_for('admin_index'))
             else:
+                session['project'] = project
+                session['number'] = number
                 return redirect(url_for('user_index', project = project))
         else: 
             return redirect(url_for('login',error="Sai tài khoản hoặc mật khẩu"))
@@ -305,11 +310,17 @@ def get_invitation():
                 username = generate_username()
                 password = generate_password()
                 project = select_project()
+                project_id = request.args['project']
+
+                number = select_number_data_of_project(project_id)
+
                 return render_template('invitation.html',
                     username=username,
                     user_admin=user_admin,
                     password=password,
                     project=project,
+                    project_id=project_id,
+                    number=number,
                     len=len(project))
             else:
                 return render_template('503.html')
@@ -321,7 +332,8 @@ def post_invitation():
     username = request.form['username']
     email = request.form['email']
     password = request.form['password']
-    project_id = request.form.get('project')
+    project_id = request.form['project']
+    number = request.form.get('number')
 
     insert_annotator(username, email, password)
 
@@ -330,7 +342,7 @@ def post_invitation():
         sender = MAIL_USERNAME, 
         recipients = [email],
         )
-    link = ROOT_DOMAIN+'/login/project={project_id}&username={username}&password={password}'.format(project_id=project_id, username=username, password=password)
+    link = ROOT_DOMAIN+'/login/project={project_id}&number={number}&username={username}&password={password}'.format(project_id=project_id, number=number, username=username, password=password)
     msg.html = render_template('welcome.html', username=username, password=password, link=link, project_id = project_id)
     mail.send(msg)
     
@@ -642,6 +654,17 @@ def select_tag_parsing_by_project_id(project_id):
     for id in cursor:
         result.append(id[0])
     return result
+
+# select number of data in project id   --------------------------------------------
+def select_number_data_of_project(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT id FROM Data where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    count = 0
+    for i in cursor:
+        count += 1
+    return count
 
 # ------------------------------- INSERT ---------------------------------------
 

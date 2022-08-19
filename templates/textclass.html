@@ -47,16 +47,18 @@
 		</nav>
 
 		<h2>{{task}}</h2>
-		<div class="d-flex justify-content-center align-items-center">
+		<!-- <div class="d-flex justify-content-center align-items-center"> -->
 	   
-            {% if (success != "") %}
+            <!-- {% if (success != "") %}
 				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
 					<strong>Success!</strong> {{success}}
 				</div>
             {% endif %}
 			<form method="post">
 				
-				<h2>{{data}}</h2>
+				{%for i in range(0, number)%}
+					<h4>{{datas[i]}}</h4>
+				{%endfor%}
 				<select id="choices-multiple-remove-button" multiple name="review_textclass">
 					
 				{%for i in tag%}
@@ -67,8 +69,40 @@
 				<button class="btn-grad login-button ">
 					Next
 				</button>
+			</form> -->
+
+			<form class="multisteps-form__form" method="POST" enctype="multipart/form-data">
+				<!--single form panel-->
+				<div class="multisteps-form__panel shadow p-4 rounded bg-white js-active" data-animation="scaleIn">
+				  <h3 class="multisteps-form__title">Project Information</h3>
+				  <div class="multisteps-form__content">
+					<div class="form-row mt-4">
+					  <div class="col-12 col-sm-6">
+						<label class="">Project Name:</label>
+						<input class="multisteps-form__input form-control" type="text" placeholder="Enter your project name..." name="project_name"/>
+					  </div>
+					  <div class="col-12 col-sm-6 mt-4 mt-sm-0">
+						<label class="">Languages:</label>
+						<select class="multisteps-form__select form-control" name="language">
+							<option selected="selected" value="eng">English</option>
+							<option value="vie">Vietnamese</option>
+						</select>
+					  </div>
+					</div>
+	
+					<div class="form-row mt-4">
+					  <div class="col-12 col-sm-12">
+						<label class="">Upload file:</label>
+						<input class="multisteps-form__input form-control" type="file" placeholder="Password" name="file"/>
+					  </div>
+					</div>
+					<div class="button-row d-flex mt-4">
+					  <button class="btn btn-grad ml-auto js-btn-next" type="button" title="Next">Next</button>
+					</div>
+				  </div>
+				</div>
 			</form>
-		</div>
+		<!-- </div> -->
 	</div>
 	
 
