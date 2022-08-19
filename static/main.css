@@ -162,8 +162,8 @@ iframe {
 /*//////////////////////////////////////////////////////////////////
 [ Utility ]*/
 .txt1 {
+  font-weight: normal;
   font-size: 16px;
-  color: #555555;
   line-height: 1.5;
 }
 
@@ -178,12 +178,10 @@ iframe {
 /*//////////////////////////////////////////////////////////////////
 [ login ]*/
 
-
-
 .wrap-login100 {
-  width: 550px;
+  width: 500px;
   background: #fff;
-  border-radius: 10px;
+  border-radius: 15px;
   position: relative;
   -webkit-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
   -moz-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
@@ -198,12 +196,18 @@ iframe {
   width: 100%;
 }
 
+
 .login100-form-title {
   width: 100%;
+  font-weight: bold;
+  font-size: 30px;
   display: block;
-  font-size: 39px;
-  color: #555555;
-  line-height: 1.2;
+  text-align: center;
+}
+
+.form-title {
+  width: 100%;
+  display: block;
   text-align: center;
 }
 
@@ -213,7 +217,10 @@ iframe {
   line-height: 1.2;
   text-align: center;
 }
-
+input::placeholder {
+  color: #999999;
+  font-size: 16px;
+}
 /*------------------------------------------------------------------
 [ Button sign in with ]*/
 .btn-face,
@@ -727,8 +734,9 @@ iframe {
 
 @media (max-width: 576px) {
   .wrap-login100 {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 40px;
+    padding-right: 40px;
+    width: 430px;
   }
 
   .btn-face,
