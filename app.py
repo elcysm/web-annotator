@@ -178,20 +178,15 @@ def textclass_post():
         review_token_pos = request.form.getlist('token')
         review_tag_pos = request.form.getlist('tag')
         print(review_token_pos, review_tag_pos)
-        return redirect(url_for('review'))
-        # for review in review_textclass:
-        #     insert_text_class(data_id, review, username)
+        
+        for review in review_token_pos:
+            insert_pos(data_id, review, username)
 
         # project = request.args['project']
         # data_id = select_data_id_by_project_id(project)
         # data = random.choice(data_id)
         # return redirect(url_for('pos', project=project, data=data))
-    # if task == "pos":
-    #     #
-    # if task == "parsing":
-    #     #
-    # if task == "ner":
-    #     #
+
 
 # admin login   ----------------------------------------------------------------
 @app.route('/admin')
@@ -301,9 +296,7 @@ def logout():
 @app.route('/admin/invitation', methods=['GET'])
 def get_invitation():
     if 'username' not in session:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
     else:
         user_admin = session['username']
         user_role = select_role(user_admin)
