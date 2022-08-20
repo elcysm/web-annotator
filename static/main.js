@@ -5,6 +5,17 @@ function add_modal(){
     $('#addModal').modal('toggle'); 
 }
 
+function get_project(){
+  var projects = document.getElementById('project').value;
+  project = document.getElementById('project_value').value;
+  if (projects.includes(project)){
+    document.querySelector('button[title="Next"]').disabled = true;
+    document.querySelector('button[title="Next"]').classList.add('no-drop');
+  }
+  else{
+    document.querySelector('button[title="Next"]').disabled = false;
+  }
+}
 
 
 var pos_tag_name = '';
@@ -61,6 +72,8 @@ $(document).ready(function(){
         // searchResultLimit:1,
         // renderChoiceLimit:1
       }); 
+
+      
  });
 
  $(document).ready(function() {

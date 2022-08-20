@@ -104,15 +104,16 @@
                       <!--form panels-->
                       <div class="row">
                         <div class="col-12 col-lg-8 m-auto">
+                          <input class="d-none" id="project" value="{{projects}}">
                           <form class="multisteps-form__form" method="POST" enctype="multipart/form-data">
                             <!--single form panel-->
                             <div class="multisteps-form__panel shadow p-4 rounded bg-white js-active" data-animation="scaleIn">
                               <h3 class="multisteps-form__title">Project Information</h3>
                               <div class="multisteps-form__content">
                                 <div class="form-row mt-4">
-                                  <div class="col-12 col-sm-6">
+                                  <div class="col-12 col-sm-6" >
                                     <label class="">Project Name:</label>
-                                    <input class="multisteps-form__input form-control" type="text" placeholder="Enter your project name..." name="project_name"/>
+                                    <input id="project_value" class="multisteps-form__input form-control" type="text" placeholder="Enter your project name..." name="project_name" onmousemove="get_project()"/>
                                   </div>
                                   <div class="col-12 col-sm-6 mt-4 mt-sm-0">
                                     <label class="">Languages:</label>

@@ -469,7 +469,7 @@ input::placeholder {
 .validate-input {
   position: relative;
 }
-
+.no-drop {cursor: no-drop;}
 .alert-validate::before {
   content: attr(data-validate);
   position: absolute;
@@ -810,10 +810,6 @@ background-size: 50% 50%;
 
 }
 
-.content {
-  width: 95%;
-  margin-top: 70px;
-}
 
 .content__title {
   margin-top: 40px;

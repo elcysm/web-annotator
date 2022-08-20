@@ -33,23 +33,6 @@
 				<i class="fa fa-list"></i>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent-3">
-				<!-- <ul class="navbar-nav mr-auto">
-					<li class="nav-item">
-						<a class="nav-link" href="#">Lifestyle <span class="sr-only">(current)</span></a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#">Beauty</a>
-					</li>
-					<li class="nav-item dropdown active">
-						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tutorials 
-							</a>
-						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink-3">
-							<a class="dropdown-item" href="#">Make-up</a>
-							<a class="dropdown-item" href="#">Nails</a>
-							<a class="dropdown-item" href="#">DIY</a>
-						</div>
-					</li>
-				</ul> -->
 				<ul class="navbar-nav ml-auto nav-flex-icons nav-pills">
 					<li class="nav-item">
 						<a class="nav-link" href="/admin"><i class="fa fa-tachometer"></i>Trang chủ</a>
@@ -76,13 +59,8 @@
 		</nav>
 
 		
-		<div class="container text-center">
+		<!-- <div class="container text-center">
 			<h2>{{task}}</h2>
-            {% if (success) %}
-				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
-					<strong>Success!</strong> {{success}}
-				</div>
-            {% endif %}
 			<form method="post">
 			<div class="card d-block">
 				<div class="card-header" >
@@ -92,7 +70,7 @@
 				</div>
 
 				<div class="card-body">
-					{%for i in token%}
+					{%for i in tokens%}
 					<button onclick="span(this)" class="btn text-token mt-2" type="button">{{i}}
 					<i class="close-button d-none"></i>
 					<input class="btn review d-none" name='token' value="{{i}}"></input> 
@@ -105,6 +83,135 @@
 			</div>
 			<button class="btn btn-grad ml-auto js-btn-next" type="submit" title="Next">CREATE</button>
 			</form>
+		</div> -->
+
+
+		<div class="content">
+			<!--content inner-->
+			<div class="content__inner">
+				<div class="container">
+				<!--content title-->
+				<h1 class="text-center">{{task}}</h1>
+				<h2 class="content__title"></h2>
+				</div>
+				
+				<div class="container overflow-hidden">
+				<!--multisteps-form-->
+				<div class="multisteps-form">
+					<!--progress bar-->
+					<div class="row">
+					<div class="col-12 col-lg-12 ml-auto mr-auto mb-4">
+						<div class="multisteps-form__progress">
+						<button class="multisteps-form__progress-btn js-active" type="button" title="User Info">1</button>
+						{%for i in range(2, number+1)%}
+						<button class="multisteps-form__progress-btn" type="button" title="User Info">{{i}}</button>
+						{%endfor%}
+						</div>
+					</div>
+					</div>
+					<!--form panels-->
+					
+					<div class="row">
+					<div class="col-12 col-lg-12 m-auto">
+						<div class="card-header text-center bg-light">
+							{%for t in tag%}
+							<span onclick="get_tag(this)" class="postag_name btn border border-success">{{t}}</span>
+							{%endfor%}
+						</div>
+						<form class="multisteps-form__form" method="POST" enctype="multipart/form-data">
+						<!--single form panel-->
+						<input class="d-none" name='number' value="{{number}}"></input> 
+						<div class="multisteps-form__panel shadow  rounded bg-white js-active card" data-animation="scaleIn">
+							<!-- <h3 class="multisteps-form__title" >ID: {{datas[0]}}</h3> -->
+							<input class="d-none" name='id_0' value="{{datas[0]}}"></input> 
+							<div class="multisteps-form__content text-center">
+								<!-- <div class="card-header" >
+									{%for t in tag%}
+									<span onclick="get_tag(this)" class="postag_name btn border border-success">{{t}}</span>
+									{%endfor%}
+								</div> -->
+								
+								<div class="card-body">
+									{%for j in tokens[0]%}
+									<button onclick="span(this)" class="btn text-token mt-2" type="button">{{j}}
+									<i class="close-button d-none"></i>
+									<input class="btn review d-none" name='token_0' value="{{j}}"></input> 
+									<input id="postag" class="btn d-none" name='tag_0' value=""></input> 
+									<span id="pos" class="badge btn-grad"></span>
+									<span class="focus-input100"></span>
+									</button>
+									{%endfor%}
+								</div>
+								<div class="button-row d-flex card-footer bg-transparent border-success">
+									<button class="btn btn-grad ml-auto js-btn-next  mr-4" type="button" title="Next">Next</button>
+								</div>
+							</div>
+						</div>
+
+						{%for i in range(1, number-1)%}
+						<div class="multisteps-form__panel shadow rounded bg-white" data-animation="scaleIn">
+							<!-- <h3 class="multisteps-form__title">ID: {{datas[i]}}</h3> -->
+							<input class="d-none" name='id_{{i}}' value="{{datas[i]}}"></input> 
+							<div class="multisteps-form__content text-center">
+								<!-- <div class="card-header" >
+									{%for t in tag%}
+									<span onclick="get_tag(this)" class="postag_name btn border border-success">{{t}}</span>
+									{%endfor%}
+								</div> -->
+				
+								<div class="card-body">
+									{%for j in tokens[i]%}
+									<button onclick="span(this)" class="btn text-token mt-2" type="button">{{j}}
+									<i class="close-button d-none"></i>
+									<input class="btn review d-none" name='token_{{i}}' value="{{j}}"></input> 
+									<input id="postag" class="btn d-none" name='tag_{{i}}' value=""></input> 
+									<span id="pos" class="badge btn-grad"></span>
+									<span class="focus-input100"></span>
+									</button>
+									{%endfor%}
+								</div>
+								<div class="button-row d-flex card-footer bg-transparent border-success">
+									<button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
+									<button class="btn btn-grad ml-auto js-btn-next" type="button" title="Next">Next</button>
+								</div>
+							</div>
+						</div>
+						{%endfor%}
+						
+						<div class="multisteps-form__panel shadow rounded bg-white" data-animation="scaleIn">
+							<!-- <h3 class="multisteps-form__title">ID: {{datas[number-1]}}</h3> -->
+							<input class="d-none" name='id_{{number-1}}' value="{{datas[number-1]}}"></input> 
+							<div class="multisteps-form__content text-center">
+								<!-- <div class="card-header" >
+									{%for t in tag%}
+									<span onclick="get_tag(this)" class="postag_name btn border border-success">{{t}}</span>
+									{%endfor%}
+								</div>
+				 -->
+								<div class="card-body">
+									{%for j in tokens[number-1]%}
+									<button onclick="span(this)" class="btn text-token mt-2" type="button">{{j}}
+									<i class="close-button d-none"></i>
+									<input class="btn review d-none" name='token_{{number-1}}' value="{{j}}"></input> 
+									<input id="postag" class="btn d-none" name='tag_{{number-1}}' value=""></input> 
+									<span id="pos" class="badge btn-grad"></span>
+									<span class="focus-input100"></span>
+									</button>
+									{%endfor%}
+								</div>
+								<div class="button-row d-flex card-footer bg-transparent border-success">
+									<button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
+									<button class="btn btn-grad ml-auto js-btn-next" type="submit" title="Next">Finish</button>
+								</div>
+							</div>
+						</div>
+						</form>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			</div>
 		</div>
 	</div>
 	

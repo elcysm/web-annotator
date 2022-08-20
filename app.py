@@ -126,6 +126,7 @@ def review():
                     project = session['project']
                     number = 5
                 finally:
+
                     task = select_task_by_project_id(project)
                     
                     if task == "textclass":
@@ -137,25 +138,47 @@ def review():
                             dt = random.choice(temp)
                             if dt not in datas:
                                 datas.append(dt)
-                        
                         sent = []
                         for dt in datas:
                             sent.append(select_sent_by_id(dt))
-
                         return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task)
+                    
                     if task == "pos":
+                        datas = []
+                        temp = select_data_id_by_project_id(project)
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+                        
+                        tokens = []
+                        for dt in datas:
+                            tokens.append(select_token_by_data_id(dt))
+
                         tag = select_tag_pos_by_project_id(project)
-                        token = select_token_by_data_id(data_id)
-                        lentoken = len(token)
-                        return render_template('pos.html', project=project, tag=tag, token=token, task=task, lentoken=lentoken)
-                    if task == "parsing":
-                        tag = select_tag_parsing_by_project_id(project)
-                        token = select_token_by_data_id(data_id)
-                        return render_template('parsing.html', project=project, tag=tag, token=token, task=task)
+                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number)
+                    
                     if task == "ner":
+                        datas = []
+                        temp = select_data_id_by_project_id(project)
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+
+                        tokens = []
+                        for dt in datas:
+                            tokens.append(select_token_by_data_id(dt))
+
                         tag = select_tag_ner_by_project_id(project)
-                        token = select_token_by_data_id(data_id)
-                        return render_template('ner.html', project=project, tag=tag, token=token, task=task)
+                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number)
+
+
+                    # if task == "parsing":
+                    #     tag = select_tag_parsing_by_project_id(project)
+                    #     # token = select_token_by_data_id(data_id)
+                    #     return render_template('parsing.html', project=project, tag=tag, token=token, task=task)
+            
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -170,10 +193,9 @@ def textclass_post():
     # data_id = request.args['data']
     project = request.args['project']
     task = select_task_by_project_id(project)
-    
-    if task == "textclass":
-        number = int(request.form['number'])
+    number = int(request.form['number'])
 
+    if task == "textclass":
         for i in range(0, number):
             review_textclass = request.form["id_{id}".format(id=str(i))]
             review_textclass_tag = request.form.getlist("tag_{id}".format(id=str(i)))
@@ -185,13 +207,37 @@ def textclass_post():
         return render_template('email_verify.html')
 
     if task == "pos":
-        review_token_pos = request.form.getlist('token')
-        review_tag_pos = request.form.getlist('tag')
 
-        print(review_token_pos, review_tag_pos)
-        
-        for review in review_token_pos:
-            insert_pos(data_id, review, username)
+        for i in range(0, number):
+            review_id = request.form["id_{id}".format(id=str(i))]
+            review_token_pos = request.form.getlist("token_{id}".format(id=str(i)))
+            review_tag_pos = request.form.getlist("tag_{id}".format(id=str(i)))
+
+            print(review_id, review_token_pos, review_tag_pos)
+            for i in range(len(review_token_pos)):
+                if review_tag_pos[i] != '':
+                    insert_pos(review_id, review_token_pos[i], review_tag_pos[i], username)
+       
+        return render_template('email_verify.html')
+
+    
+    if task == "ner":
+
+        for i in range(0, number):
+            review_id = request.form["id_{id}".format(id=str(i))]
+            review_token_ner = request.form.getlist("token_{id}".format(id=str(i)))
+            review_tag_ner = request.form.getlist("tag_{id}".format(id=str(i)))
+
+            print(review_id, review_token_ner, review_tag_ner)
+            for i in range(len(review_token_ner)):
+                if review_tag_ner[i] != '':
+                    insert_ner(review_id, review_token_ner[i], review_tag_ner[i], username)
+       
+        return render_template('email_verify.html')
+
+
+        # for review in review_token_pos:
+            # insert_pos(data_id, review, username)
 
 
 
@@ -378,7 +424,8 @@ def get_new_project():
         user_role = select_role(user_admin)
         if user_role !=None:
             if check_role(user_role[0])==True:
-                return render_template('new_project.html', user_admin=user_admin)
+                projects = select_project_name()
+                return render_template('new_project.html', user_admin=user_admin, projects=projects)
             else:
                 return render_template('503.html')
 
@@ -599,7 +646,16 @@ def select_all_project():
     result = cursor.fetchall()
     return result
 
-
+# select_project_id    --------------------------------------------------------
+def select_project_name():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT name FROM Project"
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
 # select token by data id   ----------------------------------------------------
 def select_token_by_data_id(id):
     connection = connect_to_db()
