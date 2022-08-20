@@ -130,7 +130,6 @@ def review():
                     task = select_task_by_project_id(project)
                     
                     if task == "textclass":
-                        # data = select_sent_by_id(data_id)
                         tag = select_tag_textclass_by_project_id(project)
                         datas = []
                         temp = select_data_id_by_project_id(project)
@@ -174,10 +173,24 @@ def review():
                         return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number)
 
 
-                    # if task == "parsing":
-                    #     tag = select_tag_parsing_by_project_id(project)
-                    #     # token = select_token_by_data_id(data_id)
-                    #     return render_template('parsing.html', project=project, tag=tag, token=token, task=task)
+                    if task == "parsing":
+                        datas = []
+                        temp = select_data_id_by_project_id(project)
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+                        
+                        tokens = []
+                        for dt in datas:
+                            tokens.append(select_token_by_data_id(dt))
+                        
+                        lentoken=[]
+                        for i in tokens:
+                            lentoken.append(len(i))
+                            
+                        tag = select_tag_parsing_by_project_id(project)
+                        return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken)
             
             else:
                 return redirect(url_for('admin_index'))

@@ -18,6 +18,7 @@ function get_project(){
 }
 
 
+
 var pos_tag_name = '';
 
 $(document).ready(function(){
@@ -63,6 +64,47 @@ function span_textclass(btn){
     btn.querySelector('input[id="texttag"]').value = '';
   }
 }
+
+var clicks = 0;
+var count = 0;
+
+var tag = ''
+var start = ''
+var end = ''
+
+var data_parcing = []
+var data;
+function get_tag_par(btn){
+  clicks += 1;
+  btn.querySelector('input[id="partag"]').value = pos_tag_name;
+  btn.querySelector('span').innerHTML = pos_tag_name + count;
+
+  tag = btn.querySelector('span').innerHTML;
+  start = btn.querySelector('input[id="partoken"]').value;
+  
+  if (clicks == 1){
+    data = tag + " " + start ;
+  }
+
+  if (clicks == 2){
+    btn.querySelector('span').innerHTML = pos_tag_name + count;
+    end = btn.querySelector('input[id="partoken"]').value;
+    count +=1;
+    clicks = 0;
+    data = data +  " " + end ;
+    data_parcing.push(data)
+    click();
+  } 
+}
+
+function click(){
+  for (i = 0; i <data_parcing.length; i++){
+    alert(data_parcing[i])
+  }
+}
+
+
+
 
 
 $(document).ready(function(){
@@ -186,11 +228,10 @@ function develop(){
         $(thisAlert).removeClass('alert-validate');
     }
     
- 
-      
+
+    
 
 })(jQuery);
-
 
 
 
