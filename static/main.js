@@ -66,7 +66,6 @@ function span_textclass(btn){
 }
 
 var clicks = 0;
-var count = 0;
 
 var tag = ''
 var start = ''
@@ -74,38 +73,93 @@ var end = ''
 
 var data_parcing = []
 var data;
-function get_tag_par(btn){
+function get_tag_par(btn, i){
   clicks += 1;
   btn.querySelector('input[id="partag"]').value = pos_tag_name;
-  btn.querySelector('span').innerHTML = pos_tag_name + count;
+  // btn.querySelector('span').innerHTML = pos_tag_name;
+  btn.classList.add('active');
 
-  tag = btn.querySelector('span').innerHTML;
+
   start = btn.querySelector('input[id="partoken"]').value;
   
   if (clicks == 1){
-    data = tag + " " + start ;
+    data = start ;
+    disable_button();
   }
 
   if (clicks == 2){
-    btn.querySelector('span').innerHTML = pos_tag_name + count;
+    // btn.querySelector('span').innerHTML = pos_tag_name;
+    tag = pos_tag_name;
+    btn.classList.add('active');
     end = btn.querySelector('input[id="partoken"]').value;
-    count +=1;
     clicks = 0;
-    data = data +  " " + end ;
-    data_parcing.push(data)
-    click();
-  } 
-}
+    data = tag + " " + data +  " " + end ;
+    
+    data_temp = data.split(' ')
 
-function click(){
-  for (i = 0; i <data_parcing.length; i++){
-    alert(data_parcing[i])
+    // data_parcing.push(data)
+
+    $(`#selec_${i}`).prepend(`
+    <button onclick="delete_button(this)" class="btn text-left col-12 col-sm-12 text-over btn-outline-danger mt-2" type="button">
+      <i class="fa fa-close"></i>
+      <span class="badge btn-grad">Tag:  </span> <span id="tag" > ${data_temp[0]}</span> 
+      <span class="badge btn-success">Start: </span> <span id="start"> ${data_temp[1]} </span> &nbsp;
+      <span class="badge btn-danger">End: </span> <span id="end" > ${data_temp[2]} </span> &nbsp;
+      <input class="d-none" name="parsing_${i}" value="${data}"></input>
+		</button>`);
+    enable_button();
+    delete_label();
+
+  }
+}
+  
+function disable_button(){
+ 
+  var button_step = document.getElementsByClassName('multisteps-form__progress-btn');
+  for (var i = 0; i < button_step.length; i++){
+    button_step[i].disabled = true;
+  }
+  var button_next = document.getElementsByClassName('btn btn-grad ml-auto js-btn-next');
+  for (var i = 0; i < button_next.length; i++){
+    button_next[i].disabled = true;
+  }
+  var button_prev = document.getElementsByClassName('btn btn-primary js-btn-prev');
+  for (var i = 0; i < button_prev.length; i++){
+    button_prev[i].disabled = true;
   }
 }
 
+function enable_button(){
+  
+  var button_next = document.getElementsByClassName('btn btn-grad ml-auto js-btn-next');
+  for (var i = 0; i < button_next.length; i++){
+    button_next[i].disabled = false;
+  }
+  var button_step = document.getElementsByClassName('multisteps-form__progress-btn');
+  for (var i = 0; i < button_step.length; i++){
+    button_step[i].disabled = false;
+  }
+  var button_prev = document.getElementsByClassName('btn btn-primary js-btn-prev');
+  for (var i = 0; i < button_prev.length; i++){
+    button_prev[i].disabled = false;
+  }
+}
 
+function delete_button(btn){
+  if (btn.querySelector('i').classList.value == 'fa fa-close'){
+      btn.remove();
+  }
+  else{
 
+  }
+}
 
+function delete_label(){
+  var button = document.getElementsByClassName("text-token");
+  for (var i = 0; i < button.length; i++){
+    button[i].classList.remove('active');
+  }
+}
 
 $(document).ready(function(){
      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {

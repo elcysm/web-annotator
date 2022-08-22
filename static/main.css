@@ -600,6 +600,25 @@ input::placeholder {
     left: -25px;
 }
 
+.limit-height {
+  height: 230px;
+  max-height: 230px;
+  overflow-y: scroll;
+}
+
+.text-over{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+
+.review-help{
+  position:absolute;
+  top: 20px;
+  left: 40px;
+}
 
 @media(min-width: 992px){
 	.navbar-expand-custom {
@@ -809,7 +828,9 @@ background-size: 50% 50%;
    font-size: 2.1rem;
 
 }
-
+.bu:hover {
+  color:white ;
+}
 
 .content__title {
   margin-top: 40px;

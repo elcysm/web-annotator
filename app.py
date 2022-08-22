@@ -132,7 +132,9 @@ def review():
                     if task == "textclass":
                         tag = select_tag_textclass_by_project_id(project)
                         datas = []
-                        temp = select_data_id_by_project_id(project)
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
                         while len(datas) < number:
                             dt = random.choice(temp)
                             if dt not in datas:
@@ -144,7 +146,9 @@ def review():
                     
                     if task == "pos":
                         datas = []
-                        temp = select_data_id_by_project_id(project)
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
                         while len(datas) < number:
                             dt = random.choice(temp)
                             if dt not in datas:
@@ -159,7 +163,9 @@ def review():
                     
                     if task == "ner":
                         datas = []
-                        temp = select_data_id_by_project_id(project)
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
                         while len(datas) < number:
                             dt = random.choice(temp)
                             if dt not in datas:
@@ -175,7 +181,9 @@ def review():
 
                     if task == "parsing":
                         datas = []
-                        temp = select_data_id_by_project_id(project)
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
                         while len(datas) < number:
                             dt = random.choice(temp)
                             if dt not in datas:
@@ -203,7 +211,6 @@ def review():
 @app.route('/user/review', methods=['POST'])
 def textclass_post():
     username = session['username']
-    # data_id = request.args['data']
     project = request.args['project']
     task = select_task_by_project_id(project)
     number = int(request.form['number'])
@@ -217,7 +224,7 @@ def textclass_post():
                 if tag != '':
                     insert_text_class(review_textclass, tag, username)
             
-        return render_template('email_verify.html')
+        return redirect(url_for('review_done'))
 
     if task == "pos":
 
@@ -231,7 +238,7 @@ def textclass_post():
                 if review_tag_pos[i] != '':
                     insert_pos(review_id, review_token_pos[i], review_tag_pos[i], username)
        
-        return render_template('email_verify.html')
+        return redirect(url_for('review_done'))
 
     
     if task == "ner":
@@ -246,19 +253,27 @@ def textclass_post():
                 if review_tag_ner[i] != '':
                     insert_ner(review_id, review_token_ner[i], review_tag_ner[i], username)
        
-        return render_template('email_verify.html')
+        return redirect(url_for('review_done'))
 
 
-        # for review in review_token_pos:
-            # insert_pos(data_id, review, username)
+    if task == "parsing":
+
+        for i in range(0, number):
+            review_id = request.form["id_{id}".format(id=str(i))]
+            review_tag_parsing = request.form.getlist("parsing_{id}".format(id=str(i)))
+            print(review_id, review_tag_parsing)
+            
+            if review_tag_parsing != []:
+                for i in range(len(review_tag_parsing)):
+                    rv = review_tag_parsing[i].split(' ')
+                    insert_parsing(review_id, rv[1], rv[2], rv[0], username)
+        return redirect(url_for('review_done'))
 
 
-
-        # project = request.args['project']
-        # data_id = select_data_id_by_project_id(project)
-        # data = random.choice(data_id)
-        # return redirect(url_for('pos', project=project, data=data))
-
+# Thank you  ----------------------------------------------------------------
+@app.route('/user/review/done')
+def review_done():
+    return render_template('thankyou.html')
 
 # admin login   ----------------------------------------------------------------
 @app.route('/admin')
@@ -429,9 +444,7 @@ def register_successfully():
 @app.route('/admin/new_project', methods=['GET'])
 def get_new_project():
     if 'username' not in session:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
     else:
         user_admin = session['username']
         user_role = select_role(user_admin)
@@ -446,9 +459,7 @@ def get_new_project():
 @app.route('/admin/new_project', methods=['POST'])
 def post_new_project():
     if 'username' not in session:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
     else:
         user_admin = session['username']
         user_role = select_role(user_admin)
@@ -603,10 +614,18 @@ def select_data_id(sent):
     return result
 
 # select data_id by project id  ------------------------------------------------
-def select_data_id_by_project_id(project_id):
+def select_data_id_by_project_id(project_id, username, task):
+    if task == "pos":
+        tsk = "POS"
+    if task == "ner":
+        tsk = "NER"
+    if task == "parsing":
+        tsk = "Parsing"
+    if task == "textclass":
+        tsk = "TextClass"
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "SELECT id FROM Data WHERE project_id = '{id}'".format(id = project_id)
+    query = "SELECT id FROM Data WHERE project_id = '{id}' AND id NOT IN (SELECT data_id FROM '{task}' WHERE username = '{username}')".format(id = project_id, task = tsk, username = username)
     cursor.execute(query)
     result = []
     for id in cursor:
