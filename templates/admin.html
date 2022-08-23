@@ -55,7 +55,7 @@
 						<a class="nav-link" href="/admin"><i class="fa fa-tachometer"></i>Trang chủ</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="/admin/invitation"><i class="fa fa-users"></i>Collaborator</a>
+						<a class="nav-link" href="/admin/collaborator"><i class="fa fa-users"></i>Collaborator</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="/add_student"><i class="fa fa-cloud-upload"></i>Upload Data</a>
@@ -102,7 +102,7 @@
                                 <tr>
                                     <td>ID</td>
                                     <td>Name</td>
-                                    <td>Date Modified</td>
+                                    <!-- <td>Date Modified</td> -->
 									<td>Languages</td>
                                     <td>Task</td>
                                     <td>Action</td>
@@ -113,13 +113,16 @@
                                 <tr>
                                     <td>{{i[0]}}</td>
                                     <td><a class="text-heading font-semibold" href="#">{{i[1]}}</a></td>
-                                    <td>23-01-2022</td>
+                                    <!-- <td>23-01-2022</td> -->
                                     <td>{{i[2]}}</td>
-									<td><span class="badge badge-light">{{i[3]}}</span></td>
-                                    <td><a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a> 
-                                        <a onclick="SomeDeleteRowFunction(this);" href="#"><button type="button" class="btn btn-grad btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
-										<a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-grad btn-sm btn-square"><i class="fa fa-download"></i></button></a>
-                                    </td>
+									<td><span class="badge btn-grad">{{i[3]}}</span></td>
+                                    <td>
+										<!-- <a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a>  -->
+                                        <a onclick="SomeDeleteRowFunction(this);" href="#"><button type="button" class="btn btn-danger btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
+										<a ><button type="button" class="btn btn-primary btn-sm btn-square"><i class="fa fa-download"></i></button></a>
+                                        <a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-success btn-sm btn-square"><i class="fa fa-user-plus"></i></button></a>
+										
+									</td>
                                 </tr>
 								{% endfor %}
                             </tbody>
@@ -127,7 +130,7 @@
                                 <tr>
                                     <td>ID</td>
                                     <td>Name</td>
-                                    <td>Date Modified</td>
+                                    <!-- <td>Date Modified</td> -->
 									<td>Languages</td>
                                     <td>Task</td>
                                     <td>Action</td>
