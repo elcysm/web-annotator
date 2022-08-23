@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import re
 from flask import Flask, request
 from datetime import timedelta
@@ -292,6 +293,25 @@ def admin_index():
     else:
         return redirect(url_for('index'))
 
+@app.route('/admin/collaborator')
+def collaborator_index():
+    if 'username' in session:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                annotator = select_username()
+                number_review = []
+                for i in annotator:
+                    number_review.append(select_number_review_by_username(i[0], i[2]))
+
+                len_annotator = len(annotator)
+                return render_template('collaborator.html', username=username, annotator=annotator, number_review= number_review, len_annotator=len_annotator)
+            else:
+                return render_template('503.html')
+    else:
+        return redirect(url_for('index'))
+
 ################################ LOGIN BY LINK #################################
 
 # login by link from data owner ------------------------------------------------
@@ -420,7 +440,7 @@ def post_invitation():
     project_id = request.form['project']
     number = request.form.get('number')
 
-    insert_annotator(username, email, password)
+    insert_annotator(username, email, password, project_id)
 
     msg = Message(
         EMAIL_SUBJECT,
@@ -690,6 +710,24 @@ def select_project_name():
     for id in cursor:
         result.append(id[0])
     return result
+
+def select_number_review_by_username(username, project_id):
+    task = select_task_by_project_id(project_id)
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    if task == "ner":
+        query = "SELECT DISTINCT data_id, username FROM NER WHERE username = '{uname}'".format(uname = username)
+    elif task == "pos":
+        query = "SELECT DISTINCT data_id, username FROM POS WHERE username = '{uname}'".format(uname = username)
+    elif task == "parsing":
+        query = "SELECT DISTINCT data_id, username FROM Parsing WHERE username = '{uname}'".format(uname = username)
+    elif task == "textclass":
+        query = "SELECT DISTINCT data_id, username FROM TextClass WHERE username = '{uname}'".format(uname = username)
+    cursor.execute(query)
+    count = 0
+    for i in cursor:
+        count += 1
+    return count
 # select token by data id   ----------------------------------------------------
 def select_token_by_data_id(id):
     connection = connect_to_db()
@@ -765,14 +803,23 @@ def select_number_data_of_project(project_id):
         count += 1
     return count
 
+# select username by role   --------------------------------------------
+def select_username():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT user.username, user.email, user.project_id, project.name FROM user, project where user.role = '{role}' and user.project_id = project.id".format(role = ANNOTATOR_ROLE)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
 # ------------------------------- INSERT ---------------------------------------
 
 # insert annotator  ------------------------------------------------------------
-def insert_annotator(username, email, password):
+def insert_annotator(username, email, password, project_id):
     connection = connect_to_db()
     cursor = connection.cursor()
     passwordhash = hashlib.md5(password.encode()).hexdigest()
-    query1 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}')".format(name = username, mail = email, passw = passwordhash, role = ANNOTATOR_ROLE)
+    query1 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}')".format(name = username, mail = email, passw = passwordhash, role = ANNOTATOR_ROLE, project_id=project_id)
     cursor.execute(query1)
     connection.commit()
 
@@ -781,7 +828,7 @@ def insert_data_owner(username, email, password):
     connection = connect_to_db()
     cursor = connection.cursor()
     passwordhash = hashlib.md5(password.encode()).hexdigest()
-    query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}')".format(name = username, mail = email, passw = passwordhash, role = DATA_OWNER_ROLE)
+    query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}')".format(name = username, mail = email, passw = passwordhash, role = DATA_OWNER_ROLE, project_id='')
     cursor.execute(query2)
     connection.commit()
 
