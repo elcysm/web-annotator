@@ -55,7 +55,7 @@
 						<a class="nav-link" href="/admin"><i class="fa fa-tachometer"></i>Trang chủ</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="/admin/invitation"><i class="fa fa-users"></i>Collaborator</a>
+						<a class="nav-link" href="/admin/collaborator"><i class="fa fa-users"></i>Collaborator</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="/add_student"><i class="fa fa-cloud-upload"></i>Upload Data</a>
@@ -80,17 +80,17 @@
                 <div class="card shadow-lg rounded">
                     <div class="card-header border-bottom">
                         <div class="row">
-                            <div class="col-md-6 text-left">
-                                <h2 class="mb-0">Project</h5>
+                            <div class="col-md-12 text-center">
+                                <h2 class="mb-0">Collaborator List</h5>
                             </div>
-                            <div class="col-md-6 text-right">
+                            <!-- <div class="col-md-6 text-right">
                                 <span type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">
                                     <a href="/admin/new_project" class="text-white">
 										New Project
 										<i class="fa fa-plus"></i>
 									</a>
                                 </span>
-                            </div>
+                            </div> -->
                             
                         </div>  
                     </div>
@@ -100,36 +100,39 @@
                         <table id="example" class="table table-hover table-nowrap table-bordered">
                             <thead class="table-light font-weight-bold">
                                 <tr>
-                                    <td>ID</td>
-                                    <td>Name</td>
-                                    <td>Date Modified</td>
-									<td>Languages</td>
-                                    <td>Task</td>
+                                    <td>Username</td>
+                                    <td>Email</td>
+                                    <!-- <td>Date Modified</td> -->
+									<td>Project</td>
+                                    <td onmouseover="tooltip()" data-toggle="tooltip" data-placement="top" title="Number of data that user has reviewed.">Reviewed <i class="fa fa-question-circle mr-1"></i></td>
                                     <td>Action</td>
                                 </tr>
                             </thead>
                             <tbody id="row-sent">
-								{%for i in project%}
+								{%for i in range(len_annotator)%}
                                 <tr>
-                                    <td>{{i[0]}}</td>
-                                    <td><a class="text-heading font-semibold" href="#">{{i[1]}}</a></td>
-                                    <td>23-01-2022</td>
-                                    <td>{{i[2]}}</td>
-									<td><span class="badge badge-light">{{i[3]}}</span></td>
-                                    <td><a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a> 
-                                        <a onclick="SomeDeleteRowFunction(this);" href="#"><button type="button" class="btn btn-grad btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
-										<a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-grad btn-sm btn-square"><i class="fa fa-download"></i></button></a>
-                                    </td>
+                                    <td>{{annotator[i][0]}}</td>
+                                    <td><a class="text-heading font-semibold" href="#">{{annotator[i][1]}}</a></td>
+                                    <!-- <td>23-01-2022</td> -->
+                                    <td>{{annotator[i][3]}}</td>
+									<td>{{number_review[i]}}</td>
+                                    <td>
+										<!-- <a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a>  -->
+                                        <a onclick="SomeDeleteRowFunction(this);" href="#"><button type="button" class="btn btn-danger btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
+										<a ><button type="button" class="btn btn-primary btn-sm btn-square"><i class="fa fa-download"></i></button></a>
+                                        <!-- <a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-success btn-sm btn-square"><i class="fa fa-user-plus"></i></button></a> -->
+										
+									</td>
                                 </tr>
 								{% endfor %}
                             </tbody>
 							<tfoot class="table-light font-weight-bold">
                                 <tr>
-                                    <td>ID</td>
-                                    <td>Name</td>
-                                    <td>Date Modified</td>
-									<td>Languages</td>
-                                    <td>Task</td>
+                                    <td>Username</td>
+                                    <td>Email</td>
+                                    <!-- <td>Date Modified</td> -->
+									<td>Project</td>
+                                    <td>Reviewed</td>
                                     <td>Action</td>
                                 </tr>
                             </tfoot>
