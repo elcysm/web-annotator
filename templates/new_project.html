@@ -85,7 +85,7 @@
                   <div class="container">
                     <!--content title-->
                     <h1 class="text-center">Create New Project</h1>
-                    <h2 class="content__title">Click on steps or 'Prev' and 'Next' buttons</h2>
+                    <h2 class="content__title"></h2>
                   </div>
                   <div class="container overflow-hidden">
                     <!--multisteps-form-->
@@ -113,7 +113,7 @@
                                 <div class="form-row mt-4">
                                   <div class="col-12 col-sm-6" >
                                     <label class="">Project Name:</label>
-                                    <input id="project_value" class="multisteps-form__input form-control" type="text" placeholder="Enter your project name..." name="project_name" onmousemove="get_project()"/>
+                                    <input id="project_value" class="multisteps-form__input form-control" type="text" placeholder="Enter your project name..." name="project_name" onkeyup="get_project()"/>
                                   </div>
                                   <div class="col-12 col-sm-6 mt-4 mt-sm-0">
                                     <label class="">Languages:</label>
@@ -162,10 +162,15 @@
 
                                 <div class="form-row mt-4">
                                     <div class="col-12 col-sm-12 mt-4 mt-sm-0">
-                                        <label class="">Enter Label:</label>
-                                        <input class="multisteps-form__input form-control" type="text" placeholder="Enter your label..." name="label"/>
+                                        <label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press comma (,) to split label">Enter Label: <i class="fa fa-question-circle mr-1"></i></label> 
+                                        <input id="input_tagnew" class="multisteps-form__input form-control tag" type="text" placeholder="Enter your label..." onkeypress="return runScript(event)"/>
                                     </div>
                                 </div>
+
+                                <div class="form-row mt-4 ">
+                                  <div id="tagnew" class=" multisteps-form__input form-control text-left limit-width mr-1 ml-1 p-10">
+                                  </div>
+                              </div>
                                 <div class="button-row d-flex mt-4">
                                   <button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
                                   <button class="btn btn-grad ml-auto js-btn-next" type="submit" title="Next">CREATE</button>

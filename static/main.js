@@ -10,10 +10,11 @@ function get_project(){
   project = document.getElementById('project_value').value;
   if (projects.includes(project)){
     document.querySelector('button[title="Next"]').disabled = true;
-    document.querySelector('button[title="Next"]').classList.add('no-drop');
+    document.querySelector('button[class="multisteps-form__progress-btn"]').disabled = true;
   }
   else{
     document.querySelector('button[title="Next"]').disabled = false;
+    document.querySelector('button[class="multisteps-form__progress-btn"]').disabled = false;
   }
 }
 
@@ -161,6 +162,39 @@ function delete_label(){
   }
 }
 
+var tagnew;
+function splitLabel(input){
+  if (input.value != ','){
+    if (input.value.includes(',')){
+      tagnew = input.value.replace(',','');
+      input.value = '';
+      $('#tagnew').prepend(`<button onclick="delete_button(this)" class="btn btn-outline-danger" type="button">
+      <i class="fa fa-close"></i>
+      <span class="badge btn-grad mt-1">${tagnew}</span>
+      <input class="d-none" name="label" value="${tagnew}"></input>
+		  </button> `);
+    }
+  } 
+}
+
+var input_tagnew;
+
+function runScript(e) {
+  
+    if (e.keyCode == 13) {
+        input_tagnew = document.getElementById('input_tagnew');
+        tagnew = input_tagnew.value;
+        input_tagnew.value = ''; 
+        $('#tagnew').prepend(`<button onclick="delete_button(this)" class="btn btn-outline-danger" type="button">
+        <i class="fa fa-close"></i>
+        <span class="badge btn-grad mt-1">${tagnew}</span>
+        <input class="d-none" name="label" value="${tagnew}"></input>
+        </button> `);
+      return false;
+    }
+
+}
+
 $(document).ready(function(){
      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
         removeItemButton: true,
@@ -188,6 +222,10 @@ function copyToClipboard() {
     });
   }
 
+function tooltip(){
+  $('[data-toggle="tooltip"]').tooltip('toggle');
+}
+  
 function mySubmitFunction(e) {
     e.preventDefault();
     return false;

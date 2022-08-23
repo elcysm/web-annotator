@@ -10,6 +10,7 @@ import random
 import string
 import pandas as pd
 from underthesea import word_tokenize, sent_tokenize
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -473,13 +474,16 @@ def post_new_project():
 
                 task = request.form['task']
                 method = request.form['method']
-                label_get = request.form['label']
-                label = label_get.split(", ")
+                label = request.form.getlist('label')
+
+                
+                # now = datetime.now()
+                # dt_string = now.strftime('%d/%m/%Y %H:%M:%S')
+                # print(now)
 
                 # insert
                 insert_project(project_id, project_name, language, task, method)
                 insert_label(task, label, project_id)
-                # project_id = select_project_id(project_name)  
 
                 uploaded_file = request.files['file']
                 if uploaded_file.filename != '':
@@ -857,16 +861,16 @@ def insert_tag_text_class(tag_text_class, proj_id):
 def insert_label(task, label, proj_id):
     if task == "textclass":
         for tag in label:
-            insert_tag_text_class(tag, proj_id)
+            insert_tag_text_class(" ".join(tag.split()), proj_id)
     if task == "parsing":
         for tag in label:
-            insert_tag_parsing(tag, proj_id)
+            insert_tag_parsing(" ".join(tag.split()), proj_id)
     if task == "pos":
         for tag in label:
-            insert_tag_pos(tag, proj_id)
+            insert_tag_pos(" ".join(tag.split()), proj_id)
     if task == "ner":
         for tag in label:
-            insert_tag_ner(tag, proj_id)
+            insert_tag_ner(" ".join(tag.split()), proj_id)
 
 # ### INSERT REVIEW ###
 

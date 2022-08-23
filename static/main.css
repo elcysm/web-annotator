@@ -603,9 +603,13 @@ input::placeholder {
 .limit-height {
   height: 230px;
   max-height: 230px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
+.limit-width {
+  white-space: nowrap;
+  overflow-x: auto;
+}
 .text-over{
   overflow: hidden;
   text-overflow: ellipsis;
