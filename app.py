@@ -9,7 +9,8 @@ import hashlib
 import random
 import string
 import pandas as pd
-from underthesea import word_tokenize, sent_tokenize
+from nltk import word_tokenize as en_word_tokenize, sent_tokenize as en_sent_tokenize
+from underthesea import word_tokenize as vie_word_tokenize, sent_tokenize as vie_sent_tokenize
 from datetime import datetime
 
 
@@ -489,11 +490,8 @@ def post_new_project():
                 if uploaded_file.filename != '':
                     file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
                     uploaded_file.save(file_path) 
-                    data = read_file(file_path)  
-                    
-                    for i, row in data.iterrows():
-                        
-                        insert_sentences(row[4], project_id)
+                    data = read_file(file_path, language)
+                    insert_sentences(data, project_id, language)
                         
                 return redirect(url_for('admin_index'))
 
@@ -798,8 +796,8 @@ def insert_project(project_id, project_name, language, task, method):
 # ### INSERT INPUT DATA ###
 
 # insert sentence to database   ------------------------------------------------
-def insert_sentences(data, project_id):
-    sent_list = data_to_sentences(data)
+def insert_sentences(data, project_id, language):
+    sent_list = data_to_sentences(data, language)
 
     connection = connect_to_db()
     cursor = connection.cursor()
@@ -810,11 +808,11 @@ def insert_sentences(data, project_id):
         cursor.execute(query)
         connection.commit()
 
-        insert_tokenize(sent, id)
+        insert_tokenize(sent, id, language)
 
 # insert tokenize to database   ------------------------------------------------
-def insert_tokenize(sent, data_id):
-    word_list = sentence_to_tokens(sent)
+def insert_tokenize(sent, data_id, language):
+    word_list = sentence_to_tokens(sent, language)
     
     connection = connect_to_db()
     cursor = connection.cursor()
@@ -907,26 +905,43 @@ def insert_text_class(data_id, tag_text_class, username):
     connection.commit()
 
 # Upload CSV File --------------------------------------------
-def read_file(filePath):
-    # CVS Column Names
-    # col_names = ['first_name','last_name','address', 'street', 'state' , 'zip']
-    # Use Pandas to parse the CSV file
-    csvData = pd.read_csv(filePath, header=None, encoding='utf8')
-    # Loop through the Rows
-    return csvData
-    # for i,row in csvData.iterrows():
-    #         print(i,row['first_name'],row['last_name'],row['address'],row['street'],row['state'],row['zip'],)
+def read_file(filePath, language):
+    ext = os.path.splitext(filePath)[1]
+    if ext == ".csv":
+        data = pd.read_csv(filePath, header=None, encoding='utf-8')
+        csvData = ""
+        for i, row in data.iterrows():
+            csvData += row[4]
+        return csvData
+    elif ext == ".txt":
+        with open(filePath, encoding='utf-8') as f:
+            lines = f.readlines()
+        txtData = ""
+        for line in lines:
+            if language == "eng":
+                txtData += line.replace('\n', ' ').replace("'", "''")
+            else:
+                txtData += line.replace('\n', ' ').replace("'", ' ')
+        return txtData
+################################### EXPORT DATA ################################
+
 
 ############################### HANDLE INPUT DATA ##############################
 
 # split data to sentences   ----------------------------------------------------
-def data_to_sentences(data):
-    sent_list = sent_tokenize(data)
+def data_to_sentences(data, language):
+    if language == "eng":
+        sent_list = en_sent_tokenize(data)
+    elif language == "vie":
+        sent_list = vie_sent_tokenize(data)
     return sent_list
 
 # split sentence to tokenizes   ------------------------------------------------
-def sentence_to_tokens(sent):
-    word_list = word_tokenize(sent)
+def sentence_to_tokens(sent, language):
+    if language == "eng":
+        word_list = en_word_tokenize(sent)
+    elif language == "vie":
+        word_list = vie_word_tokenize(sent)
     return word_list
 
 app.run(debug=True)
