@@ -192,7 +192,36 @@ function runScript(e) {
         </button> `);
       return false;
     }
+}
 
+function preventSubmit(e){
+  if (e.keyCode == 13) {
+    return false;
+  }
+}
+var projectid;
+function chooseExport(btn){
+  projectid = btn.getAttribute('data-id');
+  $('#exportModal').modal('toggle');
+}
+
+
+function get_type(btn, number){
+  if (btn.querySelector('i').classList.value == 'fa fa-check mr-1 d-none'){
+    var type = btn.querySelector('input[id="type"]').value;
+    btn.querySelector('i').classList.remove('d-none');
+    document.getElementById('link_download').classList.remove('d-none');
+    document.getElementById('link_download').href = `/admin/download?project=${projectid}&type=${type}`;  
+
+    var button_csv = document.getElementById('csv').classList;
+    var button_json = document.getElementById('json').classList;
+    if (number == 1){
+      button_csv.add('d-none');
+    }
+    else {
+      button_json.add('d-none');
+    }
+  }
 }
 
 $(document).ready(function(){
@@ -234,36 +263,36 @@ function mySubmitFunction(e) {
 function develop(){
     alert("Chức năng này đang phát triển!")
 }
-   var opacity = 0;
-   var intervalID = 0;
-   window.onload = fadeIn;
+//    var opacity = 0;
+//    var intervalID = 0;
+//    window.onload = fadeIn;
    
-   function fadeIn() {
-       setInterval(show, 50);
-   }
+//    function fadeIn() {
+//        setInterval(show, 50);
+//    }
    
-   function show() {
-       var body = document.getElementById("fade");
-       opacity = Number(window.getComputedStyle(body)
-                           .getPropertyValue("opacity"));
-       if (opacity < 1) {
-           opacity = opacity + 0.1;
-           body.style.opacity = opacity
-       } else {
-           clearInterval(intervalID);
-       }
-   }
+//    function show() {
+//        var body = document.getElementById("fade");
+//        opacity = Number(window.getComputedStyle(body)
+//                            .getPropertyValue("opacity"));
+//        if (opacity < 1) {
+//            opacity = opacity + 0.1;
+//            body.style.opacity = opacity
+//        } else {
+//            clearInterval(intervalID);
+//        }
+//    }
     
-    $("#fade").fadeTo(3000, 500).slideUp(500, function(){
-    $("#fade").slideUp(500);
-});
+//     $("#fade").fadeTo(3000, 500).slideUp(500, function(){
+//     $("#fade").slideUp(500);
+// });
 
-    $(document).ready(function() {
-        $("#fade").hide();
-        $("#fade").fadeTo(3000, 500).slideUp(500, function() {
-            $("#fade").slideUp(500);
-        });
-    });
+//     $(document).ready(function() {
+//         $("#fade").hide();
+//         $("#fade").fadeTo(3000, 500).slideUp(500, function() {
+//             $("#fade").slideUp(500);
+//         });
+//     });
 
 
 
@@ -328,7 +357,7 @@ function develop(){
 
 
 var current = location.pathname;
-$('.navbar-nav .nav-link').each(function(){
+$('.nav-link').each(function(){
     var $this = $(this);
     if ($this.attr('href') === current){
         $this.addClass('active');
