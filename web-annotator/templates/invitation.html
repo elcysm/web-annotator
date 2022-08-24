@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% block head %}
+	<title>Đăng nhập</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+
+	{% block styles %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/Linearicons-Free-v1.0.0/icon-font.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/bootstrap/css/bootstrap.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/animate/animate.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/css-hamburgers/hamburgers.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/animsition/css/animsition.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/select2/select2.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.css')}}" >
+	{% endblock %}
+
+	{% endblock %}
+</head>
+<body>
+	{% block content %}
+	<div class="container-center"> 
+		<nav class="mb-4 navbar navbar-expand-lg bg-white bg-unique shadow fixed-top">
+
+			<a class="navbar-brand font-weight-bold" href="#">Web based Annotator</a>
+			<button class="btn navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-3" aria-controls="navbarSupportedContent-3" aria-expanded="false" aria-label="Toggle navigation">
+				<i class="fa fa-list"></i>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent-3">
+				<ul class="navbar-nav mr-auto text-left">
+					<li class="nav-item">
+						<a class="nav-link" href="/admin"><i class="fa fa-home"></i>Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/admin/project"><i class="fa fa-share-alt"></i>Projects</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/admin/collaborator"><i class="fa fa-users"></i>Collaborators</a>
+					</li>
+					<!-- <li class="nav-item">
+						<a class="nav-link" href="#">Lifestyle <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">Beauty</a>
+					</li>
+					<li class="nav-item dropdown active">
+						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tutorials 
+							</a>
+						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink-3">
+							<a class="dropdown-item" href="#">Make-up</a>
+							<a class="dropdown-item" href="#">Nails</a>
+							<a class="dropdown-item" href="#">DIY</a>
+						</div>
+					</li> -->
+				</ul>
+
+				<ul class="navbar-nav ml-auto nav-flex-icons">
+
+					<li class="nav-item dropdown no-arrow mx-1">
+						<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<i class="fa fa-bell fa-fw mr-0"></i>
+							<!-- <span class="badge badge-danger badge-counter">.</span> -->
+						</a>
+						<!-- Dropdown - Alerts -->
+						<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in "
+							aria-labelledby="alertsDropdown">
+							
+							<h6 class="text-center dropdown-header text-primary border-bottom">
+								Alerts Center
+							</h6>
+						
+							<a class="dropdown-item d-flex align-items-center" href="#">
+								<div class="mr-3">
+									<div class="icon-circle bg-primary">
+										<i class="fa fa-file-alt text-white"></i>
+									</div>
+								</div>
+								<div class="text-truncate">
+									<div class="small text-gray-500">December 12, 2019</div>
+									<span class="font-weight-bold">A new monthly report is ready to download!</span>
+								</div>
+							</a>
+							<a class="dropdown-item d-flex align-items-center" href="#">
+								<div class="mr-3">
+									<div class="icon-circle bg-success">
+										<i class="fa fa-donate text-white"></i>
+									</div>
+								</div>
+								<div class="text-truncate">
+									<div class="small text-gray-500">December 7, 2019</div>
+									$290.29 has been deposited into your account!
+								</div>
+							</a>
+							<a class="dropdown-item d-flex align-items-center" href="#">
+								<div class="mr-3 justify-content-center">
+									<div class="icon-circle bg-warning">
+										<i class="fa fa-exclamation-triangle text-white"></i>
+									</div>
+								</div>
+								<div class="text-truncate">
+									<div class="small text-gray-500">December 2, 2019</div>
+									Spending Alert: We've noticed unusually high spending for your account.
+								</div>
+							</a>
+							<a class="dropdown-item text-center small text-gray-500 border-top" href="#">Show All Alerts</a>
+						</div>
+					</li>
+
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<img class="my-profile-picture" style="object-fit: cover;" src="https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png">
+							<span class="text-primary font-weight-bold">{{user_admin}}</span> 
+						</a>
+						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
+							<a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
+							<hr class="dropdown-divider">
+							<a  href="#" data-toggle="modal" data-target="#logoutModal"> <button class="dropdown-item" ><i class="fa fa-sign-out  m-r-15"></i>Logout</button></a>
+						</div>
+					</li>
+
+				</ul>
+			</div>
+		</nav>
+		<div class="container-login100">
+	   
+			<!-- {% if (error != "") %}
+				<div style="opacity:0;" class="alert alert-danger alert-dismissible fade show" role="alert" id="fade">
+					<strong>Error!</strong> {{error}}
+				</div>
+			{% endif %}
+
+			{% if (success != "") %}
+				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
+					<strong>Success!</strong> {{success}}
+				</div>
+			{% endif %}
+
+				<div  class="alert alert-warning alert-dismissible fade show facebookhide hide" role="alert" id="fade">
+				<strong>Warning!</strong> Chức năng này đang phát triển!
+				</div> -->
+
+			<div class="wrap-login100 p-l-50 p-r-50 p-t-30 p-b-30">
+				<form class="login100-form validate-form flex-sb flex-w" method="post" >
+					<span class="login100-form-title">
+						Invite Collaborator 
+					</span>	
+					<div class="p-t-30 p-b-9">
+						<span class="txt1">
+							Email:
+						</span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
+						
+						<input class="input100 username" type="text" name="email" placeholder="Enter email...">
+						<span class="focus-input100"></span>
+					</div>
+					<div class="p-t-30 p-b-9">
+						<span class="txt1">
+							Project:
+						</span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
+						<!-- <select class="input100 invite" id="sel1" name="project"> -->
+							<!-- {%for i in range(0, len)%}
+								{%if project[i][0] == project_id%} -->
+						<input class="input100 username" readonly type="text" value="{{project_id}}" name="project"></input>
+								<!-- {%else%}
+								<option value="{{project[i][0]}}">{{project[i][1]}}</option>
+								{%endif%}
+							{%endfor%} -->
+						<!-- </select> -->
+						<span class="focus-input100"></span>
+					</div>
+					<div class="p-t-30 p-b-9">
+						<span class="txt1">
+							Numbers of review per person:
+						</span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
+						<select class="input100 invite" id="sel1" name="number">
+							{%for i in range(1, 5)%}
+								<option value="{{i*5}}">{{i*5}}</option>
+							{%endfor%}
+						</select>
+						<span class="focus-input100"></span>
+					</div>
+
+					<div class="wrap-input100 validate-input d-none" >
+						<input id="link" class="input100" name="link" readonly value="http://127.0.0.1:5000/login/username={{username}}&password={{password}}" />
+                        <input class="input100 d-none" name="username" value="{{username}}" />
+                        <input class="input100 d-none" name="password"  value="{{password}}" />
+						<span class="focus-input100"></span>
+					</div>
+					
+					<div class="container-login100-form-btn m-t-20 m-b-20 text-center">
+						<button class="btn-grad login-button ">
+							Send
+						</button>
+						
+					</div>
+					<!-- <div class="container text-center">
+					<span class="bo1">Hoặc</span>
+					</div>
+					<div class="container-login100-form-btn m-t-20 m-b-20 text-center">
+						<a href="/callback" class="btn-google ">
+							<img src="{{url_for('.static', filename='icon-google.png')}}" alt="GOOGLE">
+							Google
+						</a>
+						
+					</div> -->
+					<!-- <div class="w-full text-center ">
+						<span class="txt2">
+							Bạn chưa có tài khoản?
+						</span>
+						<a href="/register" class="txt2 bo1">
+							Đăng kí
+						</a>
+					</div> -->
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+	<div id="dropDownSelect1"></div>
+
+	{% block scripts %}
+	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/animsition/js/animsition.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/popper.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/bootstrap.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/select2/select2.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/daterangepicker/moment.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/countdowntime/countdowntime.js')}}"></script>
+	<script src="{{url_for('.static', filename='main.js')}}"></script>
+	{% endblock %}
+	{% endblock %}
+</body>
+</html>
