@@ -1,0 +1,43 @@
+[
+    {
+        "stt": 1,
+        "sent": "Salaries and wages paid.",
+        "tag1": "Manga"
+    },
+    {
+        "stt": 2,
+        "sent": "Total income.",
+        "tag1": "Manga"
+    },
+    {
+        "stt": 3,
+        "sent": "Activity unit.",
+        "tag1": "Manga"
+    },
+    {
+        "stt": 4,
+        "sent": "Fixed tangible assets.",
+        "tag1": "Humor"
+    },
+    {
+        "stt": 5,
+        "sent": "Total assets.",
+        "tag1": "Humor"
+    },
+    {
+        "stt": 6,
+        "sent": "Activity unit.",
+        "tag1": "Manga"
+    },
+    {
+        "stt": 7,
+        "sent": "Fixed tangible assets.",
+        "tag1": "Manga"
+    },
+    {
+        "stt": 8,
+        "sent": "Total expenditure.",
+        "tag1": "Manga",
+        "tag2": "Humor"
+    }
+]

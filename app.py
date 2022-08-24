@@ -4,6 +4,7 @@ from flask import Flask, request
 from datetime import timedelta
 from flask import render_template, session, redirect, url_for
 from flask_mail import Mail, Message
+from flask import send_from_directory
 import sqlite3
 import os
 import hashlib
@@ -42,6 +43,7 @@ app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['UPLOAD_FOLDER'] =  UPLOAD_FOLDER
+
 
 mail = Mail(app)
 
@@ -106,7 +108,7 @@ def user_index():
         user_role = select_role(username)
         if user_role!= None:
             if check_role(user_role[0])==False:
-                project = session['project']
+                project = select_project_id_by_annotator(username)
                 return redirect(url_for('review', project=project)) 
             else:
                 return redirect(url_for('admin_index'))
@@ -125,14 +127,14 @@ def get_api_login(project, number, username, password):
         if username_session != username:
             session.pop('username', None)
             session.pop('project', None)
-            return redirect(url_for('get_api_login_1', project=project, number=number, username=username, password=password))
+            return redirect(url_for('get_api_login', project=project, number=number, username=username, password=password))
         else:
             user_role = select_role(username_session)
             if user_role != None:
                 if check_role(user_role[0])==True:
                     return redirect(url_for('admin_index'))
                 else:
-                    return redirect(url_for('user_index', project=project))    
+                    return redirect(url_for('user_index'))    
             else:
                 return redirect(url_for('get_register')) 
 
@@ -152,9 +154,8 @@ def post_api_login(project, number, username, password):
             if check_role(user_role)==True:
                 return redirect(url_for('admin_index'))
             else:
-                session['project'] = project
                 session['number'] = number
-                return redirect(url_for('user_index', project = project))
+                return redirect(url_for('user_index'))
         else: 
             return redirect(url_for('login',error="Sai tài khoản hoặc mật khẩu"))
     else:
@@ -166,6 +167,7 @@ def post_api_login(project, number, username, password):
 @app.route('/logout')
 def logout():
    session.pop('username', None)
+   session.pop('project', None)
    return redirect(url_for('index'))
 
 ################################### USER REVIEW ################################
@@ -180,11 +182,15 @@ def review():
             if check_role(user_role[0])==False:
                 try: 
                     project = request.args['project']
+                    project_temp = select_project_id_by_annotator(username)
+                    if project != project_temp:
+                        return redirect(url_for('review', project = project_temp))
                     number = int(session['number'])
                 except:
-                    project = session['project']
+                    project = select_project_id_by_annotator(username)
                     number = 5
-                finally:
+                    return redirect(url_for('review', project = project))
+                else:
 
                     task = select_task_by_project_id(project)
                     
@@ -381,6 +387,22 @@ def admin_project():
     else:
         return redirect(url_for('index'))
 
+# admin delete project  --------------------------------------------------------
+@app.route('/admin/delete', methods=['DELETE'])
+def admin_delete_project():
+    if 'username' in session:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                project = request.args['project']
+                delete_project_by_id(project)
+                return '0'
+            else:
+                return render_template('503.html')
+    else:
+        return redirect(url_for('index'))
+
 # create new project    --------------------------------------------------------
 @app.route('/admin/new_project', methods=['GET'])
 def get_new_project():
@@ -436,7 +458,7 @@ def post_new_project():
                     data = read_file(file_path, language)
                     insert_sentences(data, project_id, language, connection, cursor)
                         
-                return redirect(url_for('admin_index'))
+                return redirect(url_for('admin_project'))
 
         else:
             return render_template('503.html')
@@ -1104,6 +1126,15 @@ def select_username():
     result = cursor.fetchall()
     return result
 
+# select project_id_by_annotator   ------------------------------------------
+def select_project_id_by_annotator(username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT project_id FROM user where username = '{username}'".format(username = username)
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
 # select numbers of project   --------------------------------------------------
 def select_number_of_project():
     connection = connect_to_db()
@@ -1311,6 +1342,27 @@ def insert_text_class(data_id, tag_text_class, username):
     cursor.execute(query)
     connection.commit()
 
+###################################### INSERT ##################################
+
+def delete_project_by_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query1 = "DELETE FROM Project WHERE id = '{id}'".format(id = project_id)
+    query2 = "DELETE FROM Data WHERE project_id = '{id}'".format(id = project_id)
+    query3 = "DELETE FROM TagNER WHERE project_id = '{id}'".format(id = project_id)
+    query4 = "DELETE FROM TagPOS WHERE project_id = '{id}'".format(id = project_id)
+    query5 = "DELETE FROM TagParsing WHERE project_id = '{id}'".format(id = project_id) 
+    query6 = "DELETE FROM TagTextClass WHERE project_id = '{id}'".format(id = project_id)
+    query7 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
+    cursor.execute(query1)
+    cursor.execute(query2)
+    cursor.execute(query3)
+    cursor.execute(query4)
+    cursor.execute(query5)
+    cursor.execute(query6)
+    cursor.execute(query7)
+    connection.commit()
+
 ############################### HANDLE INPUT DATA ##############################
 
 # split data to sentences   ----------------------------------------------------
@@ -1328,5 +1380,6 @@ def sentence_to_tokens(sent, language):
     elif language == "vie":
         word_list = vie_word_tokenize(sent)
     return word_list
+
 
 app.run(debug=True)

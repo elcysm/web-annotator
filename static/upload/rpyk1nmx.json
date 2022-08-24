@@ -1,0 +1,33 @@
+[
+    {
+        "stt": 1,
+        "sent": "A sequence of sentences representing an idea or explaining a topic in the most organized fashion is called a paragraph.",
+        "tag1": "gd",
+        "start1": "representing",
+        "end1": "most",
+        "tag2": "fgdf",
+        "start2": "a",
+        "end2": "paragraph"
+    },
+    {
+        "stt": 2,
+        "sent": "While writing paragraphs, it is essential to care for the target audience.",
+        "tag1": "sdfgsd",
+        "start1": "writing",
+        "end1": "audience"
+    },
+    {
+        "stt": 3,
+        "sent": "Paragraph writing concerns to a single issue at a time.",
+        "tag1": "sdfgsd",
+        "start1": "at",
+        "end1": "issue"
+    },
+    {
+        "stt": 4,
+        "sent": "Students are mostly beneficial candidates of paragraphs as they look out for relevant information while crafting essays.",
+        "tag1": "sdfgsd",
+        "start1": "out",
+        "end1": "essays"
+    }
+]

@@ -200,9 +200,39 @@ function preventSubmit(e){
   }
 }
 var projectid;
+
 function chooseExport(btn){
   projectid = btn.getAttribute('data-id');
   $('#exportModal').modal('toggle');
+}
+
+
+function deleteProject(btn){
+  projectid = btn.getAttribute('data-id');
+  $('#deleteModal').modal('toggle');
+  document.getElementById('delete_span').innerHTML = projectid;
+  document.getElementById('delete_link').href = `/admin/delete?project=${projectid}`; 
+}
+
+
+function deleteSubmit(btn){
+  $.ajax({
+    type: 'DELETE',
+    url: btn.href,
+    success: function(result) {
+        if (result == '0') {
+            $('#deleteModal').modal('hide');
+            document.querySelector(`tr[id="${projectid}"]`).remove();
+            var tr_length = document.getElementsByClassName('new').length;
+            if (tr_length == 0){
+            $('#row-sent').append(`<tr class="odd"><td valign="top" colspan="5" class="dataTables_empty">No data available in table</td></tr>`)
+            }              
+        } else {
+            alert("Cannot Delete!");
+        }
+    }
+  });
+  return false;
 }
 
 
@@ -224,6 +254,8 @@ function get_type(btn, number){
   }
 }
 
+
+
 $(document).ready(function(){
      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
         removeItemButton: true,
@@ -238,7 +270,7 @@ $(document).ready(function(){
  $(document).ready(function() {
   $('#example').DataTable( {
       "pageLength": 5,
-      dom: '<"top mt-2 mb-2"i>t<"container-center mb-0 "p>',
+      dom: 't<"container-center mb-0 "p>',
   } );
 } );
 

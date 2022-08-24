@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 	{% block head %}
-	<title>Trang chủ</title>
+	<title>Data Owner | Project List</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+    <link rel="shortcut icon" href="{{url_for('.static', filename='/img/favicon.ico')}}">
+
 
 	{% block styles %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
@@ -153,7 +154,7 @@
                             
                         </div>  
                     </div>
-                    
+
 
                     <div class="text-center table-responsive">
                         <table id="example" class="table table-hover table-nowrap table-bordered">
@@ -169,7 +170,7 @@
                             </thead>
                             <tbody id="row-sent">
 								{%for i in project%}
-                                <tr>
+                                <tr id="{{i[0]}}" class="new">
                                     <td>{{i[0]}}</td>
                                     <td><a class="text-heading font-semibold" href="#">{{i[1]}}</a></td>
                                     <!-- <td>23-01-2022</td> -->
@@ -177,7 +178,7 @@
 									<td><span class="badge btn-grad">{{i[3]}}</span></td>
                                     <td>
 										<!-- <a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a>  -->
-                                        <a onclick="SomeDeleteRowFunction(this);" href="#"><button type="button" class="btn btn-danger btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
+                                        <a data-id = "{{i[0]}}" onclick="deleteProject(this);"><button type="button" class="btn btn-danger btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
 										<a data-id = "{{i[0]}}" onclick="chooseExport(this);"><button type="button" class="btn btn-primary btn-sm btn-square"><i class="fa fa-download"></i></button></a>
                                         <a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-success btn-sm btn-square"><i class="fa fa-user-plus"></i></button></a>
 										
@@ -267,6 +268,28 @@
         </div>
     </div>
 
+	<!-- delete Modal-->
+	<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Project?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Are you sure you want to delete project id = <span class="font-weight-bold" id="delete_span"></span> ?
+					
+				</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a id="delete_link" onclick="return deleteSubmit(this);" class="btn btn-primary ml-auto">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+	
 	<!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -286,6 +309,7 @@
             </div>
         </div>
     </div>
+
 	<div id="dropDownSelect1"></div>
 	{% block scripts %}
     <script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>

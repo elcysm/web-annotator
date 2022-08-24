@@ -62,7 +62,9 @@ body, html {
   justify-content: center;
   align-items: center;
 }
-
+.modal-open {
+  overflow: hidden;
+}
 .invite{
   border:0px;
    outline:0px;
