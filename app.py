@@ -1009,7 +1009,12 @@ def read_file(filePath, language):
         data = pd.read_csv(filePath, header=None, encoding='utf-8')
         csvData = ""
         for i, row in data.iterrows():
-            csvData += row[4]
+            temp = row[0]
+            if '.' not in temp:
+                temp = temp.strip() + '. '
+            if '. ' not in temp:
+                temp = temp + ' '
+            csvData += temp
         return csvData
     elif ext == ".txt":
         with open(filePath, encoding='utf-8') as f:
@@ -1017,11 +1022,35 @@ def read_file(filePath, language):
         txtData = ""
         for line in lines:
             if language == "eng":
-                txtData += line.replace('\n', ' ').replace("'", "''")
+                line.replace('\n', ' ').replace("'", "''")
             else:
-                txtData += line.replace('\n', ' ').replace("'", ' ')
+                line.replace('\n', ' ').replace("'", ' ')
+            if '.' not in line:
+                line = line.strip() + '. '
+            if '. ' not in line:
+                line = line + ' '
+            txtData += line
 
         return txtData
+# def read_file(filePath, language):
+#     ext = os.path.splitext(filePath)[1]
+#     if ext == ".csv":
+#         data = pd.read_csv(filePath, header=None, encoding='utf-8')
+#         csvData = ""
+#         for i, row in data.iterrows():
+#             csvData += row[4]
+#         return csvData
+#     elif ext == ".txt":
+#         with open(filePath, encoding='utf-8') as f:
+#             lines = f.readlines()
+#         txtData = ""
+#         for line in lines:
+#             if language == "eng":
+#                 txtData += line.replace('\n', ' ').replace("'", "''")
+#             else:
+#                 txtData += line.replace('\n', ' ').replace("'", ' ')
+
+#         return txtData
 ################################### EXPORT DATA ################################
 # write file
 def write_file(project_id, type):
