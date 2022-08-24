@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import re
 from flask import Flask, request
 from datetime import timedelta
@@ -9,8 +10,12 @@ import hashlib
 import random
 import string
 import pandas as pd
-from underthesea import word_tokenize, sent_tokenize
-
+from nltk import word_tokenize as en_word_tokenize, sent_tokenize as en_sent_tokenize
+from underthesea import word_tokenize as vie_word_tokenize, sent_tokenize as vie_sent_tokenize
+from datetime import datetime
+import json
+import collections
+import csv
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -126,36 +131,80 @@ def review():
                     project = session['project']
                     number = 5
                 finally:
+
                     task = select_task_by_project_id(project)
                     
                     if task == "textclass":
-                        # data = select_sent_by_id(data_id)
                         tag = select_tag_textclass_by_project_id(project)
                         datas = []
-                        temp = select_data_id_by_project_id(project)
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+                        sent = []
+                        for dt in datas:
+                            sent.append(select_sent_by_id(dt))
+                        return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task)
+                    
+                    if task == "pos":
+                        datas = []
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
                         while len(datas) < number:
                             dt = random.choice(temp)
                             if dt not in datas:
                                 datas.append(dt)
                         
-                        sent = []
+                        tokens = []
                         for dt in datas:
-                            sent.append(select_sent_by_id(dt))
+                            tokens.append(select_token_by_data_id(dt))
 
-                        return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task)
-                    if task == "pos":
                         tag = select_tag_pos_by_project_id(project)
-                        token = select_token_by_data_id(data_id)
-                        lentoken = len(token)
-                        return render_template('pos.html', project=project, tag=tag, token=token, task=task, lentoken=lentoken)
-                    if task == "parsing":
-                        tag = select_tag_parsing_by_project_id(project)
-                        token = select_token_by_data_id(data_id)
-                        return render_template('parsing.html', project=project, tag=tag, token=token, task=task)
+                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number)
+                    
                     if task == "ner":
+                        datas = []
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+
+                        tokens = []
+                        for dt in datas:
+                            tokens.append(select_token_by_data_id(dt))
+
                         tag = select_tag_ner_by_project_id(project)
-                        token = select_token_by_data_id(data_id)
-                        return render_template('ner.html', project=project, tag=tag, token=token, task=task)
+                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number)
+
+
+                    if task == "parsing":
+                        datas = []
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+                        
+                        tokens = []
+                        for dt in datas:
+                            tokens.append(select_token_by_data_id(dt))
+                        
+                        lentoken=[]
+                        for i in tokens:
+                            lentoken.append(len(i))
+                            
+                        tag = select_tag_parsing_by_project_id(project)
+                        return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken)
+            
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -167,13 +216,11 @@ def review():
 @app.route('/user/review', methods=['POST'])
 def textclass_post():
     username = session['username']
-    # data_id = request.args['data']
     project = request.args['project']
     task = select_task_by_project_id(project)
-    
-    if task == "textclass":
-        number = int(request.form['number'])
+    number = int(request.form['number'])
 
+    if task == "textclass":
         for i in range(0, number):
             review_textclass = request.form["id_{id}".format(id=str(i))]
             review_textclass_tag = request.form.getlist("tag_{id}".format(id=str(i)))
@@ -182,26 +229,73 @@ def textclass_post():
                 if tag != '':
                     insert_text_class(review_textclass, tag, username)
             
-        return render_template('email_verify.html')
+        return redirect(url_for('review_done'))
 
     if task == "pos":
-        review_token_pos = request.form.getlist('token')
-        review_tag_pos = request.form.getlist('tag')
 
-        print(review_token_pos, review_tag_pos)
-        
-        for review in review_token_pos:
-            insert_pos(data_id, review, username)
+        for i in range(0, number):
+            review_id = request.form["id_{id}".format(id=str(i))]
+            review_token_pos = request.form.getlist("token_{id}".format(id=str(i)))
+            review_tag_pos = request.form.getlist("tag_{id}".format(id=str(i)))
+
+            print(review_id, review_token_pos, review_tag_pos)
+            for i in range(len(review_token_pos)):
+                if review_tag_pos[i] != '':
+                    insert_pos(review_id, review_token_pos[i], review_tag_pos[i], username)
+       
+        return redirect(url_for('review_done'))
+
+    
+    if task == "ner":
+
+        for i in range(0, number):
+            review_id = request.form["id_{id}".format(id=str(i))]
+            review_token_ner = request.form.getlist("token_{id}".format(id=str(i)))
+            review_tag_ner = request.form.getlist("tag_{id}".format(id=str(i)))
+
+            print(review_id, review_token_ner, review_tag_ner)
+            for i in range(len(review_token_ner)):
+                if review_tag_ner[i] != '':
+                    insert_ner(review_id, review_token_ner[i], review_tag_ner[i], username)
+       
+        return redirect(url_for('review_done'))
 
 
+    if task == "parsing":
 
-        # project = request.args['project']
-        # data_id = select_data_id_by_project_id(project)
-        # data = random.choice(data_id)
-        # return redirect(url_for('pos', project=project, data=data))
+        for i in range(0, number):
+            review_id = request.form["id_{id}".format(id=str(i))]
+            review_tag_parsing = request.form.getlist("parsing_{id}".format(id=str(i)))
+            print(review_id, review_tag_parsing)
+            
+            if review_tag_parsing != []:
+                for i in range(len(review_tag_parsing)):
+                    rv = review_tag_parsing[i].split(' ')
+                    insert_parsing(review_id, rv[1], rv[2], rv[0], username)
+        return redirect(url_for('review_done'))
 
+
+# Thank you  ----------------------------------------------------------------
+@app.route('/user/review/done')
+def review_done():
+    return render_template('thankyou.html')
 
 # admin login   ----------------------------------------------------------------
+@app.route('/admin/project')
+def admin_project():
+    if 'username' in session:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                project = select_all_project()
+                return render_template('projects.html', username=username, project=project)
+            else:
+                return render_template('503.html')
+    else:
+        return redirect(url_for('index'))
+
+
 @app.route('/admin')
 def admin_index():
     if 'username' in session:
@@ -209,30 +303,50 @@ def admin_index():
         user_role = select_role(username)
         if user_role!= None:
             if check_role(user_role[0])==True:
-                project = select_all_project()
-                return render_template('admin.html', username=username, project=project)
+                num_project = select_number_of_project()
+                num_annot = select_number_of_colaborator()
+                num_task = int(select_number_of_task())
+                task = select_all_task()
+                tasks = []
+                for i in task:
+                    if i == "ner":
+                        tasks.append('Name Entity Recognition')
+                    if i == "pos":
+                        tasks.append('Part Of Speech Tagging')
+                    if i == "textclass":
+                       tasks.append('Text Classification')
+                    if i == "parsing":
+                       tasks.append('Dependency Parsing')
+                return render_template('admin.html', username=username, num_project=num_project,
+                num_annot= num_annot,
+                num_task = num_task,
+                tasks = tasks)
+            else:
+                return render_template('503.html')
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/admin/collaborator')
+def collaborator_index():
+    if 'username' in session:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                annotator = select_username()
+                number_review = []
+                for i in annotator:
+                    number_review.append(select_number_review_by_username(i[0], i[2]))
+
+                len_annotator = len(annotator)
+                return render_template('collaborator.html', username=username, annotator=annotator, number_review= number_review, len_annotator=len_annotator)
             else:
                 return render_template('503.html')
     else:
         return redirect(url_for('index'))
 
 ################################ LOGIN BY LINK #################################
-
-# login by link from data owner ------------------------------------------------
-# @app.route('/login/username=<username>&password=<password>', methods=['GET'])
-# def get_api_login(username, password):
-#     if 'username' not in session:
-#         return render_template('login.html', username=username, password=password)
-#     else:
-#         username = session['username']
-#         user_role = select_role(username)
-#         if user_role != None:
-#             if check_role(user_role[0])==True:
-#                 return redirect(url_for('admin_index'))
-#             else:
-#                 return redirect(url_for('user_index'))
-#         else:
-#             return redirect(url_for('get_register')) 
 
 # login by link from data owner ------------------------------------------------
 @app.route('/login/project=<project>&number=<number>&username=<username>&password=<password>', methods=['GET'])
@@ -256,23 +370,6 @@ def get_api_login_1(project, number, username, password):
                 return redirect(url_for('get_register')) 
 
 # login by link from data owner ------------------------------------------------
-# @app.route('/login/username=<username>&password=<password>', methods=['POST'])
-# def post_api_login(username, password):
-
-#     usernameform = request.form['username']
-#     passwordform = request.form['password']
-
-#     if usernameform == username and passwordform == password:
-#         result = select_role_by_username_password(username, password)
-#         if result != None:
-#             session['username'] = username
-#             user_role = result[1]
-#             if check_role(user_role)==True:
-#                 return redirect(url_for('admin_index'))
-#             else:
-#                 return redirect(url_for('user_index'))
-#     else:
-#         return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
 
 @app.route('/login/project=<project>&number=<number>&username=<username>&password=<password>', methods=['POST'])
 def post_api_login_1(project, number, username, password):
@@ -344,7 +441,7 @@ def post_invitation():
     project_id = request.form['project']
     number = request.form.get('number')
 
-    insert_annotator(username, email, password)
+    insert_annotator(username, email, password, project_id)
 
     msg = Message(
         EMAIL_SUBJECT,
@@ -370,15 +467,14 @@ def register_successfully():
 @app.route('/admin/new_project', methods=['GET'])
 def get_new_project():
     if 'username' not in session:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
     else:
         user_admin = session['username']
         user_role = select_role(user_admin)
         if user_role !=None:
             if check_role(user_role[0])==True:
-                return render_template('new_project.html', user_admin=user_admin)
+                projects = select_project_name()
+                return render_template('new_project.html', username=user_admin, projects=projects)
             else:
                 return render_template('503.html')
 
@@ -386,9 +482,7 @@ def get_new_project():
 @app.route('/admin/new_project', methods=['POST'])
 def post_new_project():
     if 'username' not in session:
-        return render_template('login.html',
-        error="",
-        success="")
+        return redirect(url_for('index'))
     else:
         user_admin = session['username']
         user_role = select_role(user_admin)
@@ -402,29 +496,45 @@ def post_new_project():
 
                 task = request.form['task']
                 method = request.form['method']
-                label_get = request.form['label']
-                label = label_get.split(", ")
+                label = request.form.getlist('label')
+
+                
+                # now = datetime.now()
+                # dt_string = now.strftime('%d/%m/%Y %H:%M:%S')
+                # print(now)
 
                 # insert
                 insert_project(project_id, project_name, language, task, method)
                 insert_label(task, label, project_id)
-                # project_id = select_project_id(project_name)  
 
                 uploaded_file = request.files['file']
                 if uploaded_file.filename != '':
                     file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
                     uploaded_file.save(file_path) 
-                    data = read_file(file_path)  
-                    
-                    for i, row in data.iterrows():
-                        
-                        insert_sentences(row[4], project_id)
+                    data = read_file(file_path, language)
+                    insert_sentences(data, project_id, language)
                         
                 return redirect(url_for('admin_index'))
 
         else:
             return render_template('503.html')
 
+
+@app.route('/admin/download')
+def download():
+    if 'username' in session:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                project = request.args['project']
+                type = request.args['type']
+                write_file(project, type)
+                return redirect(url_for('admin_project'))
+            else:
+                return render_template('503.html')
+    else:
+        return redirect(url_for('index'))
 ################################### ADMIN REGISTER ############################# 
 
 # admin register get    --------------------------------------------------------
@@ -543,10 +653,18 @@ def select_data_id(sent):
     return result
 
 # select data_id by project id  ------------------------------------------------
-def select_data_id_by_project_id(project_id):
+def select_data_id_by_project_id(project_id, username, task):
+    if task == "pos":
+        tsk = "POS"
+    if task == "ner":
+        tsk = "NER"
+    if task == "parsing":
+        tsk = "Parsing"
+    if task == "textclass":
+        tsk = "TextClass"
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "SELECT id FROM Data WHERE project_id = '{id}'".format(id = project_id)
+    query = "SELECT id FROM Data WHERE project_id = '{id}' AND id NOT IN (SELECT data_id FROM '{task}' WHERE username = '{username}')".format(id = project_id, task = tsk, username = username)
     cursor.execute(query)
     result = []
     for id in cursor:
@@ -599,7 +717,34 @@ def select_all_project():
     result = cursor.fetchall()
     return result
 
+# select_project_id    --------------------------------------------------------
+def select_project_name():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT name FROM Project"
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
 
+def select_number_review_by_username(username, project_id):
+    task = select_task_by_project_id(project_id)
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    if task == "ner":
+        query = "SELECT DISTINCT data_id, username FROM NER WHERE username = '{uname}'".format(uname = username)
+    elif task == "pos":
+        query = "SELECT DISTINCT data_id, username FROM POS WHERE username = '{uname}'".format(uname = username)
+    elif task == "parsing":
+        query = "SELECT DISTINCT data_id, username FROM Parsing WHERE username = '{uname}'".format(uname = username)
+    elif task == "textclass":
+        query = "SELECT DISTINCT data_id, username FROM TextClass WHERE username = '{uname}'".format(uname = username)
+    cursor.execute(query)
+    count = 0
+    for i in cursor:
+        count += 1
+    return count
 # select token by data id   ----------------------------------------------------
 def select_token_by_data_id(id):
     connection = connect_to_db()
@@ -675,14 +820,23 @@ def select_number_data_of_project(project_id):
         count += 1
     return count
 
+# select username by role   --------------------------------------------
+def select_username():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT user.username, user.email, user.project_id, project.name FROM user, project where user.role = '{role}' and user.project_id = project.id".format(role = ANNOTATOR_ROLE)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
 # ------------------------------- INSERT ---------------------------------------
 
 # insert annotator  ------------------------------------------------------------
-def insert_annotator(username, email, password):
+def insert_annotator(username, email, password, project_id):
     connection = connect_to_db()
     cursor = connection.cursor()
     passwordhash = hashlib.md5(password.encode()).hexdigest()
-    query1 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}')".format(name = username, mail = email, passw = passwordhash, role = ANNOTATOR_ROLE)
+    query1 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}')".format(name = username, mail = email, passw = passwordhash, role = ANNOTATOR_ROLE, project_id=project_id)
     cursor.execute(query1)
     connection.commit()
 
@@ -691,7 +845,7 @@ def insert_data_owner(username, email, password):
     connection = connect_to_db()
     cursor = connection.cursor()
     passwordhash = hashlib.md5(password.encode()).hexdigest()
-    query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}')".format(name = username, mail = email, passw = passwordhash, role = DATA_OWNER_ROLE)
+    query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}')".format(name = username, mail = email, passw = passwordhash, role = DATA_OWNER_ROLE, project_id='')
     cursor.execute(query2)
     connection.commit()
 
@@ -706,8 +860,8 @@ def insert_project(project_id, project_name, language, task, method):
 # ### INSERT INPUT DATA ###
 
 # insert sentence to database   ------------------------------------------------
-def insert_sentences(data, project_id):
-    sent_list = data_to_sentences(data)
+def insert_sentences(data, project_id, language):
+    sent_list = data_to_sentences(data, language)
 
     connection = connect_to_db()
     cursor = connection.cursor()
@@ -718,11 +872,11 @@ def insert_sentences(data, project_id):
         cursor.execute(query)
         connection.commit()
 
-        insert_tokenize(sent, id)
+        insert_tokenize(sent, id, language)
 
 # insert tokenize to database   ------------------------------------------------
-def insert_tokenize(sent, data_id):
-    word_list = sentence_to_tokens(sent)
+def insert_tokenize(sent, data_id, language):
+    word_list = sentence_to_tokens(sent, language)
     
     connection = connect_to_db()
     cursor = connection.cursor()
@@ -769,16 +923,16 @@ def insert_tag_text_class(tag_text_class, proj_id):
 def insert_label(task, label, proj_id):
     if task == "textclass":
         for tag in label:
-            insert_tag_text_class(tag, proj_id)
+            insert_tag_text_class(" ".join(tag.split()), proj_id)
     if task == "parsing":
         for tag in label:
-            insert_tag_parsing(tag, proj_id)
+            insert_tag_parsing(" ".join(tag.split()), proj_id)
     if task == "pos":
         for tag in label:
-            insert_tag_pos(tag, proj_id)
+            insert_tag_pos(" ".join(tag.split()), proj_id)
     if task == "ner":
         for tag in label:
-            insert_tag_ner(tag, proj_id)
+            insert_tag_ner(" ".join(tag.split()), proj_id)
 
 # ### INSERT REVIEW ###
 
@@ -814,27 +968,362 @@ def insert_text_class(data_id, tag_text_class, username):
     cursor.execute(query)
     connection.commit()
 
+def select_number_of_project():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT COUNT(id) FROM Project"
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
+def select_number_of_colaborator():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT COUNT(username) FROM user where role = '{role}'".format(role = ANNOTATOR_ROLE)
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
+def select_number_of_task():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT COUNT(DISTINCT task) FROM Project"
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
+def select_all_task():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT DISTINCT task FROM Project"
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
 # Upload CSV File --------------------------------------------
-def read_file(filePath):
-    # CVS Column Names
-    # col_names = ['first_name','last_name','address', 'street', 'state' , 'zip']
-    # Use Pandas to parse the CSV file
-    csvData = pd.read_csv(filePath, header=None, encoding='utf8')
-    # Loop through the Rows
-    return csvData
-    # for i,row in csvData.iterrows():
-    #         print(i,row['first_name'],row['last_name'],row['address'],row['street'],row['state'],row['zip'],)
+def read_file(filePath, language):
+    ext = os.path.splitext(filePath)[1]
+    if ext == ".csv":
+        data = pd.read_csv(filePath, header=None, encoding='utf-8')
+        csvData = ""
+        for i, row in data.iterrows():
+            temp = row[0]
+            if '.' not in temp:
+                temp = temp.strip() + '. '
+            if '. ' not in temp:
+                temp = temp + ' '
+            csvData += temp
+        return csvData
+    elif ext == ".txt":
+        with open(filePath, encoding='utf-8') as f:
+            lines = f.readlines()
+        txtData = ""
+        for line in lines:
+            if language == "eng":
+                line.replace('\n', ' ').replace("'", "''")
+            else:
+                line.replace('\n', ' ').replace("'", ' ')
+            if '.' not in line:
+                line = line.strip() + '. '
+            if '. ' not in line:
+                line = line + ' '
+            txtData += line
+
+        return txtData
+# def read_file(filePath, language):
+#     ext = os.path.splitext(filePath)[1]
+#     if ext == ".csv":
+#         data = pd.read_csv(filePath, header=None, encoding='utf-8')
+#         csvData = ""
+#         for i, row in data.iterrows():
+#             csvData += row[4]
+#         return csvData
+#     elif ext == ".txt":
+#         with open(filePath, encoding='utf-8') as f:
+#             lines = f.readlines()
+#         txtData = ""
+#         for line in lines:
+#             if language == "eng":
+#                 txtData += line.replace('\n', ' ').replace("'", "''")
+#             else:
+#                 txtData += line.replace('\n', ' ').replace("'", ' ')
+
+#         return txtData
+################################### EXPORT DATA ################################
+# write file
+def write_file(project_id, type):
+    if type == 'csv':
+        write_file_csv(project_id)
+    elif type == 'json':
+        write_file_json(project_id)
+# write file csv
+def write_file_csv(project_id):
+    task = select_task_by_project_id(project_id)
+    with open(os.path.join(app.config['UPLOAD_FOLDER'],"{id}.csv".format(id=project_id)), 'w', newline='', encoding='UTF-8') as file:
+        writer = csv.writer(file)
+        if task == "pos":
+            header = ['', 'sentences', 'tag', 'token']
+            writer.writerow(header)
+            datas = select_sent_and_id_by_project_id(project_id)
+            count=1
+            for dt in datas:
+                id = dt[0]
+                review = select_review_pos(id)
+                # Truong hop data da co nguoi review
+                if len(review) != 0:
+                    uname = ""
+                    for rv_part in review:
+                        if rv_part[2] != uname:
+                            data_review = [count, dt[1], rv_part[0], rv_part[1]]
+                            uname = rv_part[2]
+                        else:
+                            data_review = ['', '', rv_part[0], rv_part[1]]
+                        writer.writerow(data_review)
+                    count+=1
+        if task == "ner":
+            header = ['', 'sentences', 'tag', 'token']
+            writer.writerow(header)
+            datas = select_sent_and_id_by_project_id(project_id)
+            count=1
+            for dt in datas:
+                id = dt[0]
+                review = select_review_ner(id)
+                # Truong hop data da co nguoi review
+                if len(review) != 0:
+                    uname = ""
+                    for rv_part in review:
+                        if rv_part[2] != uname:
+                            data_review = [count, dt[1], rv_part[0], rv_part[1]]
+                            uname = rv_part[2]
+                        else:
+                            data_review = ['', '', rv_part[0], rv_part[1]]
+                        
+                        writer.writerow(data_review)
+                    count+=1
+        if task == "parsing":
+            header = ['', 'sentences', 'tag', 'start', 'end']
+            writer.writerow(header)
+            datas = select_sent_and_id_by_project_id(project_id)
+            count=1
+            for dt in datas:
+                id = dt[0]
+                review = select_review_parsing(id)
+                # Truong hop data da co nguoi review
+                if len(review) != 0:
+                    uname = ""
+                    for rv_part in review:
+                        if rv_part[3] != uname:
+                            data_review = [count, dt[1], rv_part[2], rv_part[0], rv_part[1]]
+                            uname = rv_part[3]
+                        else:
+                            data_review = ['', '', rv_part[2], rv_part[0], rv_part[1]]
+                        writer.writerow(data_review)
+                    count+=1
+        if task == "textclass":
+            header = ['', 'sentences', 'tag']
+            writer.writerow(header)
+            datas = select_sent_and_id_by_project_id(project_id)
+            count=1
+            for dt in datas:
+                id = dt[0]
+                review = select_review_textclass(id)
+                # Truong hop data da co nguoi review
+                if len(review) != 0:
+                    uname = ""
+                    for rv_part in review:
+                        if rv_part[1] != uname:
+                            data_review = [count, dt[1], rv_part[0]]
+                            uname = rv_part[1]
+                        else:
+                            data_review = ['', '', rv_part[0]]
+                        writer.writerow(data_review)
+                    count+=1
+def write_file_json(project_id):
+    task = select_task_by_project_id(project_id)
+    review_list = []
+    datas = select_sent_and_id_by_project_id(project_id)
+    count=1
+    if task == "ner":
+        for dt in datas:
+            id = dt[0]
+            review = select_review_ner(id)
+            # Truong hop data da co nguoi review
+            if len(review) != 0:
+                uname = review[0][2]
+                dem=1
+                d = collections.OrderedDict()
+                d['stt'] = count
+                d['sent'] = dt[1].replace('"', '')
+                for rv_part in review:
+                    if rv_part[2] == uname:
+                        d["tag{id}".format(id=dem)] = rv_part[1]
+                        d["token{id}".format(id=dem)]= rv_part[0]
+                        dem+=1
+                    else:
+                        count+=1
+                        dem=1
+                        review_list.append(d)
+                        d = collections.OrderedDict()
+                        d['stt'] = count
+                        d['sent'] = dt[1].replace('"', '')
+                        d["tag{id}".format(id=dem)] = rv_part[1]
+                        d["token{id}".format(id=dem)]= rv_part[0]
+                        dem+=1
+                        uname = rv_part[2]
+                    if rv_part == review[-1]:
+                        review_list.append(d)
+                count+=1
+    elif task == "pos":
+        for dt in datas:
+            id = dt[0]
+            review = select_review_pos(id)
+            # Truong hop data da co nguoi review
+            if len(review) != 0:
+                uname = review[0][2]
+                dem=1
+                d = collections.OrderedDict()
+                d['stt'] = count
+                d['sent'] = dt[1].replace('"', '')
+                for rv_part in review:
+                    if rv_part[2] == uname:
+                        d["tag{id}".format(id=dem)] = rv_part[1]
+                        d["token{id}".format(id=dem)]= rv_part[0]
+                        dem+=1
+                    else:
+                        count+=1
+                        dem=1
+                        review_list.append(d)
+                        d = collections.OrderedDict()
+                        d['stt'] = count
+                        d['sent'] = dt[1].replace('"', '')
+                        d["tag{id}".format(id=dem)] = rv_part[1]
+                        d["token{id}".format(id=dem)]= rv_part[0]
+                        dem+=1
+                        uname = rv_part[2]
+                    if rv_part == review[-1]:
+                        review_list.append(d)
+                count+=1
+    elif task == "parsing":
+        for dt in datas:
+            id = dt[0]
+            review = select_review_parsing(id)
+            # Truong hop data da co nguoi review
+            if len(review) != 0:
+                uname = review[0][3]
+                dem=1
+                d = collections.OrderedDict()
+                d['stt'] = count
+                d['sent'] = dt[1].replace('"', '')
+                for rv_part in review:
+                    if rv_part[3] == uname:
+                        d["tag{id}".format(id=dem)] = rv_part[2]
+                        d["start{id}".format(id=dem)]= rv_part[0]
+                        d["end{id}".format(id=dem)]= rv_part[1]
+                        dem+=1
+                    else:
+                        count+=1
+                        dem=1
+                        review_list.append(d)
+                        d = collections.OrderedDict()
+                        d['stt'] = count
+                        d['sent'] = dt[1].replace('"', '')
+                        d["tag{id}".format(id=dem)] = rv_part[2]
+                        d["start{id}".format(id=dem)]= rv_part[0]
+                        d["end{id}".format(id=dem)]= rv_part[1]
+                        dem+=1
+                        uname = rv_part[3]
+                    if rv_part == review[-1]:
+                        review_list.append(d)
+                count+=1
+    elif task == "textclass":
+        for dt in datas:
+            id = dt[0]
+            review = select_review_textclass(id)
+            print(len(review))
+            # Truong hop data da co nguoi review
+            if len(review) != 0:
+                uname = review[0][1]
+                dem=1
+                d = collections.OrderedDict()
+                d['stt'] = count
+                d['sent'] = dt[1].replace('"', '')
+                for rv_part in review:
+                    if rv_part[1] == uname:
+                        d["tag{id}".format(id=dem)] = rv_part[0]
+                        dem+=1
+                    else:
+                        count+=1
+                        dem=1
+                        review_list.append(d)
+                        d = collections.OrderedDict()
+                        d['stt'] = count
+                        d['sent'] = dt[1].replace('"', '')
+                        d["tag{id}".format(id=dem)] = rv_part[0]
+                        dem+=1
+                        uname = rv_part[1]
+                    if rv_part == review[-1]:
+                        review_list.append(d)
+                count+=1
+    j = json.dumps(review_list, ensure_ascii=False)
+    with open(os.path.join(app.config['UPLOAD_FOLDER'],"{id}.json".format(id=project_id)), 'w', encoding='UTF-8') as file:
+        file.write(j)
+                    
+
+def select_sent_and_id_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT id, sent FROM Data where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+def select_review_pos(data_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT token, tag, username FROM POS where data_id = '{id}' ORDER BY username".format(id = data_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+def select_review_ner(data_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT token, tag, username FROM NER where data_id = '{id}' ORDER BY username".format(id = data_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+def select_review_parsing(data_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT token_1, token_2, tag, username FROM Parsing where data_id = '{id}' ORDER BY username".format(id = data_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+def select_review_textclass(data_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag, username FROM TextClass where data_id = '{id}' ORDER BY username".format(id = data_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
 
 ############################### HANDLE INPUT DATA ##############################
 
 # split data to sentences   ----------------------------------------------------
-def data_to_sentences(data):
-    sent_list = sent_tokenize(data)
+def data_to_sentences(data, language):
+    if language == "eng":
+        sent_list = en_sent_tokenize(data)
+    elif language == "vie":
+        sent_list = vie_sent_tokenize(data)
     return sent_list
 
 # split sentence to tokenizes   ------------------------------------------------
-def sentence_to_tokens(sent):
-    word_list = word_tokenize(sent)
+def sentence_to_tokens(sent, language):
+    if language == "eng":
+        word_list = en_word_tokenize(sent)
+    elif language == "vie":
+        word_list = vie_word_tokenize(sent)
     return word_list
 
 app.run(debug=True)

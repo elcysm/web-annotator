@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 	{% block head %}
-	<title>Đăng nhập</title>
+	<title>Trang chủ</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
 
 	{% block styles %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
 	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}" >
@@ -25,8 +26,8 @@
 </head>
 <body>
 	{% block content %}
-	<div class="container-center" >
-		<nav class="mb-4 navbar navbar-expand-lg bg-white bg-unique shadow fixed-top">
+	<div class="container-bottom"> 
+		<nav class="mb-4 navbar navbar-expand-lg bg-white bg-unique shadow ">
 
 			<a class="navbar-brand font-weight-bold" href="#">Web based Annotator</a>
 			<button class="btn navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-3" aria-controls="navbarSupportedContent-3" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,10 +114,14 @@
 						</div>
 					</li>
 
+					
+
+
+					
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<img class="my-profile-picture" style="object-fit: cover;" src="https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png">
-							<span class="text-primary font-weight-bold">{{user_admin}}</span> 
+							<span class="text-primary font-weight-bold">{{username}}</span> 
 						</a>
 						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
 							<a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
@@ -128,70 +133,142 @@
 				</ul>
 			</div>
 		</nav>
-		<div class="container-login100">
-	   
 
-			{% if (success ) %}
+		<div class="mt-5">
+			<div class="container">
+                <div class="card shadow rounded">
+                    <div class="card-header border-bottom">
+                        <div class="row">
+                            <div class="col-md-6 text-left">
+                                <h2 class="mb-0">Project</h2>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <span type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">
+                                    <a href="/admin/new_project" class="text-white">
+										New Project
+										<i class="fa fa-plus"></i>
+									</a>
+                                </span>
+                            </div>
+                            
+                        </div>  
+                    </div>
+                    
+
+                    <div class="text-center table-responsive">
+                        <table id="example" class="table table-hover table-nowrap table-bordered">
+                            <thead class="table-light font-weight-bold">
+                                <tr>
+                                    <td>ID</td>
+                                    <td>Name</td>
+                                    <!-- <td>Date Modified</td> -->
+									<td>Languages</td>
+                                    <td>Task</td>
+                                    <td>Action</td>
+                                </tr>
+                            </thead>
+                            <tbody id="row-sent">
+								{%for i in project%}
+                                <tr>
+                                    <td>{{i[0]}}</td>
+                                    <td><a class="text-heading font-semibold" href="#">{{i[1]}}</a></td>
+                                    <!-- <td>23-01-2022</td> -->
+                                    <td>{{i[2]}}</td>
+									<td><span class="badge btn-grad">{{i[3]}}</span></td>
+                                    <td>
+										<!-- <a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a>  -->
+                                        <a onclick="SomeDeleteRowFunction(this);" href="#"><button type="button" class="btn btn-danger btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
+										<a data-id = "{{i[0]}}" onclick="chooseExport(this);"><button type="button" class="btn btn-primary btn-sm btn-square"><i class="fa fa-download"></i></button></a>
+                                        <a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-success btn-sm btn-square"><i class="fa fa-user-plus"></i></button></a>
+										
+									</td>
+                                </tr>
+								{% endfor %}
+                            </tbody>
+							<tfoot class="table-light font-weight-bold">
+                                <tr>
+                                    <td>ID</td>
+                                    <td>Name</td>
+                                    <!-- <td>Date Modified</td> -->
+									<td>Languages</td>
+                                    <td>Task</td>
+                                    <td>Action</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+				
+            </div>
+	   
+            {% if success %}
 				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
 					<strong>Success!</strong> {{success}}
 				</div>
-			{% endif %}
+            {% endif %}
 
-			<div class="wrap-login100 p-l-50 p-r-50 p-t-30 p-b-30">
-				<form class="login100-form validate-form flex-sb flex-w" onsubmit="return mySubmitFunction(event)" >
-					<span class="login100-form-title text-success">
-						SUCCESS
+			<!-- <div class="wrap-login100 p-l-70 p-r-70 p-t-30 p-b-30">
+					<span class="login100-form-title p-b-10">
+						TRANG CHỦ
 					</span>	
-					<span class="form-title">
-						Email has been sent successfully!
+
+				<div class="p-t-10 p-b-9 text-center">
+					<span class="txt1">
+						Xin chào <span class="text-success font-weight-bold">{{result}}</span>
 					</span>
+				</div>     
 
-					<div class="p-t-20 p-b-10">
-						<span class="txt1">
-							Email:
-						</span>
-					</div>
-					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
-						
-						<input class="input100 username" type="text" readonly name="email" value="{{email}}">
-						
-						
-						<span class="focus-input100"></span>
-					</div>
-					
-					<div class="p-t-20 p-b-10">
-						<span class="txt1" >
-							Share link:
-						</span>
-					</div>
+				<div class="w-full text-center m-t-10">
+					<a href="/admin/new_project" class="txt2 bo1">
+						New Project
+						<i class="fa fa-plus"></i>
+					</a>
+				</div>
+			</div> -->
 
-					<div class="wrap-input100 validate-input" >
-						<input id="link"class="input100" name="link" readonly value="{{link}}"  data-toggle="tooltip" data-placement="top" title="{{link}}">
-						<span class="focus-input100"></span>
-					</div>
-					
-					<div class="container-login100-form-btn m-t-30 m-b-20 text-center">
-						<button class="btn-grad login-button" onclick="copyToClipboard()">
-							<i id="check" class="fa fa-check d-none "></i>
-							<span id="copy">Copy Link To Clipboard</span>
-						</button>
-						
-					</div>
-					<div class="w-full text-center">
-						<span class="txt2">
-							Invite another?
-						</span>
-						<a href="/admin/project">
-							Back
-							<i class="fa fa-arrow-right"></i>
-						</a>
-					</div>
-
-				</form>
-			</div>
 		</div>
 	</div>
-	<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	<!-- Choose Export Option Modal-->
+	<div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Choose Export Method</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="card-body">
+					<div class="row ">
+						<div class="col-6 col-lg-6">
+							<button onclick="get_type(this, 0)" class="btn btn-grad w-100" type="button">
+								<i id="csv" class="fa fa-check mr-1 d-none"></i>CSV
+								<input id="type" class="type d-none" value="csv"></input> 
+							</button>
+						</div>
+						<div class="col-6 col-lg-6">
+							<button onclick="get_type(this, 1)" class="btn btn-grad w-100" type="button">
+								<i id="json" class="fa fa-check mr-1 d-none"></i>JSON
+								<input id="type" class="type d-none" value="json"></input> 
+							</button>
+						</div>
+						<div class="col-12 col-lg-12">
+							<input type='file' class="form-control mt-4" name='' value="" placeholder="Click here to get download folder..."></input> 
+						</div>
+					</div>
+				</div>
+                <div class="modal-footer d-flex">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+					<input id="projectid"class="type d-none" value=""></input> 
+                    <a id="link_download" class="btn btn-primary ml-auto d-none" >Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -209,12 +286,9 @@
             </div>
         </div>
     </div>
-	
 	<div id="dropDownSelect1"></div>
-
 	{% block scripts %}
-	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
-	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+    <script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/animsition/js/animsition.min.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/popper.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/bootstrap.min.js')}}"></script>
@@ -223,7 +297,9 @@
 	<script src="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/countdowntime/countdowntime.js')}}"></script>
 	<script src="{{url_for('.static', filename='main.js')}}"></script>
-	{% endblock %}
+	<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
+    {% endblock %}
 	{% endblock %}
 </body>
 </html>

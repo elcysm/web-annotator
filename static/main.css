@@ -34,15 +34,18 @@
    cursor: pointer;
  }
 body, html {
-  margin: 0px;
-	height: 100%;
-  position:relative; 
+  margin-top: 0;
+  height: 100%;
+  position: relative; 
   font-family: "Poppins", sans-serif;
-  background: -webkit-gradient(linear, left bottom, left top, from(#ffffff), to(#a18cd1));
-  background: -webkit-linear-gradient(bottom, #ffffff 0%, #ddd0fd 100%);
-  background: -moz-linear-gradient(bottom, #ffffff 0%, #ddd0fd 100%);
-  background: -o-linear-gradient(bottom, #ffffff 0%, #ddd0fd 100%);
-  background: linear-gradient(to top, #ffffff 0%, #ddd0fd 100%);
+
+  /* background: -webkit-linear-gradient(bottom, #b1b1b1 0%, #b1b1b1 100%);
+  background: -moz-linear-gradient(bottom,#b1b1b1 0%, #b1b1b1 100%);
+  background: -o-linear-gradient(bottom, #b1b1b1 0%, #b1b1b1 100%);
+  background: linear-gradient(to top, #b1b1b1 0%, #b1b1b1  100%); */
+}
+.shadow {
+  box-shadow: 0 0.15rem 1.75rem 0 rgb(58 59 69 / 15%) !important;
 }
 
 .container-center{
@@ -59,6 +62,7 @@ body, html {
   justify-content: center;
   align-items: center;
 }
+
 .invite{
   border:0px;
    outline:0px;
@@ -183,6 +187,7 @@ iframe {
   background: #fff;
   border-radius: 15px;
   position: relative;
+  border: 2px solid #1cfc14 ;
   -webkit-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
   -moz-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
   box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
@@ -469,7 +474,7 @@ input::placeholder {
 .validate-input {
   position: relative;
 }
-
+.no-drop {cursor: no-drop;}
 .alert-validate::before {
   content: attr(data-validate);
   position: absolute;
@@ -600,6 +605,29 @@ input::placeholder {
     left: -25px;
 }
 
+.limit-height {
+  height: 230px;
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.limit-width {
+  white-space: nowrap;
+  overflow-x: auto;
+}
+.text-over{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+
+.review-help{
+  position:absolute;
+  top: 20px;
+  left: 40px;
+}
 
 @media(min-width: 992px){
 	.navbar-expand-custom {
@@ -809,10 +837,8 @@ background-size: 50% 50%;
    font-size: 2.1rem;
 
 }
-
-.content {
-  width: 95%;
-  margin-top: 70px;
+.bu:hover {
+  color:white ;
 }
 
 .content__title {
