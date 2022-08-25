@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from itertools import count
 import re
 from flask import Flask, request
 from datetime import timedelta
@@ -17,6 +18,8 @@ from datetime import datetime
 import json
 import collections
 import csv
+import pytz
+import datetime as dt
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -277,15 +280,29 @@ def review_post():
     task = select_task_by_project_id(project)
     number = int(request.form['number'])
 
+    
+    vietnam=pytz.timezone('Asia/Ho_Chi_Minh')
+
+    now = dt.datetime.now()
+
+    vietnam_now = now.astimezone(vietnam).strftime("%d/%m/%Y %H:%M:%S")
+
+    count = 0
+
     if task == "textclass":
         for i in range(0, number):
             review_textclass = request.form["id_{id}".format(id=str(i))]
             review_textclass_tag = request.form.getlist("tag_{id}".format(id=str(i)))
-
+            
+            temp = 0
             for tag in review_textclass_tag:
                 if tag != '':
+                    temp += 1
                     insert_text_class(review_textclass, tag, username)
+            if temp != 0:
+                count +=1
             
+        insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
     if task == "pos":
@@ -295,11 +312,15 @@ def review_post():
             review_token_pos = request.form.getlist("token_{id}".format(id=str(i)))
             review_tag_pos = request.form.getlist("tag_{id}".format(id=str(i)))
 
-            print(review_id, review_token_pos, review_tag_pos)
+            temp = 0
             for i in range(len(review_token_pos)):
                 if review_tag_pos[i] != '':
+                    temp += 1
                     insert_pos(review_id, review_token_pos[i], review_tag_pos[i], username)
+            if temp != 0:
+                count +=1
        
+        insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
     
@@ -310,11 +331,16 @@ def review_post():
             review_token_ner = request.form.getlist("token_{id}".format(id=str(i)))
             review_tag_ner = request.form.getlist("tag_{id}".format(id=str(i)))
 
+            temp = 0
             print(review_id, review_token_ner, review_tag_ner)
             for i in range(len(review_token_ner)):
                 if review_tag_ner[i] != '':
+                    temp += 1
                     insert_ner(review_id, review_token_ner[i], review_tag_ner[i], username)
+            if temp != 0:
+                count +=1
        
+        insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
 
@@ -326,10 +352,12 @@ def review_post():
             print(review_id, review_tag_parsing)
             
             if review_tag_parsing != []:
+                count +=1
                 for i in range(len(review_tag_parsing)):
                     rv = review_tag_parsing[i].split(' ')
                     insert_parsing(review_id, rv[1], rv[2], rv[0], username)
 
+        insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
 
@@ -362,10 +390,14 @@ def admin_index():
                        tasks.append('Text Classification')
                     if i == "parsing":
                        tasks.append('Dependency Parsing')
+                
+                notice = select_notice()
+                print(notice)
                 return render_template('admin.html', username=username, num_project=num_project,
                 num_annot= num_annot,
                 num_task = num_task,
-                tasks = tasks)
+                tasks = tasks,
+                notice=notice)
             else:
                 return render_template('403.html')
     else:
@@ -1245,6 +1277,15 @@ def select_review_textclass(data_id):
     result = cursor.fetchall()
     return result
 
+# select notice  ---------------------------------------------------------------
+def select_notice():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT ReviewNoti.username, ReviewNoti.number_review, ReviewNoti.seen, ReviewNoti.last_modified, user.project_id, Project.name FROM ReviewNoti, Project, user where Project.id = user.project_id and user.username = ReviewNoti.username ORDER BY ReviewNoti.id DESC"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
 ###################################### INSERT ##################################
 
 # insert annotator  ------------------------------------------------------------
@@ -1271,6 +1312,14 @@ def insert_project(project_id, project_name, language, task, method):
     cursor = connection.cursor()
     query = "INSERT INTO Project (id, name, language, task, method) VALUES ('{id}', '{name}', '{lang}', '{tsk}', '{mthd}')".format(id = project_id, name = project_name, lang = language, tsk = task, mthd = method)
     cursor.execute(query)
+    connection.commit()
+
+# insert review notification  ------------------------------------------------------------
+def insert_notice(username, number, date):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query1 = "INSERT INTO ReviewNoti (username, number_review, seen, last_modified) VALUES ('{username}','{number_review}','0', '{date}')".format(username = username, number_review = number, date = date)
+    cursor.execute(query1)
     connection.commit()
 
 # ### INSERT INPUT DATA ###
@@ -1415,8 +1464,11 @@ def delete_annotator_by_username(username):
     if task == 'textclass':
         query2 = "DELETE FROM TextClass WHERE username = '{username}'".format(username = username)
 
+    query3 = "DELETE FROM ReviewNoti WHERE username = '{username}'".format(username = username)
+
     cursor.execute(query1)
     cursor.execute(query2)
+    cursor.execute(query3)
     connection.commit()
 # def delete_project_by_id(project_id):
 #     connection = connect_to_db()
