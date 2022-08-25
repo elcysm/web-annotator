@@ -8738,7 +8738,6 @@ button.bg-dark:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 200px;
 }
 .text-left {
   text-align: left !important;

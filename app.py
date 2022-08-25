@@ -392,12 +392,17 @@ def admin_index():
                        tasks.append('Dependency Parsing')
                 
                 notice = select_notice()
-                print(notice)
+                count_notif = 0
+                for i in notice:
+                    if i[2] == "0":
+                        count_notif += 1
+
                 return render_template('admin.html', username=username, num_project=num_project,
                 num_annot= num_annot,
                 num_task = num_task,
                 tasks = tasks,
-                notice=notice)
+                notice=notice,
+                count_notif=count_notif)
             else:
                 return render_template('403.html')
     else:

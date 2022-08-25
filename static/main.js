@@ -241,6 +241,10 @@ function deleteSubmit(btn){
   return false;
 }
 
+function readNoti(btn){
+  var seen = btn.getAttribute('data-id');
+}
+
 
 function get_type(btn, number){
   if (btn.querySelector('i').classList.value == 'fa fa-check mr-1 d-none'){
