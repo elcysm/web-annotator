@@ -366,7 +366,7 @@ def admin_index():
                 num_task = num_task,
                 tasks = tasks)
             else:
-                return render_template('503.html')
+                return render_template('403.html')
     else:
         return redirect(url_for('index'))
 
@@ -383,23 +383,39 @@ def admin_project():
                 project = select_all_project()
                 return render_template('projects.html', username=username, project=project)
             else:
-                return render_template('503.html')
+                return render_template('403.html')
     else:
         return redirect(url_for('index'))
 
 # admin delete project  --------------------------------------------------------
-@app.route('/admin/delete', methods=['DELETE'])
+@app.route('/admin/project/delete', methods=['DELETE'])
 def admin_delete_project():
     if 'username' in session:
         username = session['username']
         user_role = select_role(username)
         if user_role!= None:
             if check_role(user_role[0])==True:
-                project = request.args['project']
-                delete_project_by_id(project)
+                project_id = request.args['project_id']
+                delete_project_by_id(project_id)
                 return '0'
             else:
-                return render_template('503.html')
+                return render_template('403.html')
+    else:
+        return redirect(url_for('index'))
+
+# admin delete project  --------------------------------------------------------
+@app.route('/admin/collaborator/delete', methods=['DELETE'])
+def admin_delete_annotator():
+    if 'username' in session:
+        username = session['username']
+        user_role = select_role(username)
+        if user_role!= None:
+            if check_role(user_role[0])==True:
+                annotator_username = request.args['annotator_username']
+                delete_annotator_by_username(annotator_username)
+                return '0'
+            else:
+                return render_template('403.html')
     else:
         return redirect(url_for('index'))
 
@@ -416,7 +432,7 @@ def get_new_project():
                 projects = select_project_name()
                 return render_template('new_project.html', username=user_admin, projects=projects)
             else:
-                return render_template('503.html')
+                return render_template('403.html')
 
 # create new project    --------------------------------------------------------
 @app.route('/admin/new_project', methods=['POST'])
@@ -461,7 +477,7 @@ def post_new_project():
                 return redirect(url_for('admin_project'))
 
         else:
-            return render_template('503.html')
+            return render_template('403.html')
 
 # download project    ----------------------------------------------------------
 @app.route('/admin/download')
@@ -476,7 +492,7 @@ def download():
                 write_file(project, type)
                 return redirect(url_for('admin_project'))
             else:
-                return render_template('503.html')
+                return render_template('403.html')
     else:
         return redirect(url_for('index'))
 
@@ -498,7 +514,7 @@ def collaborator_index():
                 len_annotator = len(annotator)
                 return render_template('collaborator.html', username=username, annotator=annotator, number_review= number_review, len_annotator=len_annotator)
             else:
-                return render_template('503.html')
+                return render_template('403.html')
     else:
         return redirect(url_for('index'))
 
@@ -528,7 +544,7 @@ def get_invitation():
                     number=number,
                     len=len(project))
             else:
-                return render_template('503.html')
+                return render_template('403.html')
         return redirect(url_for('index'))
 
 # invitation post   ------------------------------------------------------------
@@ -570,7 +586,7 @@ def get_register():
     if check_account_exist():
         return render_template('register.html', error="")
     else:
-        return render_template('503.html')
+        return render_template('403.html')
 
 # admin register post   --------------------------------------------------------
 @app.route('/register', methods=['POST'])
@@ -586,7 +602,7 @@ def register():
             insert_data_owner(username, email, password)
             return render_template('email_verify.html', email=email, success="Đăng kí thành công")
     else:
-        return render_template('503.html')
+        return render_template('403.html')
 
 ###################################### FUNCTION ################################
 
@@ -1342,7 +1358,7 @@ def insert_text_class(data_id, tag_text_class, username):
     cursor.execute(query)
     connection.commit()
 
-###################################### INSERT ##################################
+###################################### DELETE ##################################
 
 def delete_project_by_id(project_id):
     connection = connect_to_db()
@@ -1361,6 +1377,14 @@ def delete_project_by_id(project_id):
     cursor.execute(query5)
     cursor.execute(query6)
     cursor.execute(query7)
+    connection.commit()
+
+
+def delete_annotator_by_username(username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query1 = "DELETE FROM user WHERE username = '{username}'".format(username = username)
+    cursor.execute(query1)
     connection.commit()
 
 ############################### HANDLE INPUT DATA ##############################

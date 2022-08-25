@@ -211,7 +211,16 @@ function deleteProject(btn){
   projectid = btn.getAttribute('data-id');
   $('#deleteModal').modal('toggle');
   document.getElementById('delete_span').innerHTML = projectid;
-  document.getElementById('delete_link').href = `/admin/delete?project=${projectid}`; 
+  document.getElementById('delete_link').href = `/admin/project/delete?project_id=${projectid}`; 
+}
+
+
+var annotatorid;
+function deleteAnnotator(btn){
+  annotatorid = btn.getAttribute('data-id');
+  $('#deleteModal').modal('toggle');
+  document.getElementById('delete_span').innerHTML = annotatorid;
+  document.getElementById('delete_link').href = `/admin/collaborator/delete?annotator_username=${annotatorid}`; 
 }
 
 
@@ -221,12 +230,9 @@ function deleteSubmit(btn){
     url: btn.href,
     success: function(result) {
         if (result == '0') {
-            $('#deleteModal').modal('hide');
-            document.querySelector(`tr[id="${projectid}"]`).remove();
-            var tr_length = document.getElementsByClassName('new').length;
-            if (tr_length == 0){
-            $('#row-sent').append(`<tr class="odd"><td valign="top" colspan="5" class="dataTables_empty">No data available in table</td></tr>`)
-            }              
+            
+          location.reload();
+            
         } else {
             alert("Cannot Delete!");
         }
@@ -270,7 +276,7 @@ $(document).ready(function(){
  $(document).ready(function() {
   $('#example').DataTable( {
       "pageLength": 5,
-      dom: 't<"container-center mb-0 "p>',
+      dom: '<"text-center mt-2 mb-2"i>t<"container-center mb-0 "p>',
   } );
 } );
 
