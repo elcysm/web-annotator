@@ -329,6 +329,7 @@ def review_post():
                 for i in range(len(review_tag_parsing)):
                     rv = review_tag_parsing[i].split(' ')
                     insert_parsing(review_id, rv[1], rv[2], rv[0], username)
+
         return redirect(url_for('review_done'))
 
 
@@ -780,6 +781,7 @@ def write_file_csv(project_id):
 def write_file_json(project_id):
     task = select_task_by_project_id(project_id)
     review_list = []
+    temp = []
     datas = select_sent_and_id_by_project_id(project_id, task)
     count=1
     if task == "ner":
@@ -795,22 +797,24 @@ def write_file_json(project_id):
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[2] == uname:
-                        d["tag{id}".format(id=dem)] = rv_part[1]
-                        d["token{id}".format(id=dem)]= rv_part[0]
+                        temp.append({"tag": rv_part[1], "token": rv_part[0]})
                         dem+=1
                     else:
                         count+=1
                         dem=1
+                        d['ner'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
                         d['stt'] = count
                         d['sent'] = dt[1].replace('"', '')
-                        d["tag{id}".format(id=dem)] = rv_part[1]
-                        d["token{id}".format(id=dem)]= rv_part[0]
+                        temp = []
+                        temp.append({"tag": rv_part[1], "token": rv_part[0]})
                         dem+=1
                         uname = rv_part[2]
                     if rv_part == review[-1]:
+                        d['ner'] = temp
                         review_list.append(d)
+                        temp = []
                 count+=1
     elif task == "pos":
         for dt in datas:
@@ -825,22 +829,24 @@ def write_file_json(project_id):
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[2] == uname:
-                        d["tag{id}".format(id=dem)] = rv_part[1]
-                        d["token{id}".format(id=dem)]= rv_part[0]
+                        temp.append({"tag": rv_part[1], "token": rv_part[0]})
                         dem+=1
                     else:
                         count+=1
                         dem=1
+                        d['pos'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
                         d['stt'] = count
                         d['sent'] = dt[1].replace('"', '')
-                        d["tag{id}".format(id=dem)] = rv_part[1]
-                        d["token{id}".format(id=dem)]= rv_part[0]
+                        temp = []
+                        temp.append({"tag": rv_part[1], "token": rv_part[0]})
                         dem+=1
                         uname = rv_part[2]
                     if rv_part == review[-1]:
+                        d['pos'] = temp
                         review_list.append(d)
+                        temp = []
                 count+=1
     elif task == "parsing":
         for dt in datas:
@@ -855,24 +861,24 @@ def write_file_json(project_id):
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[3] == uname:
-                        d["tag{id}".format(id=dem)] = rv_part[2]
-                        d["start{id}".format(id=dem)]= rv_part[0]
-                        d["end{id}".format(id=dem)]= rv_part[1]
+                        temp.append({"tag": rv_part[2], "start": rv_part[0], "end": rv_part[1]})
                         dem+=1
                     else:
                         count+=1
                         dem=1
+                        d['parsing'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
                         d['stt'] = count
                         d['sent'] = dt[1].replace('"', '')
-                        d["tag{id}".format(id=dem)] = rv_part[2]
-                        d["start{id}".format(id=dem)]= rv_part[0]
-                        d["end{id}".format(id=dem)]= rv_part[1]
+                        temp = []
+                        temp.append({"tag": rv_part[2], "start": rv_part[0], "end": rv_part[1]})
                         dem+=1
                         uname = rv_part[3]
                     if rv_part == review[-1]:
+                        d['parsing'] = temp
                         review_list.append(d)
+                        temp = []
                 count+=1
     elif task == "textclass":
         for dt in datas:
@@ -888,20 +894,24 @@ def write_file_json(project_id):
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[1] == uname:
-                        d["tag{id}".format(id=dem)] = rv_part[0]
+                        temp.append({"tag": rv_part[0]})
                         dem+=1
                     else:
                         count+=1
                         dem=1
+                        d['textclass'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
                         d['stt'] = count
                         d['sent'] = dt[1].replace('"', '')
-                        d["tag{id}".format(id=dem)] = rv_part[0]
+                        temp = []
+                        temp.append({"tag": rv_part[0]})
                         dem+=1
                         uname = rv_part[1]
                     if rv_part == review[-1]:
+                        d['textclass'] = temp
                         review_list.append(d)
+                        temp = []
                 count+=1
     j = json.dumps(review_list, ensure_ascii=False)
     with open(os.path.join(app.config['UPLOAD_FOLDER'],"{id}.json".format(id=project_id)), 'w', encoding='UTF-8') as file:
@@ -1359,33 +1369,86 @@ def insert_text_class(data_id, tag_text_class, username):
     connection.commit()
 
 ###################################### DELETE ##################################
-
 def delete_project_by_id(project_id):
+    task = select_task_by_project_id(project_id)
+
     connection = connect_to_db()
     cursor = connection.cursor()
     query1 = "DELETE FROM Project WHERE id = '{id}'".format(id = project_id)
     query2 = "DELETE FROM Data WHERE project_id = '{id}'".format(id = project_id)
-    query3 = "DELETE FROM TagNER WHERE project_id = '{id}'".format(id = project_id)
-    query4 = "DELETE FROM TagPOS WHERE project_id = '{id}'".format(id = project_id)
-    query5 = "DELETE FROM TagParsing WHERE project_id = '{id}'".format(id = project_id) 
-    query6 = "DELETE FROM TagTextClass WHERE project_id = '{id}'".format(id = project_id)
-    query7 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
-    cursor.execute(query1)
-    cursor.execute(query2)
-    cursor.execute(query3)
-    cursor.execute(query4)
+
+    if task == 'pos':
+        query3 = "DELETE FROM TagPOS WHERE project_id = '{id}'".format(id = project_id)
+        query4 = "DELETE FROM POS WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
+    if task == 'ner':
+        query3 = "DELETE FROM TagNER WHERE project_id = '{id}'".format(id = project_id)
+        query4 = "DELETE FROM NER WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
+    if task == 'parsing':
+        query3 = "DELETE FROM TagParsing WHERE project_id = '{id}'".format(id = project_id)
+        query4 = "DELETE FROM Parsing WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
+    if task == 'textclass':
+        query3 = "DELETE FROM TagTextClass WHERE project_id = '{id}'".format(id = project_id)
+        query4 = "DELETE FROM TextClass WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
+
+    query5 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
+
     cursor.execute(query5)
-    cursor.execute(query6)
-    cursor.execute(query7)
+    cursor.execute(query4)
+    cursor.execute(query3)
+    cursor.execute(query2)
+    cursor.execute(query1)
     connection.commit()
 
-
 def delete_annotator_by_username(username):
+    project_id = select_project_id_by_annotator(username)
+    task = select_task_by_project_id(project_id)
+
     connection = connect_to_db()
     cursor = connection.cursor()
     query1 = "DELETE FROM user WHERE username = '{username}'".format(username = username)
+    if task == 'pos':
+        query2 = "DELETE FROM POS WHERE username = '{username}'".format(username = username)
+    if task == 'ner':
+        query2 = "DELETE FROM NER WHERE username = '{username}'".format(username = username)
+    if task == 'parsing':
+        query2 = "DELETE FROM Parsing WHERE username = '{username}'".format(username = username)
+    if task == 'textclass':
+        query2 = "DELETE FROM TextClass WHERE username = '{username}'".format(username = username)
+
     cursor.execute(query1)
+    cursor.execute(query2)
     connection.commit()
+# def delete_project_by_id(project_id):
+#     connection = connect_to_db()
+#     cursor = connection.cursor()
+#     query1 = "DELETE FROM Project WHERE id = '{id}'".format(id = project_id)
+#     query2 = "DELETE FROM Data WHERE project_id = '{id}'".format(id = project_id)
+#     query3 = "DELETE FROM TagNER WHERE project_id = '{id}'".format(id = project_id)
+#     query4 = "DELETE FROM TagPOS WHERE project_id = '{id}'".format(id = project_id)
+#     query5 = "DELETE FROM TagParsing WHERE project_id = '{id}'".format(id = project_id) 
+#     query6 = "DELETE FROM TagTextClass WHERE project_id = '{id}'".format(id = project_id)
+#     query7 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
+
+
+#     cursor.execute(query1)
+#     cursor.execute(query2)
+#     cursor.execute(query3)
+#     cursor.execute(query4)
+#     cursor.execute(query5)
+#     cursor.execute(query6)
+#     cursor.execute(query7)
+#     connection.commit()
+
+
+# def delete_annotator_by_username(username):
+#     connection = connect_to_db()
+#     cursor = connection.cursor()
+#     query1 = "DELETE FROM user WHERE username = '{username}'".format(username = username)
+
+
+
+#     cursor.execute(query1)
+#     connection.commit()
 
 ############################### HANDLE INPUT DATA ##############################
 
