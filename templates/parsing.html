@@ -27,37 +27,27 @@
 <body >
 	{% block content %}
 	<div class="container-bottom"> 
-		<nav class="mb-4 navbar navbar-expand-lg bg-light bg-unique">
+		<nav class="mb-4 navbar navbar-expand-lg bg-white bg-unique shadow ">
 			<a class="navbar-brand font-weight-bold" href="#">Web based Annotator</a>
 			<button class="btn navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-3" aria-controls="navbarSupportedContent-3" aria-expanded="false" aria-label="Toggle navigation">
 				<i class="fa fa-list"></i>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent-3">
-				<ul class="navbar-nav ml-auto nav-flex-icons nav-pills">
-					<li class="nav-item">
-						<a class="nav-link" href="/admin"><i class="fa fa-tachometer"></i>Trang chủ</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/admin/invitation"><i class="fa fa-users"></i>Collaborator</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/add_student"><i class="fa fa-cloud-upload"></i>Upload Data</a>
-					</li>
+				<ul class="navbar-nav ml-auto nav-flex-icons">
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<img class="my-profile-picture" style="object-fit: cover;" src="https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png">
-							<span class="text-primary font-weight-bold"> {{username}}</span> 
+							<span class="text-primary font-weight-bold">{{username}}</span> 
 						</a>
 						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
 							<a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
 							<hr class="dropdown-divider">
-							<a  href="/logout"> <button class="dropdown-item" ><i class="fa fa-sign-out  m-r-15"></i>Logout</button></a>
+							<a data-toggle="modal" data-target="#logoutModal"> <button class="dropdown-item" ><i class="fa fa-sign-out  m-r-15"></i>Logout</button></a>
 						</div>
 					</li>
 				</ul>
 			</div>
 		</nav>
-
 		
 
 		<div class="">
@@ -65,7 +55,7 @@
 			<div class="content__inner">
 				<div class="container">
 				<!--content title-->
-				<h1 class="text-center">{{task}}</h1>
+				<h1 class="text-center">Dependency Parsing</h1>
 				<h2 class="content__title"></h2>
 				</div>
 				
@@ -239,6 +229,26 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 	
 
 	<div id="dropDownSelect1"></div>

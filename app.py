@@ -210,7 +210,7 @@ def review():
                         sent = []
                         for dt in datas:
                             sent.append(select_sent_by_id(dt))
-                        return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task)
+                        return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task, username=username)
                     
                     if task == "pos":
                         datas = []
@@ -227,7 +227,7 @@ def review():
                             tokens.append(select_token_by_data_id(dt))
 
                         tag = select_tag_pos_by_project_id(project)
-                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number)
+                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, username=username)
                     
                     if task == "ner":
                         datas = []
@@ -244,7 +244,7 @@ def review():
                             tokens.append(select_token_by_data_id(dt))
 
                         tag = select_tag_ner_by_project_id(project)
-                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number)
+                        return render_template('ner.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, username=username)
 
 
                     if task == "parsing":
@@ -266,7 +266,7 @@ def review():
                             lentoken.append(len(i))
                             
                         tag = select_tag_parsing_by_project_id(project)
-                        return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken)
+                        return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -301,8 +301,8 @@ def review_post():
                     insert_text_class(review_textclass, tag, username)
             if temp != 0:
                 count +=1
-            
-        insert_notice(username, count, vietnam_now)
+        if count != 0:   
+            insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
     if task == "pos":
@@ -319,8 +319,8 @@ def review_post():
                     insert_pos(review_id, review_token_pos[i], review_tag_pos[i], username)
             if temp != 0:
                 count +=1
-       
-        insert_notice(username, count, vietnam_now)
+        if count != 0:
+            insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
     
@@ -332,15 +332,14 @@ def review_post():
             review_tag_ner = request.form.getlist("tag_{id}".format(id=str(i)))
 
             temp = 0
-            print(review_id, review_token_ner, review_tag_ner)
             for i in range(len(review_token_ner)):
                 if review_tag_ner[i] != '':
                     temp += 1
                     insert_ner(review_id, review_token_ner[i], review_tag_ner[i], username)
             if temp != 0:
                 count +=1
-       
-        insert_notice(username, count, vietnam_now)
+        if count != 0:
+            insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
 
@@ -349,22 +348,22 @@ def review_post():
         for i in range(0, number):
             review_id = request.form["id_{id}".format(id=str(i))]
             review_tag_parsing = request.form.getlist("parsing_{id}".format(id=str(i)))
-            print(review_id, review_tag_parsing)
             
             if review_tag_parsing != []:
                 count +=1
                 for i in range(len(review_tag_parsing)):
                     rv = review_tag_parsing[i].split(' ')
                     insert_parsing(review_id, rv[1], rv[2], rv[0], username)
-
-        insert_notice(username, count, vietnam_now)
+        if count != 0:
+            insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
 
 # review done -> thank you  ----------------------------------------------------
 @app.route('/user/review/done')
 def review_done():
-    return render_template('thankyou.html')
+    username = session['username']
+    return render_template('thankyou.html', username=username)
 
 ######################################## ADMIN #################################
 
