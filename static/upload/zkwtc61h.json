@@ -1,0 +1,104 @@
+[
+    {
+        "stt": 1,
+        "sent": "Students are mostly beneficial candidates of paragraphs as they look out for relevant information while crafting essays.",
+        "parsing": [
+            {
+                "tag": "ROOT",
+                "start": "candidates",
+                "end": "for"
+            }
+        ]
+    },
+    {
+        "stt": 2,
+        "sent": "A sequence of sentences representing an idea or explaining a topic in the most organized fashion is called a paragraph.",
+        "parsing": [
+            {
+                "tag": "ROOT",
+                "start": "sentences",
+                "end": "the"
+            }
+        ]
+    },
+    {
+        "stt": 3,
+        "sent": "While writing paragraphs, it is essential to care for the target audience.",
+        "parsing": [
+            {
+                "tag": "ROOT",
+                "start": "paragraphs",
+                "end": "audience"
+            }
+        ]
+    },
+    {
+        "stt": 4,
+        "sent": "While writing paragraphs, it is essential to care for the target audience.",
+        "parsing": [
+            {
+                "tag": "ROOT",
+                "start": "the",
+                "end": "audience"
+            },
+            {
+                "tag": "ROOT",
+                "start": "audience",
+                "end": "paragraphs"
+            }
+        ]
+    },
+    {
+        "stt": 5,
+        "sent": "All matter relevant to the topic has to be clearly explained in a section in a proper flow.",
+        "parsing": [
+            {
+                "tag": "ROOT",
+                "start": "topic",
+                "end": "in"
+            },
+            {
+                "tag": "NSUBJ",
+                "start": "section",
+                "end": "proper"
+            },
+            {
+                "tag": "NSUBJ",
+                "start": "All",
+                "end": "relevant"
+            }
+        ]
+    },
+    {
+        "stt": 6,
+        "sent": "All matter relevant to the topic has to be clearly explained in a section in a proper flow.",
+        "parsing": [
+            {
+                "tag": "ROOT",
+                "start": "relevant",
+                "end": "a"
+            },
+            {
+                "tag": "NSUBJ",
+                "start": "explained",
+                "end": "in"
+            },
+            {
+                "tag": "NSUBJ",
+                "start": "All",
+                "end": "topic"
+            }
+        ]
+    },
+    {
+        "stt": 7,
+        "sent": "Paragraph writing concerns to a single issue at a time.",
+        "parsing": [
+            {
+                "tag": "NSUBJ",
+                "start": "single",
+                "end": "at"
+            }
+        ]
+    }
+]

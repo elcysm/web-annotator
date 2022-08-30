@@ -234,28 +234,28 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Choose Export Method</h5>
+                    <h5 class="modal-title" onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Click button bellow">Download</h5><i class="fa fa-question-circle ml-1"></i>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="card-body">
 					<div class="row ">
-						<div class="col-6 col-lg-6">
+						<!-- <div class="col-6 col-lg-6">
 							<button onclick="get_type(this, 0)" class="btn btn-grad w-100" type="button">
 								<i id="csv" class="fa fa-check mr-1 d-none"></i>CSV
 								<input id="type" class="type d-none" value="csv"></input> 
 							</button>
-						</div>
-						<div class="col-6 col-lg-6">
-							<button onclick="get_type(this, 1)" class="btn btn-grad w-100" type="button">
+						</div> -->
+						<div class="col-12 col-lg-12">
+							<button onclick="get_type(this)" class="btn btn-grad w-100" type="button">
 								<i id="json" class="fa fa-check mr-1 d-none"></i>JSON
 								<input id="type" class="type d-none" value="json"></input> 
 							</button>
 						</div>
-						<div class="col-12 col-lg-12">
+						<!-- <div class="col-12 col-lg-12">
 							<input type='file' class="form-control mt-4" name='' value="" placeholder="Click here to get download folder..."></input> 
-						</div>
+						</div> -->
 					</div>
 				</div>
                 <div class="modal-footer d-flex">

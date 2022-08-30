@@ -98,6 +98,8 @@ function get_tag_par(btn, i){
     
     data_temp = data.split(' ')
 
+
+    // btn.classList.add('tree');
     // data_parcing.push(data)
 
     $(`#selec_${i}`).prepend(`
@@ -108,9 +110,11 @@ function get_tag_par(btn, i){
       <span class="badge btn-danger">End: </span> <span id="end" > ${data_temp[2]} </span> &nbsp;
       <input class="d-none" name="parsing_${i}" value="${data}"></input>
 		</button>`);
+
+
+
     enable_button();
     delete_label();
-
   }
 }
   

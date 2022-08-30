@@ -331,6 +331,16 @@ def review_post():
             review_token_ner = request.form.getlist("token_{id}".format(id=str(i)))
             review_tag_ner = request.form.getlist("tag_{id}".format(id=str(i)))
 
+            for i in range(len(review_tag_ner) - 1):
+                if review_tag_ner[i] == review_tag_ner[i+1] and review_tag_ner[i] != '':
+                    review_tag_ner[i] = '0'
+
+            for i in range(len(review_tag_ner) -1 ):
+                if review_tag_ner[i] == '0':
+                    review_token_ner[i+1] = review_token_ner[i] + ' ' + review_token_ner[i+1]
+                    review_token_ner[i] = ''
+                    review_tag_ner[i] = ''
+
             temp = 0
             for i in range(len(review_token_ner)):
                 if review_tag_ner[i] != '':
@@ -711,15 +721,19 @@ def read_file(filePath, language):
             lines = f.readlines()
         txtData = ""
         for line in lines:
+            temp = ""
             if language == "eng":
-                line.replace('\n', ' ').replace("'", "''")
+                temp = line.replace('\n', ' ')
+                temp = temp.replace("'", "''")
             else:
-                line.replace('\n', ' ').replace("'", ' ')
-            if '.' not in line:
-                line = line.strip() + '. '
-            if '. ' not in line:
-                line = line + ' '
-            txtData += line
+                temp = line.replace('\n', ' ')
+                temp = temp.replace("'", " ")
+            if '.' not in temp:
+                temp = temp.strip() + '. '
+            if '. ' not in temp:
+                temp = temp + ' '
+
+            txtData += temp
 
         return txtData
 
@@ -829,7 +843,7 @@ def write_file_json(project_id):
                 uname = review[0][2]
                 dem=1
                 d = collections.OrderedDict()
-                d['stt'] = count
+                d['id'] = count
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[2] == uname:
@@ -841,7 +855,7 @@ def write_file_json(project_id):
                         d['ner'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
-                        d['stt'] = count
+                        d['id'] = count
                         d['sent'] = dt[1].replace('"', '')
                         temp = []
                         temp.append({"tag": rv_part[1], "token": rv_part[0]})
@@ -861,7 +875,7 @@ def write_file_json(project_id):
                 uname = review[0][2]
                 dem=1
                 d = collections.OrderedDict()
-                d['stt'] = count
+                d['id'] = count
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[2] == uname:
@@ -873,7 +887,7 @@ def write_file_json(project_id):
                         d['pos'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
-                        d['stt'] = count
+                        d['id'] = count
                         d['sent'] = dt[1].replace('"', '')
                         temp = []
                         temp.append({"tag": rv_part[1], "token": rv_part[0]})
@@ -893,7 +907,7 @@ def write_file_json(project_id):
                 uname = review[0][3]
                 dem=1
                 d = collections.OrderedDict()
-                d['stt'] = count
+                d['id'] = count
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[3] == uname:
@@ -905,7 +919,7 @@ def write_file_json(project_id):
                         d['parsing'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
-                        d['stt'] = count
+                        d['id'] = count
                         d['sent'] = dt[1].replace('"', '')
                         temp = []
                         temp.append({"tag": rv_part[2], "start": rv_part[0], "end": rv_part[1]})
@@ -926,7 +940,7 @@ def write_file_json(project_id):
                 uname = review[0][1]
                 dem=1
                 d = collections.OrderedDict()
-                d['stt'] = count
+                d['id'] = count
                 d['sent'] = dt[1].replace('"', '')
                 for rv_part in review:
                     if rv_part[1] == uname:
@@ -938,7 +952,7 @@ def write_file_json(project_id):
                         d['textclass'] = temp
                         review_list.append(d)
                         d = collections.OrderedDict()
-                        d['stt'] = count
+                        d['id'] = count
                         d['sent'] = dt[1].replace('"', '')
                         temp = []
                         temp.append({"tag": rv_part[0]})
