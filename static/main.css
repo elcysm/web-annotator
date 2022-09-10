@@ -695,9 +695,7 @@ input::placeholder {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.upload-process{
 
-}
 
 .loader{
   position: fixed;

@@ -36,7 +36,7 @@
 				<ul class="navbar-nav ml-auto nav-flex-icons">
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<img class="my-profile-picture" style="object-fit: cover;" src="https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png">
+							<img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">
 							<span class="text-primary font-weight-bold">{{username}}</span> 
 						</a>
 						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
@@ -79,13 +79,16 @@
 
 
 					<div class="col-12 col-lg-12 m-auto">
-						<div class="card-header text-center bg-light">
-							<div class="review-help">
-								<a href="#"><i class="fa fa-question-circle mr-1"></i>How to review?</a>
+						<div class="card-header text-center ml-auto bg-light">
+							<!-- <div>
+								<button class="btn border"><i class="fa fa-question-circle mr-1"></i>How to review?</button>
+							</div> -->
+							<div>
+								{%for t in tag%}
+								<span onclick="get_tag(this)" class="postag_name btn border border-success">{{t}}</span>
+								{%endfor%}
 							</div>
-							{%for t in tag%}
-							<span onclick="get_tag(this)" class="postag_name btn border border-success">{{t}}</span>
-							{%endfor%}
+							<!-- <div></div> -->
 						</div>
 						<form class="multisteps-form__form" method="POST" enctype="multipart/form-data">
 						<!--single form panel-->
@@ -95,21 +98,24 @@
 							<input class="d-none" name='id_0' value="{{datas[0]}}"></input> 
 							<div class="multisteps-form__content">
 								<div class="row">
-									<div class="col-7 col-lg-7 text-center">
-										<div class="card-body">
-											{%for j in tokens[0]%}
-											<button onclick="get_tag_par(this,0)" class="btn text-token mt-2 btn-outline-success" type="button">{{j}}
+									<div class="col-12 col-lg-12">
+										<div class="card-body text-center limit-width">
+											<div>
+												<div class="text-left">
+													<button type="button" class="btn btn-outline-danger" onclick="reset1(0)"><i class="fa fa-refresh mr-1"></i>Reset</button>
+												</div>
+												<canvas  id="canvas_0" width="{{lentoken[0]*200}}" class="limit-height"></canvas>
+											</div>
+											{%for index in range(0, lentoken[0])%}
+											<button id="0_{{index}}" onclick="get_tag_par(this,0)" class="btn text-token btn-outline-success" type="button">{{tokens[0][index]}}
 											<i class="close-button d-none"></i>
-											<input id="partoken" class="btn review d-none" name='token_0' value="{{j}}"></input> 
+											<input id="partoken" class="btn review d-none" name='token_0' value="{{tokens[0][index]}}"></input> 
 											<input id="partag" class="btn d-none" name='tag_0' value=""></input> 
 											<span class="badge btn-grad"></span>
 											<span class="focus-input100"></span>
 											</button>
 											{%endfor%}
-										</div>
-									</div>
-									<div class="col-5 col-lg-5">
-										<div class="card-body limit-height text-left border-left" id="selec_0">
+											<div class="card-body d-none limit-height text-left border-left" id="selec_{{0}}"></div>
 										</div>
 									</div>
 								</div>
@@ -125,20 +131,24 @@
 							<input class="d-none" name='id_{{i}}' value="{{datas[i]}}"></input> 
 							<div class="multisteps-form__content">
 								<div class="row">
-									<div class="col-7 col-lg-7">
-										<div class="card-body text-center">
+									<div class="col-12 col-lg-12">
+										<div class="card-body text-center limit-width">
+											<div>
+												<div class="text-left">
+													<button type="button" class="btn btn-outline-danger" onclick="reset1('{{i}}')"><i class="fa fa-refresh mr-1"></i>Reset</button>
+												</div>
+												<canvas  id="canvas_{{i}}" width="{{lentoken[i]*200}}" class="limit-height"></canvas>
+											</div>
 											{%for index in range(0, lentoken[i])%}
-											<button onclick="get_tag_par(this,'{{i}}')" class="btn text-token mt-2  btn-outline-success" type="button">{{tokens[i][index]}}
+											<button id="{{i}}_{{index}}" onclick="get_tag_par(this,'{{i}}')" class="btn text-token mt-2  btn-outline-success" type="button">{{tokens[i][index]}}
 											<i class="close-button d-none"></i>
 											<input id="partoken" class="btn review d-none" name='token_{{i}}' value="{{tokens[i][index]}}"></input> 
 											<input id="partag" class="btn d-none" name='tag_{{i}}' value=""></input> 
 											<span class="badge btn-grad"></span>
 											</button>
 											{%endfor%}
+											<div class="card-body d-none limit-height text-left border-left" id="selec_{{i}}"></div>
 										</div>
-									</div>
-									<div class="col-5 col-lg-5">
-										<div class="card-body limit-height text-left border-left" id="selec_{{i}}"></div>
 									</div>
 								</div>
 								<div class="button-row d-flex card-footer bg-transparent border-top">
@@ -153,20 +163,24 @@
 							<input class="d-none" name='id_{{number-1}}' value="{{datas[number-1]}}"></input> 
 							<div class="multisteps-form__content">
 								<div class="row">
-									<div class="col-7 col-lg-7">
-										<div class="card-body text-center">
-											{%for j in tokens[number-1]%}
-											<button onclick="get_tag_par(this,'{{number-1}}')" class="btn text-token mt-2  btn-outline-success" type="button">{{j}}
+									<div class="col-12 col-lg-12">
+										<div class="card-body text-center limit-width">
+											<div>
+												<div class="text-left">
+													<button type="button" class="btn btn-outline-danger" onclick="reset1('{{number-1}}')"><i class="fa fa-refresh mr-1"></i>Reset</button>
+												</div>
+												<canvas  id="canvas_{{number-1}}" width="{{lentoken[number-1]*200}}" class="limit-height"></canvas>
+											</div>
+											{%for index in range(0, lentoken[number-1])%}
+											<button id="{{number-1}}_{{index}}" onclick="get_tag_par(this,'{{number-1}}')" class="btn text-token mt-2  btn-outline-success" type="button">{{tokens[number-1][index]}}
 											<i class="close-button d-none"></i>
-											<input id="partoken" class="btn review d-none" name='token_{{number-1}}' value="{{j}}"></input> 
+											<input id="partoken" class="btn review d-none" name='token_{{number-1}}' value="{{tokens[number-1][index]}}"></input> 
 											<input id="partag" class="btn d-none" name='tag_{{number-1}}' value=""></input> 
 											<span class="badge btn-grad"></span>
 											</button>
 											{%endfor%}
+											<div class="card-body d-none limit-height text-left border-left" id="selec_{{number-1}}"></div>
 										</div>
-									</div>
-									<div class="col-5 col-lg-5">
-										<div class="card-body limit-height text-left border-left" id="selec_{{number-1}}"></div>
 									</div>
 								</div>
 								<div class="button-row d-flex card-footer bg-transparent border-top">
@@ -219,6 +233,7 @@
 	<script src="{{url_for('.static', filename='/vendor/countdowntime/countdowntime.js')}}"></script>
 	<script src="{{url_for('.static', filename='/vendor/anseki/leader-line.min.js')}}"></script>
 	<script src="{{url_for('.static', filename='main.js')}}"></script>
+	<script src="{{url_for('.static', filename='leader-line.min.js')}}"></script>
     {% endblock %}
 	{% endblock %}
 </body>

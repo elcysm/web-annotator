@@ -272,7 +272,6 @@ var data;
 function get_tag_par(btn, i){
   clicks += 1;
   btn.querySelector('input[id="partag"]').value = pos_tag_name;
-  // btn.querySelector('span').innerHTML = pos_tag_name;
   btn.classList.add('active');
 
   var btn_id = btn.getAttribute('id');
@@ -286,14 +285,14 @@ function get_tag_par(btn, i){
     document.body.style.cursor = 'alias';
     disable_button();
     start_button = btn;
-    draw_canva(clicks, tag, btn_number);
+    draw_canva(clicks, tag, data_number, btn_number);
   }
 
   if (clicks == 2){
     tag = pos_tag_name;
     btn.classList.add('active');
     end = btn.querySelector('input[id="partoken"]').value;
-    draw_canva(clicks,tag, btn_number);
+    draw_canva(clicks, tag, data_number, btn_number);
     end_button = btn;
     clicks = 0;
     data = tag + " " + data +  " " + end ;
@@ -316,11 +315,6 @@ function get_tag_par(btn, i){
     enable_button();
     delete_label();
 
-    // new LeaderLine(
-    //   start_button, end_button, {
-    //     middleLabel: LeaderLine.captionLabel(tag),
-    //   }
-    // ).setOptions({startSocket: 'top', endSocket: 'top'});
   }
 }
 
@@ -330,12 +324,18 @@ function get_tag_par(btn, i){
 var sx;
 var sy;
 var height = 0;
-function draw_canva(clicks, tag, btn_number){
+var hx;
+var hy;
+var ctx;
+var can;
+var button_list = [];
+
+function draw_canva(clicks, tag, data_number, btn_number){
 
   function drawArrowhead(locx, locy, angle, sizex, sizey) {
-    var hx = sizex / 2;
-    var hy = sizey / 2;
-    ctx.translate((locx ), (locy));
+    hx = sizex / 2;
+    hy = sizey / 2;
+    ctx.translate((locx), (locy));
     ctx.rotate(angle);
     ctx.translate(-hx, -hy);
   
@@ -343,7 +343,6 @@ function draw_canva(clicks, tag, btn_number){
     ctx.moveTo(0,0);
     ctx.lineTo(0,1*sizey);    
     ctx.lineTo(1*sizex,1*hy);
-    ctx.closePath();
     ctx.fill();
     }
 
@@ -353,34 +352,61 @@ function draw_canva(clicks, tag, btn_number){
     return Math.atan((ey - sy) / (ex - sx));
   }
 
+  button_list.push(btn_number);
+  var count = 0;
 if (clicks == 1){
-    // height += 30
+    
+    for (var i = 0; i < button_list.length; i++){
+      if (button_list[i] == btn_number){
+        count++;
+      }
+    }
+
+    temp_number = btn_number;
     sx_temp = 100 + 200*(btn_number) ;     //bat dau theo x
-    sy = 100 ;       //bat dau theo y
+    sy = 100 - (30*count);       //bat dau theo y
+
+  
 }
 if (clicks == 2){
-  var can = document.getElementById('canvas1');
-  var ctx = can.getContext('2d');
-
+  can = document.getElementById('canvas_' + data_number);
+  ctx = can.getContext('2d');
   var ex = 100 + 200*(btn_number);     //diem cuoi cung theo x
   sx = (ex + sx_temp)/2; 
-  var ey = 146;     //diem cuoi cung theo y
-  
+  var ey = 145;     //diem cuoi cung theo y
   ctx.beginPath();
   ctx.fillStyle = "rgba(55, 217, 56,1)";
   ctx.moveTo(sx_temp, 150);
   ctx.quadraticCurveTo( sx, sy , ex, ey);
+
+  for (var i = 0; i < button_list.length; i++){
+    if (button_list[i] == temp_number){
+      count++;
+    }
+  }
+
   ctx.font = "15px Poppins";
   ctx.textAlign = "center";
-  ctx.fillText(tag, sx, sy+20);
- 
+  ctx.fillText(tag, sx, sy+(count*15));
   ctx.stroke();
 
   var ang = findAngle(sx, sy, ex, ey);
-  // ctx.fillRect(ex, ey, 2, 2);
-  // drawArrowhead(ex, ey, ang, 12, 12);
-  // ctx.clearRect(0, 0, can.width, can.height);
+  if(btn_number<temp_number){
+    ang += 135;
+  }
+  ctx.fillRect(ex, ey, 2, 2);
+  drawArrowhead(ex, ey, ang, 12, 12);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
 }
+
+function reset1(i){
+  can = document.getElementById('canvas_'+i);
+  ctx = can.getContext('2d');
+  ctx.clearRect(0, 0, can.width, can.height);
+  button_list = [];
+  $(`#selec_${i}`).remove();
+  clicks = 0;
 }
 
   

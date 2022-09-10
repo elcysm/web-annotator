@@ -27,10 +27,10 @@ app.secret_key = "lethanhdat"
 dirname = os.getcwd()
 
 ##########################--- DATA OWNER CUSTOM ---#############################
-MAIL_USERNAME = 'nnktcbkr@gmail.com'
-MAIL_PASSWORD = 'pcpteiclywtbsnqa'
+MAIL_USERNAME = 'webbasedannotator@gmail.com'
+MAIL_SERVICE_PASSWORD = 'eblqqukvfjguceyp'
 ROOT_DOMAIN = 'http://127.0.0.1:5000'
-EMAIL_SUBJECT = 'Thư mời đánh giá'
+EMAIL_SUBJECT = 'REVIEW INVITATION'
 LIFETIME_SESSION = 24
 ################################################################################
 
@@ -43,7 +43,7 @@ UPLOAD_FOLDER = 'static/upload'
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = MAIL_USERNAME
-app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+app.config['MAIL_PASSWORD'] = MAIL_SERVICE_PASSWORD
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['UPLOAD_FOLDER'] =  UPLOAD_FOLDER
@@ -271,7 +271,7 @@ def review():
                             lentoken.append(len(i))
                             
                         tag = select_tag_parsing_by_project_id(project)
-                        return render_template('parsing_clone.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
+                        return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -363,7 +363,10 @@ def review_post():
                 count +=1
                 for i in range(len(review_tag_parsing)):
                     rv = review_tag_parsing[i].split(' ')
-                    insert_parsing(review_id, rv[1], rv[2], rv[0], username)
+                    temp_token_1 = rv[1].replace("'","''")
+                    temp_token_2 = rv[2].replace("'","''")
+
+                    insert_parsing(review_id, temp_token_1, temp_token_2, rv[0], username)
         if count != 0:
             insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
