@@ -1,0 +1,47 @@
+[
+    {
+        "id": 1,
+        "sent": "A sequence of sentences representing an idea or explaining a topic in the most organized fashion is called a paragraph.",
+        "textclass": [
+            {
+                "tag": "POSITIVE"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "sent": "Paragraph writing concerns to a single issue at a time.",
+        "textclass": [
+            {
+                "tag": "POSITIVE"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "sent": "All matter relevant to the topic has to be clearly explained in a section in a proper flow.",
+        "textclass": [
+            {
+                "tag": "NEGATIVE"
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "sent": "While writing paragraphs, it is essential to care for the target audience.",
+        "textclass": [
+            {
+                "tag": "POSITIVE"
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "sent": "Students are mostly beneficial candidates of paragraphs as they look out for relevant information while crafting essays.",
+        "textclass": [
+            {
+                "tag": "NEGATIVE"
+            }
+        ]
+    }
+]

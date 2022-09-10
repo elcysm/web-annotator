@@ -5,17 +5,79 @@ function add_modal(){
     $('#addModal').modal('toggle'); 
 }
 
-function get_project(){
-  var projects = document.getElementById('project').value;
-  project = document.getElementById('project_value').value;
-  if (projects.includes(project)){
-    document.querySelector('button[title="Next"]').disabled = true;
-    document.querySelector('button[class="multisteps-form__progress-btn"]').disabled = true;
-  }
-  else{
-    document.querySelector('button[title="Next"]').disabled = false;
-    document.querySelector('button[class="multisteps-form__progress-btn"]').disabled = false;
-  }
+$('.multisteps-form__form').ready(function() {
+
+  document.querySelector('button[title="Next_New"]').disabled = true;
+  document.querySelector('button[title="btn_next2"]').disabled = true;
+  
+
+  var projects_database = document.getElementById('project').value.replace(/[&\/\\#+()$~%. '":*?<>{}[]/g, "").replace(']','');
+  var project_list = projects_database.split(',');
+
+  
+
+  $('#project_value').on('keyup change',function(){
+    var project_input = document.getElementById('project_value').value;
+    if (project_input == ' '){
+      document.getElementById('project_error').classList.remove('d-none');
+      document.getElementById('project_error').innerHTML = "Project must be filled out!";
+    }
+    else{
+      document.getElementById('project_error').classList.add('d-none');
+    }
+
+    if (project_list.includes(project_input)){
+      document.getElementById('project_error').classList.remove('d-none');
+      document.getElementById('project_error').innerHTML = "Project name has been already used!";
+    }
+    else{
+      document.getElementById('project_error').classList.add('d-none');
+    }
+  });
+
+
+  $('#file_upload').change(function(){
+    var file_input = document.getElementById('file_upload').value;
+    if (file_input == ''){
+      document.getElementById('file_error').classList.remove('d-none');
+      document.getElementById('file_error').innerHTML = "File must be chosen!";
+    }
+    else{
+      document.getElementById('file_error').classList.add('d-none');
+    }
+  });
+
+  $('.multisteps-form__form').on("mouseover", function(){
+    var project_input = document.getElementById('project_value').value;
+    var file_input = document.getElementById('file_upload').value;
+    var tag_after = document.getElementById('tagnew').innerHTML;
+
+    if ((project_input != '') && (file_input != '') && !(project_list.includes(project_input))){
+      document.querySelector('button[title="Next_New"]').disabled = false;
+      if (tag_after != ' '){
+        document.querySelector('button[title="Submit"]').disabled = false;
+      }
+      else{
+        document.querySelector('button[title="Submit"]').disabled = true;
+      }
+    }
+    else{
+      document.querySelector('button[title="Next_New"]').disabled = true;
+      document.querySelector('button[title="btn_next2"]').disabled = true;
+    }
+
+   
+    
+  });
+
+
+});
+
+
+
+function new_project(){
+  var process = document.getElementById('upload');
+  process.classList.remove('d-none');
 }
 
 
@@ -36,7 +98,8 @@ function get_tag(btn){
   btn.classList.add('btn-grad');
 }
 
-function span(btn){
+
+function span_pos(btn){
   if (btn.querySelector('i').classList.value == 'close-button d-none'){
     btn.classList.add('btn-outline-success');
     btn.querySelector('span').innerHTML = pos_tag_name;
@@ -48,6 +111,137 @@ function span(btn){
     btn.classList.remove('btn-outline-success');
     btn.querySelector('span').innerHTML = '';
     btn.querySelector('input[id="postag"]').value = '';
+  }
+}
+
+
+function span(btn, lentoken){
+    var button_id = btn.getAttribute('id');
+    var button_id_number = button_id.split('_')[1]
+    var index_button = button_id.split('_')[0];
+    var pre_index = parseInt(button_id_number) - 1;
+    var next_index = parseInt(button_id_number) + 1;
+
+    if (pre_index == -1){
+        pre_index = 0;
+    }
+    if (next_index == lentoken){
+      next_index = lentoken-1;
+    }
+    
+    var pre_button = document.getElementById(index_button + "_" + pre_index);
+    var next_button = document.getElementById(index_button + "_" + next_index);
+
+    while ((pre_button.classList.contains('d-none')) && (pre_index >= 1)){
+      pre_index -= 1;
+      pre_button = document.getElementById(index_button + "_" + pre_index);
+    }
+    while ((next_button.classList.contains('d-none')) && (next_index <= lentoken-2)){
+      next_index += 1;
+      next_button = document.getElementById(index_button + "_" + next_index);
+    }
+    
+    var pre_button_value = pre_button.querySelector('input[class="btn review d-none"]').value;
+    var next_button_value = next_button.querySelector('input[class="btn review d-none"]').value;
+
+    var pre_button_label = pre_button.querySelector('input[id="postag"]').value;
+    var next_button_label = next_button.querySelector('input[id="postag"]').value;
+    var current_button_value = btn.querySelector('input[class="btn review d-none"]').value;
+
+  if (btn.querySelector('i').classList.value == 'close-button d-none'){
+
+    btn.classList.add('btn-outline-success');
+    btn.querySelector('span[class="badge btn-grad"]').innerHTML = pos_tag_name;
+    btn.querySelector('i').classList.remove('d-none'); 
+    btn.querySelector('input[id="postag"]').value = pos_tag_name;
+    var current_button_label = btn.querySelector('input[id="postag"]').value;
+
+    if ((current_button_label == pre_button_label)){
+        btn.innerHTML =`
+        <span class="name_token">${pre_button_value} ${current_button_value}</span>
+        <i class="close-button"></i>
+        <input class="btn review d-none" name="token_${index_button}" value="${pre_button_value} ${current_button_value}"> 
+        <input id="postag" class="btn d-none" name="tag_${index_button}" value="${current_button_label}"> 
+        <span id="pos" class="badge btn-grad">${current_button_label}</span>
+        `
+        pre_button.classList.add('d-none');
+        pre_button.querySelector('input[class="btn review d-none"]').value = '';
+        pre_button.querySelector('input[id="postag"]').value = current_button_label;
+        pre_button.querySelector('i').classList.add('d-none'); 
+    }
+
+    if ((current_button_label == next_button_label)){
+  
+      btn.innerHTML =`
+        <span class="name_token">${current_button_value} ${next_button_value}</span>
+        <i class="close-button"></i>
+        <input class="btn review d-none" name="token_${index_button}" value="${current_button_value} ${next_button_value}"> 
+        <input id="postag" class="btn d-none" name="tag_${index_button}" value="${current_button_label}"> 
+        <span id="pos" class="badge btn-grad">${current_button_label}</span>
+      `
+      next_button.classList.add('d-none');
+      next_button.querySelector('input[class="btn review d-none"]').value = '';
+      next_button.querySelector('input[id="postag"]').value = current_button_label;
+      next_button.querySelector('i').classList.add('d-none'); 
+    }
+
+    if (((current_button_label == next_button_label) && (current_button_label == pre_button_label))){
+      btn.innerHTML =`
+        <span class="name_token">${pre_button_value} ${current_button_value} ${next_button_value}</span>
+        <i class="close-button"></i>
+        <input class="btn review d-none" name="token_${index_button}" value="${pre_button_value} ${current_button_value} ${next_button_value}"> 
+        <input id="postag" class="btn d-none" name="tag_${index_button}" value="${current_button_label}"> 
+        <span id="pos" class="badge btn-grad">${current_button_label}</span>
+      `
+      next_button.classList.add('d-none');
+      next_button.querySelector('input[class="btn review d-none"]').value = '';
+      next_button.querySelector('input[id="postag"]').value = current_button_label;
+      next_button.querySelector('i').classList.add('d-none'); 
+      pre_button.classList.add('d-none');
+      pre_button.querySelector('input[class="btn review d-none"]').value = '';
+      pre_button.querySelector('input[id="postag"]').value = current_button_label;
+      pre_button.querySelector('i').classList.add('d-none'); 
+    }
+
+
+  }
+  else{
+    var temp = current_button_value.split(' ');
+    if (temp.length != 1){
+      var id = button_id_number - temp.length + 1;
+      
+      while ((document.getElementById(index_button + "_"+ id) == null)){
+        id += 1;
+      }
+      while ((document.getElementById(index_button + "_" + id).querySelector('input[id="postag"]').value != document.getElementById(button_id).querySelector('input[id="postag"]').value)){
+        id += 1;
+      }
+      for (var i = 0; i < temp.length; i++){
+        var temp_id = id+i;
+        if (document.getElementById(index_button + "_" + temp_id).querySelector('input[id="postag"]').value != document.getElementById(button_id).querySelector('input[id="postag"]').value){
+          id+=1;
+        }
+      }
+      while ((document.getElementById(index_button + "_" + id).querySelector('input[id="postag"]').value != document.getElementById(button_id).querySelector('input[id="postag"]').value)){
+        id += 1;
+      }
+      for (var i = 0; i < temp.length; i++){
+        document.getElementById(index_button + "_"+ id).classList.remove('btn-outline-success');
+        document.getElementById(index_button + "_"+ id).classList.remove('d-none');
+        document.getElementById(index_button + "_"+ id).querySelector('span[class="name_token"]').innerHTML = temp[i];
+        document.getElementById(index_button + "_"+ id).querySelector('i').classList.add('d-none'); 
+        document.getElementById(index_button + "_"+ id).querySelector('input[class="btn review d-none"]').value = temp[i];
+        document.getElementById(index_button + "_"+ id).querySelector('input[id="postag"]').value = '';
+        document.getElementById(index_button + "_"+ id).querySelector('span[class="badge btn-grad"]').innerHTML = '';
+        id += 1;
+      }
+    }
+    else{
+      btn.querySelector('i').classList.add('d-none');
+      btn.classList.remove('btn-outline-success');
+      btn.querySelector('span[class="badge btn-grad"]').innerHTML = '';
+      btn.querySelector('input[id="postag"]').value = '';
+    }
   }
 }
 
@@ -71,7 +265,8 @@ var clicks = 0;
 var tag = ''
 var start = ''
 var end = ''
-
+var start_button;
+var end_button;
 var data_parcing = []
 var data;
 function get_tag_par(btn, i){
@@ -80,27 +275,32 @@ function get_tag_par(btn, i){
   // btn.querySelector('span').innerHTML = pos_tag_name;
   btn.classList.add('active');
 
+  var btn_id = btn.getAttribute('id');
+  var data_number = btn_id.split('_')[0];
+  var btn_number = btn_id.split('_')[1];
 
   start = btn.querySelector('input[id="partoken"]').value;
   
   if (clicks == 1){
     data = start ;
+    document.body.style.cursor = 'alias';
     disable_button();
+    start_button = btn;
+    draw_canva(clicks, tag, btn_number);
   }
 
   if (clicks == 2){
-    // btn.querySelector('span').innerHTML = pos_tag_name;
     tag = pos_tag_name;
     btn.classList.add('active');
     end = btn.querySelector('input[id="partoken"]').value;
+    draw_canva(clicks,tag, btn_number);
+    end_button = btn;
     clicks = 0;
     data = tag + " " + data +  " " + end ;
     
     data_temp = data.split(' ')
 
-
-    // btn.classList.add('tree');
-    // data_parcing.push(data)
+    
 
     $(`#selec_${i}`).prepend(`
     <button onclick="delete_button(this)" class="btn text-left col-12 col-sm-12 text-over btn-outline-danger mt-2" type="button">
@@ -112,11 +312,77 @@ function get_tag_par(btn, i){
 		</button>`);
 
 
-
+    document.body.style.cursor = 'default';
     enable_button();
     delete_label();
+
+    // new LeaderLine(
+    //   start_button, end_button, {
+    //     middleLabel: LeaderLine.captionLabel(tag),
+    //   }
+    // ).setOptions({startSocket: 'top', endSocket: 'top'});
   }
 }
+
+
+
+
+var sx;
+var sy;
+var height = 0;
+function draw_canva(clicks, tag, btn_number){
+
+  function drawArrowhead(locx, locy, angle, sizex, sizey) {
+    var hx = sizex / 2;
+    var hy = sizey / 2;
+    ctx.translate((locx ), (locy));
+    ctx.rotate(angle);
+    ctx.translate(-hx, -hy);
+  
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(0,1*sizey);    
+    ctx.lineTo(1*sizex,1*hy);
+    ctx.closePath();
+    ctx.fill();
+    }
+
+   // returns radians
+   function findAngle(sx, sy, ex, ey) {
+    // make sx and sy at the zero point
+    return Math.atan((ey - sy) / (ex - sx));
+  }
+
+if (clicks == 1){
+    // height += 30
+    sx_temp = 100 + 200*(btn_number) ;     //bat dau theo x
+    sy = 100 ;       //bat dau theo y
+}
+if (clicks == 2){
+  var can = document.getElementById('canvas1');
+  var ctx = can.getContext('2d');
+
+  var ex = 100 + 200*(btn_number);     //diem cuoi cung theo x
+  sx = (ex + sx_temp)/2; 
+  var ey = 146;     //diem cuoi cung theo y
+  
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(55, 217, 56,1)";
+  ctx.moveTo(sx_temp, 150);
+  ctx.quadraticCurveTo( sx, sy , ex, ey);
+  ctx.font = "15px Poppins";
+  ctx.textAlign = "center";
+  ctx.fillText(tag, sx, sy+20);
+ 
+  ctx.stroke();
+
+  var ang = findAngle(sx, sy, ex, ey);
+  // ctx.fillRect(ex, ey, 2, 2);
+  // drawArrowhead(ex, ey, ang, 12, 12);
+  // ctx.clearRect(0, 0, can.width, can.height);
+}
+}
+
   
 function disable_button(){
  
@@ -154,9 +420,6 @@ function delete_button(btn){
   if (btn.querySelector('i').classList.value == 'fa fa-close'){
       btn.remove();
   }
-  else{
-
-  }
 }
 
 function delete_label(){
@@ -166,34 +429,21 @@ function delete_label(){
   }
 }
 
-var tagnew;
-function splitLabel(input){
-  if (input.value != ','){
-    if (input.value.includes(',')){
-      tagnew = input.value.replace(',','');
-      input.value = '';
-      $('#tagnew').prepend(`<button onclick="delete_button(this)" class="btn btn-outline-danger" type="button">
-      <i class="fa fa-close"></i>
-      <span class="badge btn-grad mt-1">${tagnew}</span>
-      <input class="d-none" name="label" value="${tagnew}"></input>
-		  </button> `);
-    }
-  } 
-}
+
 
 var input_tagnew;
-
+var tagnew;
 function runScript(e) {
-  
     if (e.keyCode == 13) {
         input_tagnew = document.getElementById('input_tagnew');
         tagnew = input_tagnew.value;
         input_tagnew.value = ''; 
-        $('#tagnew').prepend(`<button onclick="delete_button(this)" class="btn btn-outline-danger" type="button">
+        $('#tagnew').prepend(`<button onclick="delete_button(this)" class="btn btn-outline-danger mr-2" type="button">
         <i class="fa fa-close"></i>
         <span class="badge btn-grad mt-1">${tagnew}</span>
         <input class="d-none" name="label" value="${tagnew}"></input>
-        </button> `);
+        </button>`);
+      document.querySelector('button[title="Submit"]').disabled = false;
       return false;
     }
 }
@@ -270,15 +520,16 @@ function get_type(btn, number){
 
 
 
+
+
+
 $(document).ready(function(){
      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
         removeItemButton: true,
         // maxItemCount:1,
         // searchResultLimit:1,
         // renderChoiceLimit:1
-      }); 
-
-      
+      });   
  });
 
  $(document).ready(function() {

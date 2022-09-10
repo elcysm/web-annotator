@@ -20,6 +20,7 @@ import collections
 import csv
 import pytz
 import datetime as dt
+import time
 
 app = Flask(__name__)
 app.secret_key = "lethanhdat"
@@ -30,7 +31,7 @@ MAIL_USERNAME = 'nnktcbkr@gmail.com'
 MAIL_PASSWORD = 'pcpteiclywtbsnqa'
 ROOT_DOMAIN = 'http://127.0.0.1:5000'
 EMAIL_SUBJECT = 'Thư mời đánh giá'
-LIFETIME_SESSION = 5
+LIFETIME_SESSION = 24
 ################################################################################
 
 ############################### ROLE ###########################################
@@ -59,7 +60,7 @@ def not_found(e):
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=LIFETIME_SESSION)
+    app.permanent_session_lifetime = timedelta(hours=LIFETIME_SESSION)
 
 ######################################## LOGIN #################################
 
@@ -243,8 +244,12 @@ def review():
                         for dt in datas:
                             tokens.append(select_token_by_data_id(dt))
 
+                        lentoken=[]
+                        for i in tokens:
+                            lentoken.append(len(i))
+
                         tag = select_tag_ner_by_project_id(project)
-                        return render_template('ner.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, username=username)
+                        return render_template('ner.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, lentoken=lentoken, username=username)
 
 
                     if task == "parsing":
@@ -266,7 +271,7 @@ def review():
                             lentoken.append(len(i))
                             
                         tag = select_tag_parsing_by_project_id(project)
-                        return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
+                        return render_template('parsing_clone.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -316,7 +321,8 @@ def review_post():
             for i in range(len(review_token_pos)):
                 if review_tag_pos[i] != '':
                     temp += 1
-                    insert_pos(review_id, review_token_pos[i], review_tag_pos[i], username)
+                    temp_token = review_token_pos[i].replace("'","''")
+                    insert_pos(review_id, temp_token, review_tag_pos[i], username)
             if temp != 0:
                 count +=1
         if count != 0:
@@ -331,21 +337,15 @@ def review_post():
             review_token_ner = request.form.getlist("token_{id}".format(id=str(i)))
             review_tag_ner = request.form.getlist("tag_{id}".format(id=str(i)))
 
-            for i in range(len(review_tag_ner) - 1):
-                if review_tag_ner[i] == review_tag_ner[i+1] and review_tag_ner[i] != '':
-                    review_tag_ner[i] = '0'
-
-            for i in range(len(review_tag_ner) -1 ):
-                if review_tag_ner[i] == '0':
-                    review_token_ner[i+1] = review_token_ner[i] + ' ' + review_token_ner[i+1]
-                    review_token_ner[i] = ''
-                    review_tag_ner[i] = ''
 
             temp = 0
             for i in range(len(review_token_ner)):
-                if review_tag_ner[i] != '':
+                
+                if review_tag_ner[i] != '' and review_token_ner[i] != '':
                     temp += 1
-                    insert_ner(review_id, review_token_ner[i], review_tag_ner[i], username)
+                    temp_token = review_token_ner[i].replace("'","''")
+                    insert_ner(review_id, temp_token, review_tag_ner[i], username)
+
             if temp != 0:
                 count +=1
         if count != 0:
@@ -500,11 +500,6 @@ def post_new_project():
                 task = request.form['task']
                 method = request.form['method']
                 label = request.form.getlist('label')
-
-                
-                # now = datetime.now()
-                # dt_string = now.strftime('%d/%m/%Y %H:%M:%S')
-                # print(now)
 
                 # insert
                 insert_project(project_id, project_name, language, task, method)
@@ -666,17 +661,18 @@ def generate_password():
 
 # generate username ------------------------------------------------------------
 def generate_username():
-    length = 6
+    length = 8
     lower = string.ascii_lowercase
     num = string.digits
     all = lower + num
+    print(len(all))
     temp = random.sample(all,length)
     username = "".join(temp)
     return 'user_' + username
 
 # generate code ----------------------------------------------------------------
 def generate_code():
-    length = 8
+    length = 10
     lower = string.ascii_lowercase
     num = string.digits
     all = lower + num
@@ -709,11 +705,14 @@ def read_file(filePath, language):
         data = pd.read_csv(filePath, header=None, encoding='utf-8')
         csvData = ""
         for i, row in data.iterrows():
-            temp = row[0]
+            temp_1 = row[0]
+            temp = temp_1.replace("'", "''")
             if '.' not in temp:
                 temp = temp.strip() + '. '
             if '. ' not in temp:
                 temp = temp + ' '
+            if ' .' in temp:
+                temp = temp.replace(" .", ". ")
             csvData += temp
         return csvData
     elif ext == ".txt":
@@ -973,6 +972,11 @@ def write_file_json(project_id):
 def connect_to_db():
     conn = sqlite3.connect(dirname + '\data.db')
     return conn
+
+# connect to database   --------------------------------------------------------
+def vacuum_db():
+    conn = connect_to_db()
+    conn.execute('VACUUM')
 
 ###################################### SELECT ##################################
 
@@ -1344,13 +1348,27 @@ def insert_notice(username, number, date):
 
 # insert sentence to database   ------------------------------------------------
 def insert_sentences(data, project_id, language, connection, cursor):
+    
     sent_list = data_to_sentences(data, language)
 
+    
     for sent in sent_list:
-        id = generate_code()
-        query = "INSERT INTO Data (id, sent, project_id) VALUES ('{id}', '{text}', '{proj_id}')".format(id = id, text = sent, proj_id = project_id)
-        cursor.execute(query)
-        connection.commit()
+        try:
+            id = generate_code()
+            # start = time.time()
+            query = "INSERT INTO Data (id, sent, project_id) VALUES ('{id}', '{text}', '{proj_id}')".format(id = id, text = sent, proj_id = project_id)
+            cursor.execute(query)
+        except:
+            print(sent)
+    
+    start1 = time.time()
+    connection.commit()
+    end2 = time.time()
+    print("\n"f"{(end2 - start1)} secs.")
+
+
+    
+    
 
 # ### INSERT TAG ###
 
@@ -1458,13 +1476,13 @@ def delete_project_by_id(project_id):
         query4 = "DELETE FROM TextClass WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
 
     query5 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
-
     cursor.execute(query5)
     cursor.execute(query4)
     cursor.execute(query3)
     cursor.execute(query2)
     cursor.execute(query1)
     connection.commit()
+    vacuum_db()
 
 def delete_annotator_by_username(username):
     project_id = select_project_id_by_annotator(username)

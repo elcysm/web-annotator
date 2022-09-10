@@ -82,52 +82,59 @@
 						<!--single form panel-->
 						<input class="d-none" name='number' value="{{number}}"></input> 
 
-						<div class="multisteps-form__panel shadow p-4 rounded bg-white js-active" data-animation="scaleIn">
+						<div class="multisteps-form__panel shadow rounded bg-white js-active" data-animation="scaleIn">
 							<!-- <h3 class="multisteps-form__title" >ID: {{datas[0]}}</h3> -->
 							<input class="d-none" name='id_0' value="{{datas[0]}}"></input> 
 							<div class="multisteps-form__content">
-								<div class="form-row mt-4">
-									<div class="col-12 col-sm-12">
-										<span>{{sent[0]}}</span>
+								<div class="row">
+									<div class="col-7 col-lg-7 text-center">
+										<div class="card-body ">
+											<span>{{sent[0]}}</span>
+										</div>
+									</div>
+									<div class="col-5 col-lg-5">
+										<div class="card-body text-center border-left">
+											{%for i in tag%}
+											<button onclick="span_textclass(this)" class="btn text-token col-12 col-sm-12 btn-outline-success  mt-1 mb-1" type="button">{{i}}
+												<i class="fa fa-check d-none"></i>
+												<input id="tag" class="btn review d-none" value="{{i}}"></input> 
+												<input id="texttag" class="btn review d-none" name='tag_0' value=""></input> 
+												<span class="focus-input100"></span>
+											</button>
+											{%endfor%}
+										</div>
 									</div>
 								</div>
-								<div class="form-row mt-4">
-									{%for i in tag%}
-									<button onclick="span_textclass(this)" class="btn text-token col-12 col-sm-12 btn-outline-success mt-2" type="button">{{i}}
-										<i class="fa fa-check d-none"></i>
-										<input id="tag" class="btn review d-none" value="{{i}}"></input> 
-										<input id="texttag" class="btn review d-none" name='tag_0' value=""></input> 
-										<span class="focus-input100"></span>
-									</button>
-									{%endfor%}
-								</div>
-								<div class="button-row d-flex mt-4">
+								<div class="button-row d-flex card-footer bg-transparent border-top">
 									<button class="btn btn-grad ml-auto js-btn-next" type="button" title="Next">Next</button>
 								</div>
 							</div>
 						</div>
 
 						{%for i in range(1, number-1)%}
-						<div class="multisteps-form__panel shadow p-4 rounded bg-white" data-animation="scaleIn">
-							<!-- <h3 class="multisteps-form__title">ID: {{datas[i]}}</h3> -->
+						<div class="multisteps-form__panel shadow rounded bg-white" data-animation="scaleIn">
 							<input class="d-none" name='id_{{i}}' value="{{datas[i]}}"></input> 
 							<div class="multisteps-form__content">
-								<div class="form-row mt-4">
-									<div class="col-12 col-sm-12">
-										<span>{{sent[i]}}</span>
+								<div class="row">
+									<div class="col-7 col-lg-7 text-center">
+										<div class="card-body ">
+											<span>{{sent[i]}}</span>
+										</div>
+									</div>
+									<div class="col-5 col-lg-5">
+										<div class="card-body text-center border-left">
+											{%for j in tag%}
+											<button onclick="span_textclass(this)" class="btn text-token col-12 col-sm-12 btn-outline-success mt-1 mb-1" type="button">{{j}}
+												<i class="fa fa-check d-none"></i>
+												<input id="tag" class="btn review d-none" value="{{j}}"></input> 
+												<input id="texttag" class="btn review d-none" name='tag_{{i}}' value=""></input> 
+												<span class="focus-input100"></span>
+											</button>
+											{%endfor%}
+										</div>
 									</div>
 								</div>
-								<div class="form-row mt-4">
-									{%for j in tag%}
-									<button onclick="span_textclass(this)" class="btn text-token col-12 col-sm-12 btn-outline-success mt-2" type="button">{{j}}
-										<i class="fa fa-check d-none"></i>
-										<input id="tag" class="btn review d-none" value="{{j}}"></input> 
-										<input id="texttag" class="btn review d-none" name='tag_{{i}}' value=""></input> 
-										<span class="focus-input100"></span>
-									</button>
-									{%endfor%}
-								</div>
-								<div class="button-row d-flex mt-4">
+								<div class="button-row d-flex card-footer bg-transparent border-top">
 									<button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
 									<button class="btn btn-grad ml-auto js-btn-next" type="button" title="Next">Next</button>
 								</div>
@@ -135,26 +142,30 @@
 						</div>
 						{%endfor%}
 						
-						<div class="multisteps-form__panel shadow p-4 rounded bg-white" data-animation="scaleIn">
+						<div class="multisteps-form__panel shadow rounded bg-white" data-animation="scaleIn">
 							<!-- <h3 class="multisteps-form__title">ID: {{datas[number-1]}}</h3> -->
 							<input class="d-none" name='id_{{number-1}}' value="{{datas[number-1]}}"></input> 
 							<div class="multisteps-form__content">
-								<div class="form-row mt-4">
-									<div class="col-12 col-sm-12">
-										<span>{{sent[-1]}}</span>
+								<div class="row">
+									<div class="col-7 col-lg-7 text-center">
+										<div class="card-body ">
+											<span>{{sent[-1]}}</span>
+										</div>
+									</div>
+									<div class="col-5 col-lg-5">
+										<div class="card-body text-center border-left">
+											{%for i in tag%}
+											<button onclick="span_textclass(this)" class="btn text-token col-12 col-sm-12 btn-outline-success mt-2" type="button">{{i}}
+												<i class="fa fa-check d-none"></i>
+												<input id="tag" class="btn review d-none" value="{{i}}"></input> 
+												<input id="texttag" class="btn review d-none" name='tag_{{number-1}}' value=""></input> 
+												<span class="focus-input100"></span>
+											</button>
+											{%endfor%}
+										</div>
 									</div>
 								</div>
-								<div class="form-row mt-4">
-									{%for i in tag%}
-									<button onclick="span_textclass(this)" class="btn text-token col-12 col-sm-12 btn-outline-success mt-2" type="button">{{i}}
-										<i class="fa fa-check d-none"></i>
-										<input id="tag" class="btn review d-none" value="{{i}}"></input> 
-										<input id="texttag" class="btn review d-none" name='tag_{{number-1}}' value=""></input> 
-										<span class="focus-input100"></span>
-									</button>
-									{%endfor%}
-								</div>
-								<div class="button-row d-flex mt-4">
+								<div class="button-row d-flex card-footer bg-transparent border-top">
 									<button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
 									<button class="btn btn-grad ml-auto js-btn-next" type="submit" title="Next">Finish</button>
 								</div>

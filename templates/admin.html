@@ -62,21 +62,6 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="/admin/collaborator"><i class="fa fa-users"></i>Collaborators</a>
                             </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" href="#">Lifestyle <span class="sr-only">(current)</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Beauty</a>
-                            </li>
-                            <li class="nav-item dropdown active">
-                                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tutorials 
-                                    </a>
-                                <div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink-3">
-                                    <a class="dropdown-item" href="#">Make-up</a>
-                                    <a class="dropdown-item" href="#">Nails</a>
-                                    <a class="dropdown-item" href="#">DIY</a>
-                                </div>
-                            </li> -->
                         </ul>
 
                         <ul class="navbar-nav ml-auto nav-flex-icons">
@@ -85,38 +70,42 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa fa-bell fa-fw mr-0"><sup class="badge badge-danger badge-counter">{{count_notif}}</sup></i>
-                                    <!-- <sup> class="badge badge-danger badge-counter">.</sup> -->
                                 </a>
                                 <!-- Dropdown - Alerts -->
-                                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in "
+                                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                     aria-labelledby="alertsDropdown" onclick="event.stopPropagation()">
                                     
                                     <div class="row border-bottom">
-                                        <div class="col-5 text-left">
+                                        <div class="col-12 text-center">
                                             <h6 class="text-center dropdown-header text-primary ">
                                                 Notifications 
                                             </h6>
                                         </div>
-                                        <div class="col-5 text-right">
+                                        <!-- <div class="col-5 text-right">
                                             <i role="button" class="fa fa-check"></i>
                                             <span class="small">Mark as read</span>
-                                        </div>
+                                        </div> -->
                                     </div>
                                     
-                                    
-                                    {% for i in notice %}
+                                    {% if notice %}
+                                        {% for i in notice %}
                                     <a data-id = "{{i[2]}}" onclick="readNoti(this)" role="button" class="dropdown-item d-flex align-items-center" >
                                         <div class="mr-3">
-                                            <div class="icon-circle bg-primary">
-                                                <i class="fa fa-file-alt text-white"></i>
-                                            </div>
+                                            <img class="my-profile-picture" style="object-fit: cover;" src="https://www.pngkey.com/png/detail/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png">
                                         </div>
                                         <div class="text-truncate">
                                             <span class="font-weight-bold">{{i[0]}} </span> has reviewed <span class="font-weight-bold text-success">{{i[1]}} sentences</span> from <span class="font-weight-bold">{{i[5]}}.</span>
                                             <div class="small">{{i[3]}}</div>
                                         </div>
                                     </a>
-                                    {% endfor %}
+                                        {% endfor %}
+                                    {% else %}
+                                    <a role="button" class="dropdown-item align-items-center" >
+                                        <div class="text-truncate text-center">
+                                            <span class="small">No reviewed yet.</span>
+                                        </div>
+                                    </a>
+                                    {% endif %}
                                     
                                     
                                 </div>
@@ -181,38 +170,42 @@
 
                         <!-- Earnings (Monthly) Card Example -->
                         <div class="col-xl-4 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Collaborators</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{num_annot}}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fa fa-users fa-2x text-success"></i>
+                            <a href="/admin/collaborator" class="text-decoration-none">
+                                <div class="card border-left-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                    Collaborators</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{num_annot}}</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa fa-users fa-2x text-success"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
                         <!-- Earnings (Monthly) Card Example -->
                         <div class="col-xl-4 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                Tasks</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{num_task}}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fa fa-tasks fa-2x text-info"></i>
+                            <a href="#task" class="text-decoration-none">
+                                <div class="card border-left-info shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                    Tasks</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{num_task}}</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa fa-tasks fa-2x text-info"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
                         <!-- Earnings (Monthly) Card Example -->
@@ -268,7 +261,7 @@
                     <div class="row">
 
                         {% if tasks %}
-                        <div class="col-lg-12 mb-4">
+                        <div class="col-lg-12 mb-4" id="task">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 text-center">
                                     <h6 class="m-0 font-weight-bold text-primary">Tasks</h6>
