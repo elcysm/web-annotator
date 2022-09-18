@@ -272,6 +272,34 @@ def review():
                             
                         tag = select_tag_parsing_by_project_id(project)
                         return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
+
+
+                    if task == "aspect":
+                        tag = select_tag_aspect_by_project_id(project)
+                        tag_entity = select_tag_aspect_entity_by_project_id(project)
+                        tag_attribute = select_tag_aspect_attribute_by_project_id(project)
+
+                        datas = []
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+                        sent = []
+                        for dt in datas:
+                            sent.append(select_sent_by_id(dt))
+                        return render_template('aspect.html', project=project, 
+                        datas=datas, 
+                        sent=sent, 
+                        number=number, 
+                        tag=tag, 
+                        tag_entity=tag_entity, 
+                        tag_attribute=tag_attribute, 
+                        task=task, 
+                        username=username)
+            
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -368,6 +396,28 @@ def review_post():
 
                     insert_parsing(review_id, temp_token_1, temp_token_2, rv[0], username)
         if count != 0:
+            insert_notice(username, count, vietnam_now)
+        return redirect(url_for('review_done'))
+
+
+    if task == "aspect":
+        for i in range(0, number):
+            review_aspect = request.form["id_{id}".format(id=str(i))]
+            review_aspect_tag_entity = request.form.getlist("tag_entity_{id}".format(id=str(i)))[0]
+            review_aspect_tag_attribute = request.form.getlist("tag_attribute_{id}".format(id=str(i)))[0]
+            review_aspect_tag = request.form.getlist("tag_{id}".format(id=str(i)))[0]
+
+
+            
+            temp = 0
+            if review_aspect_tag != '' and review_aspect_tag_entity != '' and review_aspect_tag_attribute != '':
+                temp += 1
+                print(review_aspect_tag_entity, review_aspect_tag_attribute, review_aspect_tag)
+                insert_aspect(review_aspect, review_aspect_tag_entity, review_aspect_tag_attribute, review_aspect_tag, username)
+                    
+            if temp != 0:
+                count +=1
+        if count != 0:   
             insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
@@ -504,10 +554,24 @@ def post_new_project():
                 method = request.form['method']
                 label = request.form.getlist('label')
 
+                
+
+
                 # insert
                 insert_project(project_id, project_name, language, task, method)
                 insert_label(task, label, project_id)
 
+                if task == "aspect":
+                    label_entity = request.form.getlist('label_entity')
+                    label_attribute = request.form.getlist('label_attribute')
+                    
+                    for tag in label_entity:
+                        insert_tag_aspect_entity(" ".join(tag.split()), project_id)
+                    for tag in label_attribute:
+                        insert_tag_aspect_attribute(" ".join(tag.split()), project_id)
+                    
+
+                    
                 
                 connection = connect_to_db()
                 cursor = connection.cursor()
@@ -1035,6 +1099,8 @@ def select_data_id_by_project_id(project_id, username, task):
         tsk = "Parsing"
     if task == "textclass":
         tsk = "TextClass"
+    if task == "aspect":
+        tsk = "Aspect"
     connection = connect_to_db()
     cursor = connection.cursor()
     query = "SELECT id FROM Data WHERE project_id = '{id}' AND id NOT IN (SELECT data_id FROM '{task}' WHERE username = '{username}')".format(id = project_id, task = tsk, username = username)
@@ -1115,6 +1181,8 @@ def select_number_review_by_username(username, project_id):
         query = "SELECT DISTINCT data_id, username FROM Parsing WHERE username = '{uname}'".format(uname = username)
     elif task == "textclass":
         query = "SELECT DISTINCT data_id, username FROM TextClass WHERE username = '{uname}'".format(uname = username)
+    elif task == "aspect":
+        query = "SELECT DISTINCT data_id, username FROM Aspect WHERE username = '{uname}'".format(uname = username)
     cursor.execute(query)
     count = 0
     for i in cursor:
@@ -1188,6 +1256,40 @@ def select_tag_parsing_by_project_id(project_id):
     for id in cursor:
         result.append(id[0])
     return result
+
+# select tag aspect by project id  --------------------------------------------
+def select_tag_aspect_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag FROM TagAspect where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
+# select tag aspect entity by project id  --------------------------------------------
+def select_tag_aspect_entity_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag_entity FROM TagAspectEntity where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
+# select tag aspect attribute by project id  --------------------------------------------
+def select_tag_aspect_attribute_by_project_id(project_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag_attribute FROM TagAspectAttribute where project_id = '{id}'".format(id = project_id)
+    cursor.execute(query)
+    result = []
+    for id in cursor:
+        result.append(id[0])
+    return result
+
 
 # select number of data in project id   ----------------------------------------
 def select_number_data_of_project(project_id):
@@ -1407,6 +1509,30 @@ def insert_tag_text_class(tag_text_class, proj_id):
     cursor.execute(query)
     connection.commit()
 
+# insert tag aspect   --------------------------------------------
+def insert_tag_aspect(tag_aspect, proj_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TagAspect (tag, project_id) VALUES ('{tag}', '{proj_id}')".format(tag = tag_aspect, proj_id = proj_id)
+    cursor.execute(query)
+    connection.commit()
+
+# insert tag aspect entity  --------------------------------------------
+def insert_tag_aspect_entity(tag_aspect_entity, proj_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TagAspectEntity (tag_entity, project_id) VALUES ('{tag}', '{proj_id}')".format(tag = tag_aspect_entity, proj_id = proj_id)
+    cursor.execute(query)
+    connection.commit()
+
+# insert tag aspect attribute  --------------------------------------------
+def insert_tag_aspect_attribute(tag_aspect_attribute, proj_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO TagAspectAttribute (tag_attribute, project_id) VALUES ('{tag}', '{proj_id}')".format(tag = tag_aspect_attribute, proj_id = proj_id)
+    cursor.execute(query)
+    connection.commit()
+
 # insert tag by task
 def insert_label(task, label, proj_id):
     if task == "textclass":
@@ -1421,6 +1547,9 @@ def insert_label(task, label, proj_id):
     if task == "ner":
         for tag in label:
             insert_tag_ner(" ".join(tag.split()), proj_id)
+    if task == "aspect":
+        for tag in label:
+            insert_tag_aspect(" ".join(tag.split()), proj_id)
 
 # ### INSERT REVIEW ###
 
@@ -1456,6 +1585,15 @@ def insert_text_class(data_id, tag_text_class, username):
     cursor.execute(query)
     connection.commit()
 
+# insert review Aspect --------------------------------------------
+def insert_aspect(data_id, tag_entity, tag_attribute, tag, username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO Aspect (data_id, tag_entity, tag_attribute, tag, username) VALUES ('{dt_id}', '{tag_entity}', '{tag_attribute}', '{tag}', '{user}')".format(dt_id = data_id, tag_entity = tag_entity, tag_attribute = tag_attribute, tag = tag,  user = username)
+    cursor.execute(query)
+    connection.commit()
+
+
 ###################################### DELETE ##################################
 def delete_project_by_id(project_id):
     task = select_task_by_project_id(project_id)
@@ -1478,7 +1616,17 @@ def delete_project_by_id(project_id):
         query3 = "DELETE FROM TagTextClass WHERE project_id = '{id}'".format(id = project_id)
         query4 = "DELETE FROM TextClass WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
 
+    if task == 'aspect':
+        query3 = "DELETE FROM TagAspect WHERE project_id = '{id}'".format(id = project_id)
+        query4 = "DELETE FROM Aspect WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
+        query6 = "DELETE FROM TagAspectEntity WHERE project_id = '{id}'".format(id = project_id)
+        query7 = "DELETE FROM TagAspectAttribute WHERE project_id = '{id}'".format(id = project_id)
+
+        cursor.execute(query6)
+        cursor.execute(query7)
+
     query5 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
+
     cursor.execute(query5)
     cursor.execute(query4)
     cursor.execute(query3)

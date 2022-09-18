@@ -46,76 +46,9 @@
 					<li class="nav-item">
 						<a class="nav-link" href="/admin/collaborator"><i class="fa fa-users"></i>Collaborators</a>
 					</li>
-					<!-- <li class="nav-item">
-						<a class="nav-link" href="#">Lifestyle <span class="sr-only">(current)</span></a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#">Beauty</a>
-					</li>
-					<li class="nav-item dropdown active">
-						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tutorials 
-							</a>
-						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink-3">
-							<a class="dropdown-item" href="#">Make-up</a>
-							<a class="dropdown-item" href="#">Nails</a>
-							<a class="dropdown-item" href="#">DIY</a>
-						</div>
-					</li> -->
 				</ul>
 
 				<ul class="navbar-nav ml-auto nav-flex-icons">
-
-					<li class="nav-item dropdown no-arrow mx-1">
-						<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<i class="fa fa-bell fa-fw mr-0"></i>
-							<!-- <span class="badge badge-danger badge-counter">.</span> -->
-						</a>
-						<!-- Dropdown - Alerts -->
-						<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in "
-							aria-labelledby="alertsDropdown">
-							
-							<h6 class="text-center dropdown-header text-primary border-bottom">
-								Alerts Center
-							</h6>
-						
-							<a class="dropdown-item d-flex align-items-center" href="#">
-								<div class="mr-3">
-									<div class="icon-circle bg-primary">
-										<i class="fa fa-file-alt text-white"></i>
-									</div>
-								</div>
-								<div class="text-truncate">
-									<div class="small text-gray-500">December 12, 2019</div>
-									<span class="font-weight-bold">A new monthly report is ready to download!</span>
-								</div>
-							</a>
-							<a class="dropdown-item d-flex align-items-center" href="#">
-								<div class="mr-3">
-									<div class="icon-circle bg-success">
-										<i class="fa fa-donate text-white"></i>
-									</div>
-								</div>
-								<div class="text-truncate">
-									<div class="small text-gray-500">December 7, 2019</div>
-									$290.29 has been deposited into your account!
-								</div>
-							</a>
-							<a class="dropdown-item d-flex align-items-center" href="#">
-								<div class="mr-3 justify-content-center">
-									<div class="icon-circle bg-warning">
-										<i class="fa fa-exclamation-triangle text-white"></i>
-									</div>
-								</div>
-								<div class="text-truncate">
-									<div class="small text-gray-500">December 2, 2019</div>
-									Spending Alert: We've noticed unusually high spending for your account.
-								</div>
-							</a>
-							<a class="dropdown-item text-center small text-gray-500 border-top" href="#">Show All Alerts</a>
-						</div>
-					</li>
-
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">
@@ -150,7 +83,7 @@
                       <div class="row">
                         <div class="col-12 col-lg-8 ml-auto mr-auto mb-4">
                           <div class="multisteps-form__progress">
-                            <button class="multisteps-form__progress-btn js-active" type="button" title="btn_next">Project Infor</button>
+                            <button class="multisteps-form__progress-btn js-active" type="button" title="btn_next">Project Information</button>
                             <button class="multisteps-form__progress-btn" type="button" title="btn_next2">Task</button>
                             <!-- <button class="multisteps-form__progress-btn" type="button" title="Order Info">Order Info</button>
                             <button class="multisteps-form__progress-btn" type="button" title="Comments">Comments</button> -->
@@ -164,15 +97,14 @@
                           <form class="multisteps-form__form" method="POST" enctype="multipart/form-data">
                             <!--single form panel-->
                             <div class="multisteps-form__panel shadow p-4 rounded bg-white js-active" data-animation="scaleIn">
-                              <h3 class="multisteps-form__title">Project Information</h3>
                               <div class="multisteps-form__content">
-                                <div class="form-row mt-4">
-                                  <div class="col-12 col-sm-6" >
+                                <div class="form-row mt-2">
+                                  <div class="col-12 col-sm-7" >
                                     <label class="">Project Name:</label>
                                     <input id="project_value" onkeypress="return preventSubmit(event)" class="multisteps-form__input form-control" type="text" placeholder="Enter your project name..." name="project_name" onkeyup="get_project()"/>
 									<p id="project_error" class="d-none mb-0 mt-1 text-danger"></p>
 								</div>
-                                  <div class="col-12 col-sm-6 mt-4 mt-sm-0">
+                                  <div class="col-12 col-sm-5 mt-4 mt-sm-0">
                                     <label class="">Languages:</label>
                                     <select class="multisteps-form__select form-control" name="language">
                                         <option selected="selected" value="eng">English</option>
@@ -180,11 +112,32 @@
                                     </select>
                                   </div>
                                 </div>
+
+								<div class="form-row mt-4">
+                                    <div class="col-12 col-sm-7">
+                                      <label class="">Project Name:</label>
+                                        <select id="task_select" class="multisteps-form__select form-control" name="task">
+                                            <option selected="selected" value="textclass">Text Classification</option>
+                                            <option value="aspect">Sentiment Analysis (Aspect-Based)</option>
+                                            <option value="pos">Part Of Speech Tagging</option>
+                                            <option value="ner">Named Entity Recognition</option>
+                                            <option value="parsing">Dependency Parsing</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-sm-5 mt-4 mt-sm-0">
+                                        <label class="">Method:</label>
+                                        <select class="multisteps-form__select form-control" name="method">
+                                            <option selected="selected" value="0">Manual</option>
+                                            <option value="1">Binary</option>
+                                            <option value="2">Captioning</option>
+                                        </select>
+                                    </div>
+                                </div>
                 
                                 <div class="form-row mt-4">
                                   <div class="col-12 col-sm-12">
                                     <label class="">Upload file:</label>
-                                    <input id="file_upload" class="multisteps-form__input form-control" type="file" placeholder="Password" name="file"/>
+                                    <input id="file_upload" class="multisteps-form__input form-control" type="file" accept=".csv, .txt" placeholder="Password" name="file"/>
 									<p id="file_error" class="d-none mb-0 mt-1 text-danger"></p>
                                   </div>
                                 </div>
@@ -196,39 +149,46 @@
                             
                             <!--single form panel-->
                             <div class="multisteps-form__panel shadow p-4 rounded bg-white" data-animation="scaleIn">
-                              <h3 class="multisteps-form__title">Choose Task</h3>
                               <div class="multisteps-form__content">
-                                <div class="form-row mt-4">
-                                    <div class="col-12 col-sm-6">
-                                      <label class="">Project Name:</label>
-                                        <select class="multisteps-form__select form-control" name="task">
-                                            <option selected="selected" value="textclass">Text Classification</option>
-                                            <option value="pos">Part Of Speech Tagging</option>
-                                            <option value="ner">Named Entity Recognition</option>
-                                            <option value="parsing">Dependency Parsing</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-sm-6 mt-4 mt-sm-0">
-                                        <label class="">Method:</label>
-                                        <select class="multisteps-form__select form-control" name="method">
-                                            <option selected="selected" value="0">Manual</option>
-                                            <option value="1">Binary</option>
-                                            <option value="2">Captioning</option>
-                                        </select>
-                                    </div>
-                                </div>
+                               
 
-                                <div class="form-row mt-4">
-                                    <div class="col-12 col-sm-12 mt-4 mt-sm-0">
+                                <div class="form-row mt-3">
+                                    <div class="col-12 col-sm-12 mt-2 mt-sm-0">
                                         <label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press Enter to add label">Enter Label: <i class="fa fa-question-circle mr-1"></i></label> 
                                         <input id="input_tagnew" class="multisteps-form__input form-control tag" type="text" placeholder="Enter your label..." onkeypress="return runScript(event)"/>
 										<p id="label_error" class="d-none mb-0 mt-1 text-danger"></p>
                                     </div>
                                 </div>
 
-                                <div class="form-row mt-4 ">
-                                  <div id="tagnew" class="multisteps-form__input form-control text-left limit-width mr-1 ml-1 p-10"> </div>
-                              	</div>
+								<div class="form-row mt-2">
+									<div id="tagnew" class="multisteps-form__input form-control text-left limit-width mr-1 ml-1 p-10"> </div>
+								</div>
+
+								<div id="aspect_section" class="d-none"> 
+									<div class="form-row mt-3">
+										<div class="col-12 col-sm-12 mt-2 mt-sm-0">
+											<label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press Enter to add Entity">Enter Entity: <i class="fa fa-question-circle mr-1"></i></label> 
+											<input id="input_entity" class="multisteps-form__input form-control tag" type="text" placeholder="Enter Entity..." onkeypress="return runScript_entity(event)"/>
+											<p id="label_error" class="d-none mb-0 mt-1 text-danger"></p>
+										</div>
+									</div>
+									<div class="form-row mt-2">
+										<div id="tag_entity" class="multisteps-form__input form-control text-left limit-width mr-1 ml-1 p-10"> </div>
+									</div>
+
+
+									<div class="form-row mt-3">
+										<div class="col-12 col-sm-12 mt-2 mt-sm-0">
+											<label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press Enter to add Attribute">Enter Attribute: <i class="fa fa-question-circle mr-1"></i></label> 
+											<input id="input_attribute" class="multisteps-form__input form-control tag" type="text" placeholder="Enter Attribute..." onkeypress="return runScript_attribute(event)"/>
+											<p id="label_error" class="d-none mb-0 mt-1 text-danger"></p>
+										</div>
+									</div>
+									<div class="form-row mt-2">
+										<div id="tag_attribute" class="multisteps-form__input form-control text-left limit-width mr-1 ml-1 p-10"> </div>
+									</div>
+								</div>
+								
                                 <div class="button-row d-flex mt-4">
                                   <button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
                                   <button id="submit_new" class="btn btn-grad ml-auto js-btn-next" onclick="new_project()" type="submit" title="Submit">CREATE</button>

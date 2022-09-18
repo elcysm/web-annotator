@@ -5,6 +5,17 @@ function add_modal(){
     $('#addModal').modal('toggle'); 
 }
 
+$('.multisteps-form__form').change(function() {
+
+var task_value = document.getElementById('task_select').value;
+if (task_value == 'aspect'){
+  document.getElementById('aspect_section').classList.remove('d-none');
+}
+else{
+  document.getElementById('aspect_section').classList.add('d-none');
+}
+});
+
 $('.multisteps-form__form').ready(function() {
 
   document.querySelector('button[title="Next_New"]').disabled = true;
@@ -14,7 +25,6 @@ $('.multisteps-form__form').ready(function() {
   var projects_database = document.getElementById('project').value.replace(/[&\/\\#+()$~%. '":*?<>{}[]/g, "").replace(']','');
   var project_list = projects_database.split(',');
 
-  
 
   $('#project_value').on('keyup change',function(){
     var project_input = document.getElementById('project_value').value;
@@ -473,6 +483,44 @@ function runScript(e) {
       return false;
     }
 }
+
+var input_entity;
+var entity_new;
+function runScript_entity(e) {
+  if (e.keyCode == 13) {
+    input_entity = document.getElementById('input_entity');
+    entity_new = input_entity.value;
+    input_entity.value = ''; 
+      $('#tag_entity').prepend(`<button onclick="delete_button(this)" class="btn btn-outline-danger mr-2" type="button">
+      <i class="fa fa-close"></i>
+      <span class="badge btn-grad">${entity_new}</span>
+      <input class="d-none" name="label_entity" value="${entity_new}"></input>
+      </button>`);
+    document.querySelector('button[title="Submit"]').disabled = false;
+    return false;
+  }
+}
+
+var input_attribute;
+var attribute_new;
+function runScript_attribute(e) {
+  if (e.keyCode == 13) {
+    input_attribute = document.getElementById('input_attribute');
+    attribute_new = input_attribute.value;
+    input_attribute.value = ''; 
+      $('#tag_attribute').prepend(`<button onclick="delete_button(this)" class="btn btn-outline-danger mr-2" type="button">
+      <i class="fa fa-close"></i>
+      <span class="badge btn-grad">${attribute_new}</span>
+      <input class="d-none" name="label_attribute" value="${attribute_new}"></input>
+      </button>`);
+    document.querySelector('button[title="Submit"]').disabled = false;
+    return false;
+  }
+}
+
+
+
+
 
 function preventSubmit(e){
   if (e.keyCode == 13) {
