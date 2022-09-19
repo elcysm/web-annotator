@@ -95,7 +95,7 @@
 							<div class="multisteps-form__content text-center">
 								<div class="card-body">
 									{%for index in range(0, lentoken[0])%}
-									<button id="0_{{index}}" onclick="span(this, '{{lentoken[0]}}')" class="btn text-token mt-2" type="button">
+									<button id="0_{{index}}" onclick="span(this, '{{lentoken[0]}}')" class="btn  mt-2" type="button">
 									<span class="name_token">{{tokens[0][index]}}</span>
 									<i class="close-button d-none"></i>
 									<input class="btn review d-none" name='token_0' value="{{tokens[0][index]}}"></input> 
@@ -116,7 +116,7 @@
 							<div class="multisteps-form__content text-center">
 								<div class="card-body">
 									{%for index in range(0, lentoken[i])%}
-									<button id="{{i}}_{{index}}" onclick="span(this, '{{lentoken[i]}}')" class="btn text-token mt-2" type="button">
+									<button id="{{i}}_{{index}}" onclick="span(this, '{{lentoken[i]}}')" class="btn  mt-2" type="button">
 									<span class="name_token">{{tokens[i][index]}}</span>
 									<i class="close-button d-none"></i>
 									<input class="btn review d-none" name='token_{{i}}' value="{{tokens[i][index]}}"></input> 
@@ -138,7 +138,7 @@
 							<div class="multisteps-form__content text-center">
 								<div class="card-body">
 									{%for index in range(0, lentoken[number-1])%}
-									<button id="{{number-1}}_{{index}}" onclick="span(this, '{{lentoken[number-1]}}')" class="btn text-token mt-2" type="button">
+									<button id="{{number-1}}_{{index}}" onclick="span(this, '{{lentoken[number-1]}}')" class="btn  mt-2" type="button">
 									<span class="name_token">{{tokens[number-1][index]}}</span>
 									<i class="close-button d-none"></i>
 									<input class="btn review d-none" name='token_{{number-1}}' value="{{tokens[number-1][index]}}"></input> 

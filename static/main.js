@@ -5,15 +5,30 @@ function add_modal(){
     $('#addModal').modal('toggle'); 
 }
 
+var task_value;
+var method;
 $('.multisteps-form__form').change(function() {
 
-var task_value = document.getElementById('task_select').value;
-if (task_value == 'aspect'){
-  document.getElementById('aspect_section').classList.remove('d-none');
-}
-else{
-  document.getElementById('aspect_section').classList.add('d-none');
-}
+  task_value = document.getElementById('task_select').value;
+  method = document.getElementById('method_select').value;
+
+  if (task_value == 'paraphrase' && method == '1'){
+    document.getElementById('label_section').classList.add('d-none');
+    document.getElementById('binary_section').classList.remove('d-none');
+  }
+  else{
+    document.getElementById('label_section').classList.remove('d-none');
+    document.getElementById('binary_section').classList.add('d-none');
+  }
+
+  if (task_value == 'aspect' && method == '0'){
+    document.getElementById('aspect_section').classList.remove('d-none');
+  }
+  else{
+    document.getElementById('aspect_section').classList.add('d-none');
+  }
+
+
 });
 
 $('.multisteps-form__form').ready(function() {
@@ -64,19 +79,25 @@ $('.multisteps-form__form').ready(function() {
 
     if ((project_input != '') && (file_input != '') && !(project_list.includes(project_input))){
       document.querySelector('button[title="Next_New"]').disabled = false;
-      if (tag_after != ' '){
+
+      if (method == '0'){
+        if (tag_after != ' '){
+          document.querySelector('button[title="Submit"]').disabled = false;
+        }
+        else{
+          document.querySelector('button[title="Submit"]').disabled = true;
+        }
+      }
+      else if (method == '1'){
         document.querySelector('button[title="Submit"]').disabled = false;
       }
-      else{
-        document.querySelector('button[title="Submit"]').disabled = true;
-      }
+      
     }
     else{
       document.querySelector('button[title="Next_New"]').disabled = true;
       document.querySelector('button[title="btn_next2"]').disabled = true;
     }
 
-   
     
   });
 
@@ -269,6 +290,54 @@ function span_textclass(btn){
     btn.querySelector('input[id="texttag"]').value = '';
   }
 }
+
+
+function span_paraphrase(btn, number){
+
+  var button_id = btn.getAttribute('id');
+  
+  var data_id = button_id.split('_')[0];
+  var button_number = button_id.split('_')[1];
+
+  var button_true = document.getElementById(data_id + '_1');
+  var button_false = document.getElementById(data_id + '_0');
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '1'){
+    button_true.classList.add('active');
+    button_true.querySelector('input[id="tag"]').value = number;
+    button_true.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_true.querySelector('i').classList.add('d-none');
+    button_true.classList.remove('active');
+    button_true.querySelector('input[id="tag"]').value = '';
+  }
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '0'){
+    button_false.classList.add('active');
+    button_false.querySelector('input[id="tag"]').value = number;
+    button_false.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_false.querySelector('i').classList.add('d-none');
+    button_false.classList.remove('active');
+    button_false.querySelector('input[id="tag"]').value = '';
+  }
+
+
+
+  // if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == 1){
+  //   btn.classList.add('active');
+  //   btn.querySelector('input[id="tag"]').value = number;
+  //   btn.querySelector('i').classList.remove('d-none'); 
+  // }
+  // else{
+  //   btn.querySelector('i').classList.add('d-none');
+  //   btn.classList.remove('active');
+  //   btn.querySelector('input[id="tag"]').value = number;
+  // }
+}
+
 
 var clicks = 0;
 
@@ -624,6 +693,13 @@ function copyToClipboard() {
 
 function tooltip(){
   $('[data-toggle="tooltip"]').tooltip('toggle');
+}
+
+function tooltip_entity(){
+  $('[data-toggle="tooltip_entity"]').tooltip('toggle');
+}
+function tooltip_attribute(){
+  $('[data-toggle="tooltip_attribute"]').tooltip('toggle');
 }
   
 function mySubmitFunction(e) {

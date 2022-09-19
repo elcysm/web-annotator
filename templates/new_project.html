@@ -84,7 +84,7 @@
                         <div class="col-12 col-lg-8 ml-auto mr-auto mb-4">
                           <div class="multisteps-form__progress">
                             <button class="multisteps-form__progress-btn js-active" type="button" title="btn_next">Project Information</button>
-                            <button class="multisteps-form__progress-btn" type="button" title="btn_next2">Task</button>
+                            <button class="multisteps-form__progress-btn" type="button" title="btn_next2">Label</button>
                             <!-- <button class="multisteps-form__progress-btn" type="button" title="Order Info">Order Info</button>
                             <button class="multisteps-form__progress-btn" type="button" title="Comments">Comments</button> -->
                           </div>
@@ -122,11 +122,12 @@
                                             <option value="pos">Part Of Speech Tagging</option>
                                             <option value="ner">Named Entity Recognition</option>
                                             <option value="parsing">Dependency Parsing</option>
+                                            <option value="paraphrase">Paraphrase Detection</option>
                                         </select>
                                     </div>
                                     <div class="col-12 col-sm-5 mt-4 mt-sm-0">
                                         <label class="">Method:</label>
-                                        <select class="multisteps-form__select form-control" name="method">
+                                        <select id="method_select" class="multisteps-form__select form-control" name="method">
                                             <option selected="selected" value="0">Manual</option>
                                             <option value="1">Binary</option>
                                             <option value="2">Captioning</option>
@@ -151,23 +152,30 @@
                             <div class="multisteps-form__panel shadow p-4 rounded bg-white" data-animation="scaleIn">
                               <div class="multisteps-form__content">
                                
+								<div id="label_section"> 
+									<div class="form-row mt-3">
+										<div class="col-12 col-sm-12 mt-2 mt-sm-0">
+											<label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press Enter to add label">Enter Label: <i class="fa fa-question-circle mr-1"></i></label> 
+											<input id="input_tagnew" class="multisteps-form__input form-control tag" type="text" placeholder="Enter your label..." onkeypress="return runScript(event)"/>
+											<p id="label_error" class="d-none mb-0 mt-1 text-danger"></p>
+										</div>
+									</div>
 
-                                <div class="form-row mt-3">
-                                    <div class="col-12 col-sm-12 mt-2 mt-sm-0">
-                                        <label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press Enter to add label">Enter Label: <i class="fa fa-question-circle mr-1"></i></label> 
-                                        <input id="input_tagnew" class="multisteps-form__input form-control tag" type="text" placeholder="Enter your label..." onkeypress="return runScript(event)"/>
-										<p id="label_error" class="d-none mb-0 mt-1 text-danger"></p>
-                                    </div>
-                                </div>
+									<div class="form-row mt-2">
+										<div id="tagnew" class="multisteps-form__input form-control text-left limit-width mr-1 ml-1 p-10"> </div>
+									</div>
+								</div>
 
-								<div class="form-row mt-2">
-									<div id="tagnew" class="multisteps-form__input form-control text-left limit-width mr-1 ml-1 p-10"> </div>
+								<div id="binary_section" class="d-none"> 
+									<div class="text-center">
+										<h3>Click <span class="badge btn-grad">Create</span> to Create New Project</h3>
+									</div>
 								</div>
 
 								<div id="aspect_section" class="d-none"> 
 									<div class="form-row mt-3">
 										<div class="col-12 col-sm-12 mt-2 mt-sm-0">
-											<label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press Enter to add Entity">Enter Entity: <i class="fa fa-question-circle mr-1"></i></label> 
+											<label onmouseover="tooltip_entity()" data-toggle="tooltip_entity" data-placement="right" title="Press Enter to add Entity">Enter Entity: <i class="fa fa-question-circle mr-1"></i></label> 
 											<input id="input_entity" class="multisteps-form__input form-control tag" type="text" placeholder="Enter Entity..." onkeypress="return runScript_entity(event)"/>
 											<p id="label_error" class="d-none mb-0 mt-1 text-danger"></p>
 										</div>
@@ -179,7 +187,7 @@
 
 									<div class="form-row mt-3">
 										<div class="col-12 col-sm-12 mt-2 mt-sm-0">
-											<label onmouseover="tooltip()" data-toggle="tooltip" data-placement="right" title="Press Enter to add Attribute">Enter Attribute: <i class="fa fa-question-circle mr-1"></i></label> 
+											<label onmouseover="tooltip_attribute()" data-toggle="tooltip_attribute" data-placement="right" title="Press Enter to add Attribute">Enter Attribute: <i class="fa fa-question-circle mr-1"></i></label> 
 											<input id="input_attribute" class="multisteps-form__input form-control tag" type="text" placeholder="Enter Attribute..." onkeypress="return runScript_attribute(event)"/>
 											<p id="label_error" class="d-none mb-0 mt-1 text-danger"></p>
 										</div>

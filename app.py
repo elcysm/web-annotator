@@ -197,8 +197,11 @@ def review():
                 else:
 
                     task = select_task_by_project_id(project)
+                    method = select_method_by_project_id(project)
+
+                    print(task, method )
                     
-                    if task == "textclass":
+                    if task == "textclass" and method == "0":
                         tag = select_tag_textclass_by_project_id(project)
                         datas = []
                         temp = select_data_id_by_project_id(project, username, task)
@@ -213,7 +216,7 @@ def review():
                             sent.append(select_sent_by_id(dt))
                         return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task, username=username)
                     
-                    if task == "pos":
+                    if task == "pos" and method == "0":
                         datas = []
                         temp = select_data_id_by_project_id(project, username, task)
                         if number > len(temp):
@@ -230,7 +233,7 @@ def review():
                         tag = select_tag_pos_by_project_id(project)
                         return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, username=username)
                     
-                    if task == "ner":
+                    if task == "ner" and method == "0":
                         datas = []
                         temp = select_data_id_by_project_id(project, username, task)
                         if number > len(temp):
@@ -252,7 +255,7 @@ def review():
                         return render_template('ner.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, lentoken=lentoken, username=username)
 
 
-                    if task == "parsing":
+                    if task == "parsing" and method == "0":
                         datas = []
                         temp = select_data_id_by_project_id(project, username, task)
                         if number > len(temp):
@@ -274,7 +277,7 @@ def review():
                         return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
 
 
-                    if task == "aspect":
+                    if task == "aspect" and method == "0":
                         tag = select_tag_aspect_by_project_id(project)
                         tag_entity = select_tag_aspect_entity_by_project_id(project)
                         tag_attribute = select_tag_aspect_attribute_by_project_id(project)
@@ -299,7 +302,32 @@ def review():
                         tag_attribute=tag_attribute, 
                         task=task, 
                         username=username)
-            
+
+
+                    if task == "paraphrase" and method == "1":
+
+                        datas = []
+                        sent1 = []
+                        sent2 = []
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+                        for dt in datas:
+                            temp = select_sent_by_id(dt).split('~')
+                            sent1.append(temp[0])
+                            sent2.append(temp[1])
+
+                        return render_template('paraphrase.html', project=project, 
+                        datas=datas, 
+                        sent1=sent1, 
+                        sent2=sent2, 
+                        number=number, 
+                        task=task, 
+                        username=username)
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -421,6 +449,21 @@ def review_post():
             insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
+    if task == "paraphrase":
+        for i in range(0, number):
+            review_paraphrase = request.form["id_{id}".format(id=str(i))]
+            review_paraphrase_tag = request.form.getlist("tag_{id}".format(id=str(i)))
+            
+            temp = 0
+            for tag in review_paraphrase_tag:
+                if tag != '':
+                    temp += 1
+                    insert_paraphrase(review_paraphrase, tag, username)
+            if temp != 0:
+                count +=1
+        if count != 0:   
+            insert_notice(username, count, vietnam_now)
+        return redirect(url_for('review_done'))
 
 # review done -> thank you  ----------------------------------------------------
 @app.route('/user/review/done')
@@ -544,24 +587,23 @@ def post_new_project():
         user_role = select_role(user_admin)
         if user_role!= None:
             if check_role(user_role[0])==True:
-                project_id = generate_code()
 
+                project_id = generate_code()
                 project_name = request.form['project_name']
                 language = request.form['language']
-
-
                 task = request.form['task']
                 method = request.form['method']
                 label = request.form.getlist('label')
 
-                
-
+                if task == "paraphrase" and method == "1":
+                    print("Log: Create Task: Paraphrase Detection")
+                else: 
+                    insert_label(task, label, project_id)
 
                 # insert
                 insert_project(project_id, project_name, language, task, method)
-                insert_label(task, label, project_id)
 
-                if task == "aspect":
+                if task == "aspect" and method == "0":
                     label_entity = request.form.getlist('label_entity')
                     label_attribute = request.form.getlist('label_attribute')
                     
@@ -569,9 +611,7 @@ def post_new_project():
                         insert_tag_aspect_entity(" ".join(tag.split()), project_id)
                     for tag in label_attribute:
                         insert_tag_aspect_attribute(" ".join(tag.split()), project_id)
-                    
 
-                    
                 
                 connection = connect_to_db()
                 cursor = connection.cursor()
@@ -580,8 +620,7 @@ def post_new_project():
                 if uploaded_file.filename != '':
                     file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
                     uploaded_file.save(file_path) 
-                    data = read_file(file_path, language)
-                    insert_sentences(data, project_id, language, connection, cursor)
+                    read_file(file_path, project_id, language, connection, cursor, task, method)
                         
                 return redirect(url_for('admin_project'))
 
@@ -764,44 +803,64 @@ def get_tag(task):
         return 'Parsing'
     if task == 'textclass':
         return 'TextClass'
+    if task == 'aspect':
+        return 'Aspect'
+    if task == 'paraphrase':
+        return 'Paraphrase'
 
 ################################### READ FILE ##################################
-def read_file(filePath, language):
+def read_file(filePath, project_id, language, connection, cursor, task, method):
     ext = os.path.splitext(filePath)[1]
     if ext == ".csv":
-        data = pd.read_csv(filePath, header=None, encoding='utf-8')
-        csvData = ""
-        for i, row in data.iterrows():
-            temp_1 = row[0]
-            temp = temp_1.replace("'", "''")
-            if '.' not in temp:
+        data = pd.read_csv(filePath, header=0, encoding='utf-8')
+        # csvData = ""
+        if task == "paraphrase" and method == "1":
+            for i, row in data.iterrows():
+                temp1 = row[1]
+                temp2 = row[2]
+                temp1 = temp1.replace("'", "''")
+                temp2 = temp2.replace("'", "''")
+                if '.' not in temp1:
+                    temp1 = temp1.strip() + '. '
+                if '.' not in temp2:
+                    temp2 = temp2.strip() + '. '
+                
+                temp = temp1 + '~' + temp2
+                
+                insert_sentences(temp, project_id, language, connection, cursor)
+            connection.commit()
+        else:
+            for i, row in data.iterrows():
+                temp_1 = row[0]
+                temp = temp_1.replace("'", "''")
                 temp = temp.strip() + '. '
-            if '. ' not in temp:
-                temp = temp + ' '
-            if ' .' in temp:
-                temp = temp.replace(" .", ". ")
-            csvData += temp
-        return csvData
+            
+                insert_sentences(temp, project_id, language, connection, cursor)
+            connection.commit()
+            
     elif ext == ".txt":
         with open(filePath, encoding='utf-8') as f:
             lines = f.readlines()
-        txtData = ""
         for line in lines:
-            temp = ""
+            temp1 = line
+            temp = temp1.replace('\n', ' ')
             if language == "eng":
-                temp = line.replace('\n', ' ')
                 temp = temp.replace("'", "''")
             else:
-                temp = line.replace('\n', ' ')
                 temp = temp.replace("'", " ")
-            if '.' not in temp:
-                temp = temp.strip() + '. '
-            if '. ' not in temp:
-                temp = temp + ' '
 
-            txtData += temp
-
-        return txtData
+            # if language == "eng":
+            #     temp = line.replace('\n', ' ')
+            #     temp = temp.replace("'", "''")
+            # else:
+            #     temp = line.replace('\n', ' ')
+            #     temp = temp.replace("'", " ")
+            # if '.' not in temp:
+            #     temp = temp.strip() + '. '
+            # if '. ' not in temp:
+            #     temp = temp + ' '
+            insert_sentences(temp, project_id, language, connection, cursor)
+        connection.commit()
 
 ################################### EXPORT DATA ################################
 # write file   -----------------------------------------------------------------
@@ -1029,6 +1088,52 @@ def write_file_json(project_id):
                         review_list.append(d)
                         temp = []
                 count+=1
+    elif task == "aspect":
+        temp1 = []
+        for dt in datas:
+            id = dt[0]
+            review = select_review_aspect(id)
+            # Truong hop data da co nguoi review
+            if len(review) != 0:
+                uname = review[0][3]
+                ent = review[0][0]
+                dem=1
+                d = collections.OrderedDict()
+                d['id'] = count
+                d['sent'] = dt[1].replace('"', '')
+                for rv_part in review:
+                    if rv_part[3] == uname:
+                        if rv_part[0] == ent:
+                            temp1.append({"attribute": rv_part[1], "tag": rv_part[2]})
+                        else:
+                            temp.append({"entity": ent, "review": temp1})
+                            temp1 = []
+                            ent = rv_part[0]
+                            temp1.append({"attribute": rv_part[1], "tag": rv_part[2]})
+                    else:
+                        count+=1
+                        dem=1
+                        temp.append({"entity": ent, "review": temp1})
+                        temp1 = []
+                        ent = rv_part[0]
+                        d['aspect'] = temp
+                        review_list.append(d)
+                        d = collections.OrderedDict()
+                        d['id'] = count
+                        d['sent'] = dt[1].replace('"', '')
+                        temp = []
+                        temp1.append({"attribute": rv_part[1], "tag": rv_part[2]})
+                        dem+=1
+                        uname = rv_part[3]
+
+                    if rv_part == review[-1]:
+                        temp.append({"entity": ent, "review": temp1})
+                        temp1 = []
+                        ent = rv_part[0]
+                        d['aspect'] = temp
+                        review_list.append(d)
+                        temp = []
+                count+=1
     j = json.dumps(review_list, ensure_ascii=False)
     with open(os.path.join(app.config['UPLOAD_FOLDER'],"{id}.json".format(id=project_id)), 'w', encoding='UTF-8') as file:
         file.write(j)
@@ -1101,6 +1206,8 @@ def select_data_id_by_project_id(project_id, username, task):
         tsk = "TextClass"
     if task == "aspect":
         tsk = "Aspect"
+    if task == "paraphrase":
+        tsk = "Paraphrase"
     connection = connect_to_db()
     cursor = connection.cursor()
     query = "SELECT id FROM Data WHERE project_id = '{id}' AND id NOT IN (SELECT data_id FROM '{task}' WHERE username = '{username}')".format(id = project_id, task = tsk, username = username)
@@ -1183,6 +1290,8 @@ def select_number_review_by_username(username, project_id):
         query = "SELECT DISTINCT data_id, username FROM TextClass WHERE username = '{uname}'".format(uname = username)
     elif task == "aspect":
         query = "SELECT DISTINCT data_id, username FROM Aspect WHERE username = '{uname}'".format(uname = username)
+    elif task == "paraphrase":
+        query = "SELECT DISTINCT data_id, username FROM Paraphrase WHERE username = '{uname}'".format(uname = username)
     cursor.execute(query)
     count = 0
     for i in cursor:
@@ -1209,6 +1318,15 @@ def select_task_by_project_id(id):
     connection = connect_to_db()
     cursor = connection.cursor()
     query = "SELECT task FROM Project WHERE id = '{id}'".format(id = id)
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
+# select method by project id ----------------------------------------------------
+def select_method_by_project_id(id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT method FROM Project WHERE id = '{id}'".format(id = id)
     cursor.execute(query)
     result = cursor.fetchone()[0]
     return result
@@ -1395,6 +1513,15 @@ def select_review_parsing(data_id):
     result = cursor.fetchall()
     return result
 
+# select review aspect  -------------------------------------------------------
+def select_review_aspect(data_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag_entity, tag_attribute, tag, username FROM Aspect where data_id = '{id}' ORDER BY username, tag_entity".format(id = data_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
 # select review textclass  -----------------------------------------------------
 def select_review_textclass(data_id):
     connection = connect_to_db()
@@ -1454,22 +1581,21 @@ def insert_notice(username, number, date):
 # insert sentence to database   ------------------------------------------------
 def insert_sentences(data, project_id, language, connection, cursor):
     
-    sent_list = data_to_sentences(data, language)
+    # sent_list = data_to_sentences(data, language)
 
+    # for sent in sent_list:
+    try:
+        id = generate_code()
+        # start = time.time()
+        query = "INSERT INTO Data (id, sent, project_id) VALUES ('{id}', '{text}', '{proj_id}')".format(id = id, text = data, proj_id = project_id)
+        cursor.execute(query)
+    except:
+        print(data)
     
-    for sent in sent_list:
-        try:
-            id = generate_code()
-            # start = time.time()
-            query = "INSERT INTO Data (id, sent, project_id) VALUES ('{id}', '{text}', '{proj_id}')".format(id = id, text = sent, proj_id = project_id)
-            cursor.execute(query)
-        except:
-            print(sent)
-    
-    start1 = time.time()
-    connection.commit()
-    end2 = time.time()
-    print("\n"f"{(end2 - start1)} secs.")
+    # start1 = time.time()
+    # connection.commit()
+    # end2 = time.time()
+    # print("\n"f"{(end2 - start1)} secs.")=
 
 
     
@@ -1585,6 +1711,15 @@ def insert_text_class(data_id, tag_text_class, username):
     cursor.execute(query)
     connection.commit()
 
+# insert review Paraphrase Detection --------------------------------------------
+def insert_paraphrase(data_id, tag_paraphrase, username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO Paraphrase (data_id, tag, username) VALUES ('{dt_id}', '{tag}', '{user}')".format(dt_id = data_id, tag = tag_paraphrase, user = username)
+    cursor.execute(query)
+    connection.commit()
+
+
 # insert review Aspect --------------------------------------------
 def insert_aspect(data_id, tag_entity, tag_attribute, tag, username):
     connection = connect_to_db()
@@ -1615,15 +1750,17 @@ def delete_project_by_id(project_id):
     if task == 'textclass':
         query3 = "DELETE FROM TagTextClass WHERE project_id = '{id}'".format(id = project_id)
         query4 = "DELETE FROM TextClass WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
-
     if task == 'aspect':
         query3 = "DELETE FROM TagAspect WHERE project_id = '{id}'".format(id = project_id)
         query4 = "DELETE FROM Aspect WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
         query6 = "DELETE FROM TagAspectEntity WHERE project_id = '{id}'".format(id = project_id)
         query7 = "DELETE FROM TagAspectAttribute WHERE project_id = '{id}'".format(id = project_id)
-
         cursor.execute(query6)
         cursor.execute(query7)
+    if task == 'paraphrase':
+        query3 = "DELETE FROM Paraphrase WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
+        query4 = ""
+
 
     query5 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
 
@@ -1650,6 +1787,8 @@ def delete_annotator_by_username(username):
         query2 = "DELETE FROM Parsing WHERE username = '{username}'".format(username = username)
     if task == 'textclass':
         query2 = "DELETE FROM TextClass WHERE username = '{username}'".format(username = username)
+    if task == 'aspect':
+        query2 = "DELETE FROM Aspect WHERE username = '{username}'".format(username = username)
 
     query3 = "DELETE FROM ReviewNoti WHERE username = '{username}'".format(username = username)
 
@@ -1657,37 +1796,6 @@ def delete_annotator_by_username(username):
     cursor.execute(query2)
     cursor.execute(query3)
     connection.commit()
-# def delete_project_by_id(project_id):
-#     connection = connect_to_db()
-#     cursor = connection.cursor()
-#     query1 = "DELETE FROM Project WHERE id = '{id}'".format(id = project_id)
-#     query2 = "DELETE FROM Data WHERE project_id = '{id}'".format(id = project_id)
-#     query3 = "DELETE FROM TagNER WHERE project_id = '{id}'".format(id = project_id)
-#     query4 = "DELETE FROM TagPOS WHERE project_id = '{id}'".format(id = project_id)
-#     query5 = "DELETE FROM TagParsing WHERE project_id = '{id}'".format(id = project_id) 
-#     query6 = "DELETE FROM TagTextClass WHERE project_id = '{id}'".format(id = project_id)
-#     query7 = "DELETE FROM user WHERE project_id = '{id}'".format(id = project_id)
-
-
-#     cursor.execute(query1)
-#     cursor.execute(query2)
-#     cursor.execute(query3)
-#     cursor.execute(query4)
-#     cursor.execute(query5)
-#     cursor.execute(query6)
-#     cursor.execute(query7)
-#     connection.commit()
-
-
-# def delete_annotator_by_username(username):
-#     connection = connect_to_db()
-#     cursor = connection.cursor()
-#     query1 = "DELETE FROM user WHERE username = '{username}'".format(username = username)
-
-
-
-#     cursor.execute(query1)
-#     connection.commit()
 
 ############################### HANDLE INPUT DATA ##############################
 
