@@ -1,0 +1,47 @@
+[
+    {
+        "id": 1,
+        "image": [
+            {
+                "image": "4005.jpg",
+                "tag": "Negative"
+            }
+        ],
+        "text": [
+            {
+                "text": "#cars http://t.co/T4A1vEqoLS #Cars #Chatillion-Car-Graveyard #WWII Traffic Jam in Belgian Forest Lies ... http://t.co/9zrLJRk7Qa",
+                "tag": "Negative"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "image": [
+            {
+                "image": "3777.jpg",
+                "tag": "Positive"
+            }
+        ],
+        "text": [
+            {
+                "text": "RT @lana_palestine: 1 yr ago today, Mohammed Abu khdeir was kidnapped, tortured & burnt alive by Israeli settlers. Via @Palestine_UN http:/¡­ ",
+                "tag": "Positive"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "image": [
+            {
+                "image": "2809.jpg",
+                "tag": "Neutral"
+            }
+        ],
+        "text": [
+            {
+                "text": "RT @DailyMailUK: JK Rowling completely ruins Twitter troll for body-shaming Serena Williams. ",
+                "tag": "Neutral"
+            }
+        ]
+    }
+]

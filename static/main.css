@@ -55,6 +55,10 @@ body, html {
   align-items: center;
 }
 
+.bottom{
+  margin-bottom: 200px;
+}
+
 .container-bottom{
   height: 100%;
   position: relative; 
@@ -810,11 +814,17 @@ input::placeholder {
   position: relative;
   width:196px;
 }
+
 .my-profile-picture{
   border-radius: 100%;
   width: 23px;
   height: 23px;
   margin-right: 10px;
+}
+.fit-img{
+  height: 200px; 
+  width: 400px; 
+  object-fit: contain;
 }
 .alert-validate::after {
   content: "\f12a";

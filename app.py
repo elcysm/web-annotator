@@ -14,7 +14,6 @@ import string
 import pandas as pd
 from nltk import word_tokenize as en_word_tokenize, sent_tokenize as en_sent_tokenize
 from underthesea import word_tokenize as vie_word_tokenize, sent_tokenize as vie_sent_tokenize
-from datetime import datetime
 import json
 import collections
 import csv
@@ -38,6 +37,7 @@ LIFETIME_SESSION = 24
 ANNOTATOR_ROLE = '0'
 DATA_OWNER_ROLE = '1'
 UPLOAD_FOLDER = 'static/upload'
+DOWNLOAD_FOLDER = 'static/download'
 
 # config Mail   ----------------------------------------------------------------
 app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -47,6 +47,7 @@ app.config['MAIL_PASSWORD'] = MAIL_SERVICE_PASSWORD
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['UPLOAD_FOLDER'] =  UPLOAD_FOLDER
+app.config['DOWNLOAD_FOLDER'] =  DOWNLOAD_FOLDER
 
 
 mail = Mail(app)
@@ -87,22 +88,37 @@ def index():
         else:
             return redirect(url_for('get_register')) 
 
-# login with username, password ------------------------------------------------
-@app.route('/', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
-    passwordhash = hashlib.md5(password.encode()).hexdigest()
-    session['username'] = username
+# # login with username, password ------------------------------------------------
+# @app.route('/', methods=['POST'])
+# def login():
+#     username = request.form['username']
+#     password = request.form['password']
+#     # passwordhash = hashlib.md5(password.encode()).hexdigest()
+#     result = select_role_by_username_password(username, password)
+#     if result != None:
+#         session['username'] = username
+#         user_role = result[1]
+#         if check_role(user_role)==True:
+#             return redirect(url_for('admin_index'))
+#         else:
+#             return redirect(url_for('user_index'))
+#     else:
+#         return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
+
+
+# validate login with username, password ------------------------------------------------
+@app.route('/username=<username>&password=<password>', methods=['POST'])
+def validate(username, password):
     result = select_role_by_username_password(username, password)
     if result != None:
+        session['username'] = username
         user_role = result[1]
         if check_role(user_role)==True:
-            return redirect(url_for('admin_index'))
+            return "True"
         else:
-            return redirect(url_for('user_index'))
+            return "False"
     else:
-        return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
+        return "Invalid"
 
 # user index    ----------------------------------------------------------------
 @app.route('/user')
@@ -112,8 +128,7 @@ def user_index():
         user_role = select_role(username)
         if user_role!= None:
             if check_role(user_role[0])==False:
-                project = select_project_id_by_annotator(username)
-                return redirect(url_for('review', project=project)) 
+                return redirect(url_for('review')) 
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -127,43 +142,59 @@ def get_api_login(project, number, username, password):
     if 'username' not in session:
          return render_template('login.html', username=username, password=password)
     else:
-        username_session = session['username']
-        if username_session != username:
-            session.pop('username', None)
-            session.pop('project', None)
-            return redirect(url_for('get_api_login', project=project, number=number, username=username, password=password))
-        else:
-            user_role = select_role(username_session)
-            if user_role != None:
-                if check_role(user_role[0])==True:
-                    return redirect(url_for('admin_index'))
-                else:
-                    return redirect(url_for('user_index'))    
+        # username_session = session['username']
+        # if username_session != username:
+        #     session.pop('username', None)
+        #     session.pop('project', None)
+        #     return redirect(url_for('get_api_login', project=project, number=number, username=username, password=password))
+        # else:
+        user_role = select_role(username)
+        if user_role != None:
+            if check_role(user_role[0])==True:
+                return redirect(url_for('admin_index'))
             else:
-                return redirect(url_for('get_register')) 
+                return redirect(url_for('user_index'))    
+        else:
+            return redirect(url_for('get_register')) 
+
 
 # login by link from data owner ------------------------------------------------
 
-@app.route('/login/project=<project>&number=<number>&username=<username>&password=<password>', methods=['POST'])
-def post_api_login(project, number, username, password):
+@app.route('/login/username=<username>&password=<password>&number=<number>', methods=['POST'])
+def validate_annotator(username, password, number):
+    result = select_role_by_username_password(username, password)
+    if result != None:
+        session['username'] = username
+        user_role = result[1]
+        if check_role(user_role)==False:
+            session['number'] = number
+            return "True"
+        else:
+            return "False"
+    else: 
+        return "Invalid"
+        
+# # login by link from data owner ------------------------------------------------
+# @app.route('/login/project=<project>&number=<number>&username=<username>&password=<password>', methods=['POST'])
+# def post_api_login(project, number, username, password):
 
-    usernameform = request.form['username']
-    passwordform = request.form['password']
+#     usernameform = request.form['username']
+#     passwordform = request.form['password']
 
-    if usernameform == username and passwordform == password:
-        result = select_role_by_username_password(username, password)
-        if result != None:
-            session['username'] = username
-            user_role = result[1]
-            if check_role(user_role)==True:
-                return redirect(url_for('admin_index'))
-            else:
-                session['number'] = number
-                return redirect(url_for('user_index'))
-        else: 
-            return redirect(url_for('login',error="Sai tài khoản hoặc mật khẩu"))
-    else:
-        return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
+#     if usernameform == username and passwordform == password:
+#         result = select_role_by_username_password(username, password)
+#         if result != None:
+#             session['username'] = username
+#             user_role = result[1]
+#             if check_role(user_role)==True:
+#                 return redirect(url_for('admin_index'))
+#             else:
+#                 session['number'] = number
+#                 return redirect(url_for('user_index'))
+#         else: 
+#             return redirect(url_for('login',error="Sai tài khoản hoặc mật khẩu"))
+#     else:
+#         return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
 
 ####################################### LOGOUT #################################
 
@@ -198,8 +229,6 @@ def review():
 
                     task = select_task_by_project_id(project)
                     method = select_method_by_project_id(project)
-
-                    print(task, method )
                     
                     if task == "textclass" and method == "0":
                         tag = select_tag_textclass_by_project_id(project)
@@ -325,6 +354,32 @@ def review():
                         datas=datas, 
                         sent1=sent1, 
                         sent2=sent2, 
+                        number=number, 
+                        task=task, 
+                        username=username)
+                    
+                    if task == "multimodal" and method == "0":
+
+                        datas = []
+                        img_src = []
+                        text = []
+                        temp = select_data_id_by_project_id(project, username, task)
+                        if number > len(temp):
+                            return redirect(url_for('review_done'))
+                        while len(datas) < number:
+                            dt = random.choice(temp)
+                            if dt not in datas:
+                                datas.append(dt)
+                        for dt in datas:
+                            temp = select_sent_by_id(dt).split('~')
+                            img_src.append(temp[0])
+                            text.append(temp[1])
+
+                        print(img_src)
+                        return render_template('multimodal.html', project=project, 
+                        datas=datas, 
+                        img_src=img_src, 
+                        text=text, 
                         number=number, 
                         task=task, 
                         username=username)
@@ -465,6 +520,32 @@ def review_post():
             insert_notice(username, count, vietnam_now)
         return redirect(url_for('review_done'))
 
+    if task == "multimodal":
+        for i in range(0, number):
+            review_multimodal = request.form["id_{id}".format(id=str(i))]
+            review_multimodal_img_tag = request.form.getlist("img_tag_{id}".format(id=str(i)))
+            review_multimodal_text_tag = request.form.getlist("text_tag_{id}".format(id=str(i)))
+            print(review_multimodal_img_tag,review_multimodal_text_tag)
+
+            temp = 0
+            temp_img_tag = ''
+            temp_text_tag = ''
+
+            for i in range(0, 3):
+                if review_multimodal_img_tag[i] != '':
+                    temp_img_tag = review_multimodal_img_tag[i]
+                if review_multimodal_text_tag[i] != '':
+                    temp_text_tag = review_multimodal_text_tag[i]
+
+            if temp_img_tag != '' and temp_text_tag != '':
+                temp += 1
+                insert_multimodal(review_multimodal, temp_img_tag, temp_text_tag, username)
+            if temp != 0:
+                count +=1
+        if count != 0:   
+            insert_notice(username, count, vietnam_now)
+        return redirect(url_for('review_done'))
+
 # review done -> thank you  ----------------------------------------------------
 @app.route('/user/review/done')
 def review_done():
@@ -476,6 +557,7 @@ def review_done():
 # admin index   ----------------------------------------------------------------
 @app.route('/admin')
 def admin_index():
+    print(session)
     if 'username' in session:
         username = session['username']
         user_role = select_role(username)
@@ -495,6 +577,12 @@ def admin_index():
                        tasks.append('Text Classification')
                     if i == "parsing":
                        tasks.append('Dependency Parsing')
+                    if i == "aspect":
+                       tasks.append('Aspect-based Sentiment')
+                    if i == "paraphrase":
+                       tasks.append('Paraphrase Detection')
+                    if i == "multimodal":
+                       tasks.append('MultiModal Sentiment')
                 
                 notice = select_notice()
                 count_notif = 0
@@ -507,7 +595,8 @@ def admin_index():
                 num_task = num_task,
                 tasks = tasks,
                 notice=notice,
-                count_notif=count_notif)
+                count_notif=count_notif,
+                success="Đăng nhập thành công")
             else:
                 return render_template('403.html')
     else:
@@ -595,8 +684,10 @@ def post_new_project():
                 method = request.form['method']
                 label = request.form.getlist('label')
 
-                if task == "paraphrase" and method == "1":
+                if task == "paraphrase" and method == "1" :
                     print("Log: Create Task: Paraphrase Detection")
+                elif task == "multimodal" and method == "0" :
+                    print("Log: Create Task: Multi Modal")
                 else: 
                     insert_label(task, label, project_id)
 
@@ -807,6 +898,8 @@ def get_tag(task):
         return 'Aspect'
     if task == 'paraphrase':
         return 'Paraphrase'
+    if task == 'multimodal':
+        return 'MultiModal'
 
 ################################### READ FILE ##################################
 def read_file(filePath, project_id, language, connection, cursor, task, method):
@@ -815,6 +908,21 @@ def read_file(filePath, project_id, language, connection, cursor, task, method):
         data = pd.read_csv(filePath, header=0, encoding='utf-8')
         # csvData = ""
         if task == "paraphrase" and method == "1":
+            for i, row in data.iterrows():
+                temp1 = row[1]
+                temp2 = row[2]
+                temp1 = temp1.replace("'", "''")
+                temp2 = temp2.replace("'", "''")
+                if '.' not in temp1:
+                    temp1 = temp1.strip() + '. '
+                if '.' not in temp2:
+                    temp2 = temp2.strip() + '. '
+                
+                temp = temp1 + '~' + temp2
+                
+                insert_sentences(temp, project_id, language, connection, cursor)
+            connection.commit()
+        elif task == "multimodal" and method == "0":
             for i, row in data.iterrows():
                 temp1 = row[1]
                 temp2 = row[2]
@@ -872,7 +980,7 @@ def write_file(project_id, type):
 # write file csv    ------------------------------------------------------------
 def write_file_csv(project_id):
     task = select_task_by_project_id(project_id)
-    with open(os.path.join(app.config['UPLOAD_FOLDER'],"{id}.csv".format(id=project_id)), 'w', newline='', encoding='UTF-8') as file:
+    with open(os.path.join(app.config['DOWNLOAD_FOLDER'],"{id}.csv".format(id=project_id)), 'w', newline='', encoding='UTF-8') as file:
         writer = csv.writer(file)
         if task == "pos":
             header = ['', 'sentences', 'tag', 'token']
@@ -1134,8 +1242,41 @@ def write_file_json(project_id):
                         review_list.append(d)
                         temp = []
                 count+=1
+    elif task == "paraphrase":
+        for dt in datas:
+            id = dt[0]
+            review = select_review_paraphrase(id)
+            # Truong hop data da co nguoi review
+            if len(review) != 0:
+                
+                for rv_part in review:
+                    d = collections.OrderedDict()
+                    d['id'] = count
+                    temp = dt[1].replace('"', '')
+                    temp = temp.split("~")
+                    d['sent1'] = temp[0]
+                    d['sent2'] = temp[1]
+                    d['tag'] = rv_part[0]
+                    count += 1
+                    review_list.append(d)
+    elif task == "multimodal":
+        for dt in datas:
+            id = dt[0]
+            review = select_review_multimodal(id)
+            # Truong hop data da co nguoi review
+            if len(review) != 0:
+                
+                for rv_part in review:
+                    d = collections.OrderedDict()
+                    d['id'] = count
+                    temp = dt[1].replace('"', '')
+                    temp = temp.split("~")
+                    d['image'] = [{"image": temp[0], "tag": rv_part[0]}]
+                    d['text'] = [{"text": temp[1], "tag": rv_part[1]}]
+                    count += 1
+                    review_list.append(d)
     j = json.dumps(review_list, ensure_ascii=False)
-    with open(os.path.join(app.config['UPLOAD_FOLDER'],"{id}.json".format(id=project_id)), 'w', encoding='UTF-8') as file:
+    with open(os.path.join(app.config['DOWNLOAD_FOLDER'],"{id}.json".format(id=project_id)), 'w', encoding='UTF-8') as file:
         file.write(j)
 
 ############################### DATABASE CRUD METHOD ###########################
@@ -1208,6 +1349,8 @@ def select_data_id_by_project_id(project_id, username, task):
         tsk = "Aspect"
     if task == "paraphrase":
         tsk = "Paraphrase"
+    if task == "multimodal":
+        tsk = "MultiModal"
     connection = connect_to_db()
     cursor = connection.cursor()
     query = "SELECT id FROM Data WHERE project_id = '{id}' AND id NOT IN (SELECT data_id FROM '{task}' WHERE username = '{username}')".format(id = project_id, task = tsk, username = username)
@@ -1292,6 +1435,8 @@ def select_number_review_by_username(username, project_id):
         query = "SELECT DISTINCT data_id, username FROM Aspect WHERE username = '{uname}'".format(uname = username)
     elif task == "paraphrase":
         query = "SELECT DISTINCT data_id, username FROM Paraphrase WHERE username = '{uname}'".format(uname = username)
+    elif task == "multimodal":
+        query = "SELECT DISTINCT data_id, username FROM MultiModal WHERE username = '{uname}'".format(uname = username)
     cursor.execute(query)
     count = 0
     for i in cursor:
@@ -1517,7 +1662,7 @@ def select_review_parsing(data_id):
 def select_review_aspect(data_id):
     connection = connect_to_db()
     cursor = connection.cursor()
-    query = "SELECT tag_entity, tag_attribute, tag, username FROM Aspect where data_id = '{id}' ORDER BY username, tag_entity".format(id = data_id)
+    query = "SELECT tag_entity, tag_attribute, tag, username FROM Aspect where data_id = '{id}' ORDER BY  username, tag_entity".format(id = data_id)
     cursor.execute(query)
     result = cursor.fetchall()
     return result
@@ -1527,6 +1672,24 @@ def select_review_textclass(data_id):
     connection = connect_to_db()
     cursor = connection.cursor()
     query = "SELECT tag, username FROM TextClass where data_id = '{id}' ORDER BY username".format(id = data_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
+# select review paraphrase  -------------------------------------------------------
+def select_review_paraphrase(data_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT tag, username FROM Paraphrase where data_id = '{id}' ORDER BY username".format(id = data_id)
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
+# select review multimodal  -------------------------------------------------------
+def select_review_multimodal(data_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT img_tag, text_tag, username FROM MultiModal where data_id = '{id}' ORDER BY username".format(id = data_id)
     cursor.execute(query)
     result = cursor.fetchall()
     return result
@@ -1719,6 +1882,14 @@ def insert_paraphrase(data_id, tag_paraphrase, username):
     cursor.execute(query)
     connection.commit()
 
+# insert review MultiModal --------------------------------------------
+def insert_multimodal(data_id, img_tag, text_tag, username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "INSERT INTO MultiModal (data_id, img_tag, text_tag, username) VALUES ('{dt_id}', '{img_tag}', '{text_tag}', '{user}')".format(dt_id = data_id, img_tag = img_tag, text_tag = text_tag, user = username)
+    cursor.execute(query)
+    connection.commit()
+
 
 # insert review Aspect --------------------------------------------
 def insert_aspect(data_id, tag_entity, tag_attribute, tag, username):
@@ -1759,6 +1930,9 @@ def delete_project_by_id(project_id):
         cursor.execute(query7)
     if task == 'paraphrase':
         query3 = "DELETE FROM Paraphrase WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
+        query4 = ""
+    if task == 'multimodal':
+        query3 = "DELETE FROM MultiModal WHERE data_id IN (SELECT id FROM Data WHERE project_id = '{id}')".format(id = project_id)
         query4 = ""
 
 

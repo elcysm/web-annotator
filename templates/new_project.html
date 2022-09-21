@@ -52,7 +52,7 @@
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">
-							<span class="text-primary font-weight-bold">{{username}}</span> 
+							<span class="text-primary font-weight-bold">{{username}}</span> <sup class="badge badge-secondary">Admin</sup>
 						</a>
 						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
 							<a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
@@ -66,9 +66,9 @@
 		</nav>
 
 
-		<div class="mt-2">
+		<div class="">
 
-            <div class="content ">
+            <div class="content">
                 <!--content inner-->
                 <div class="content__inner">
                   <div class="container">
@@ -94,9 +94,9 @@
                       <div class="row">
                         <div class="col-12 col-lg-8 m-auto">
                           <input class="d-none" id="project" value="{{projects}}">
-                          <form class="multisteps-form__form" method="POST" enctype="multipart/form-data">
+                          <form class="multisteps-form__form bottom" method="POST" enctype="multipart/form-data">
                             <!--single form panel-->
-                            <div class="multisteps-form__panel shadow p-4 rounded bg-white js-active" data-animation="scaleIn">
+                            <div class="multisteps-form__panel shadow p-4 rounded bg-white js-active bottom" data-animation="scaleIn">
                               <div class="multisteps-form__content">
                                 <div class="form-row mt-2">
                                   <div class="col-12 col-sm-7" >
@@ -117,12 +117,13 @@
                                     <div class="col-12 col-sm-7">
                                       <label class="">Project Name:</label>
                                         <select id="task_select" class="multisteps-form__select form-control" name="task">
-                                            <option selected="selected" value="textclass">Text Classification</option>
-                                            <option value="aspect">Sentiment Analysis (Aspect-Based)</option>
-                                            <option value="pos">Part Of Speech Tagging</option>
-                                            <option value="ner">Named Entity Recognition</option>
-                                            <option value="parsing">Dependency Parsing</option>
-                                            <option value="paraphrase">Paraphrase Detection</option>
+                                            <option selected="selected" value="textclass">Text Classification (Manual)</option>
+                                            <option value="aspect">Aspect-Based Sentiment Analysis (Manual)</option>
+                                            <option value="pos">Part Of Speech Tagging (Manual)</option>
+                                            <option value="ner">Named Entity Recognition (Manual)</option>
+                                            <option value="parsing">Dependency Parsing (Manual)</option>
+                                            <option value="paraphrase">Paraphrase Detection (Binary)</option>
+                                            <option value="multimodal">MultiModal Sentiment Analysis (Manual)</option>
                                         </select>
                                     </div>
                                     <div class="col-12 col-sm-5 mt-4 mt-sm-0">

@@ -38,7 +38,7 @@
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">
-							<span class="text-primary font-weight-bold">{{username}}</span> 
+							<span class="text-primary font-weight-bold">{{username}}</span> <sup class="badge badge-secondary">Annotator</sup>
 						</a>
 						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
 							<a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
@@ -97,7 +97,7 @@
 
 								<div class="card-body">
 									{%for j in tokens[0]%}
-									<button onclick="span_pos(this)" class="btn text-token mt-2" type="button">{{j}}
+									<button onclick="span_pos(this)" class="btn  mt-2" type="button">{{j}}
 									<i class="close-button d-none"></i>
 									<input class="btn review d-none" name='token_0' value="{{j}}"></input> 
 									<input id="postag" class="btn d-none" name='tag_0' value=""></input> 
@@ -120,7 +120,7 @@
 				
 								<div class="card-body">
 									{%for j in tokens[i]%}
-									<button onclick="span_pos(this)" class="btn text-token mt-2" type="button">{{j}}
+									<button onclick="span_pos(this)" class="btn  mt-2" type="button">{{j}}
 									<i class="close-button d-none"></i>
 									<input class="btn review d-none" name='token_{{i}}' value="{{j}}"></input> 
 									<input id="postag" class="btn d-none" name='tag_{{i}}' value=""></input> 
@@ -143,7 +143,7 @@
 							<div class="multisteps-form__content text-center">
 								<div class="card-body">
 									{%for j in tokens[number-1]%}
-									<button onclick="span_pos(this)" class="btn text-token mt-2" type="button">{{j}}
+									<button onclick="span_pos(this)" class="btn  mt-2" type="button">{{j}}
 									<i class="close-button d-none"></i>
 									<input class="btn review d-none" name='token_{{number-1}}' value="{{j}}"></input> 
 									<input id="postag" class="btn d-none" name='tag_{{number-1}}' value=""></input> 

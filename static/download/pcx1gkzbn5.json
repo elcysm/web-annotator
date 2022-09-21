@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "sent": "Students are mostly beneficial candidates of paragraphs as they look out for relevant information while crafting essays.. ",
+        "parsing": [
+            {
+                "tag": "NSUBJ",
+                "start": "beneficial",
+                "end": "candidates"
+            },
+            {
+                "tag": "NSUBJ",
+                "start": "Students",
+                "end": "are"
+            },
+            {
+                "tag": "ROOT",
+                "start": "mostly",
+                "end": "mostly"
+            }
+        ]
+    }
+]

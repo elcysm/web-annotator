@@ -91,7 +91,7 @@
                                         {% for i in notice %}
                                     <a data-id = "{{i[2]}}" onclick="readNoti(this)" role="button" class="dropdown-item d-flex align-items-center" >
                                         <div class="mr-3">
-                                            <img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">
+                                            <img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">                                            
                                         </div>
                                         <div class="text-truncate">
                                             {% if i[1] == '1' %}
@@ -122,7 +122,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">
-                                    <span class="text-primary font-weight-bold">{{username}}</span> 
+                                    <span class="text-primary font-weight-bold">{{username}}</span> <sup class="badge badge-secondary">Admin</sup>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
                                     <a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
@@ -134,7 +134,11 @@
                         </ul>
                     </div>
                 </nav>
-                
+                {% if success %}
+				<div style="opacity:0;" class="alert alert-success alert-dismissible show" role="alert" id="fade">
+					<strong>Success!</strong> {{success}}
+				</div>
+			    {% endif %}
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -273,7 +277,7 @@
                                 <div class="card-body">
                                     <div class="row">
                                         {% for i in range(num_task) %}
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-3 mb-2">
                                             <div class="card bg-info text-black text-center">
                                                 <div class="card-body text-white">
                                                     {{tasks[i]}}

@@ -1,0 +1,41 @@
+[
+    {
+        "id": 1,
+        "sent": "Sales, government funding, grants and subsidies. ",
+        "textclass": [
+            {
+                "tag": "Manga"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "sent": "Salaries and wages paid. ",
+        "textclass": [
+            {
+                "tag": "Manga"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "sent": "Operating profit before tax. ",
+        "textclass": [
+            {
+                "tag": "Anime"
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "sent": "Fixed tangible assets. ",
+        "textclass": [
+            {
+                "tag": "Anime"
+            },
+            {
+                "tag": "Manga"
+            }
+        ]
+    }
+]

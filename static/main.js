@@ -12,7 +12,7 @@ $('.multisteps-form__form').change(function() {
   task_value = document.getElementById('task_select').value;
   method = document.getElementById('method_select').value;
 
-  if (task_value == 'paraphrase' && method == '1'){
+  if ((task_value == 'paraphrase' && method == '1') || (task_value == 'multimodal' && method == '0')){
     document.getElementById('label_section').classList.add('d-none');
     document.getElementById('binary_section').classList.remove('d-none');
   }
@@ -80,7 +80,14 @@ $('.multisteps-form__form').ready(function() {
     if ((project_input != '') && (file_input != '') && !(project_list.includes(project_input))){
       document.querySelector('button[title="Next_New"]').disabled = false;
 
-      if (method == '0'){
+
+      if ((task_value == 'paraphrase' && method == '1')  ){
+        document.querySelector('button[title="Submit"]').disabled = false;
+      }
+      else if (task_value == 'multimodal' && method == '0'){
+        document.querySelector('button[title="Submit"]').disabled = false;
+      }
+      else{
         if (tag_after != ' '){
           document.querySelector('button[title="Submit"]').disabled = false;
         }
@@ -88,10 +95,6 @@ $('.multisteps-form__form').ready(function() {
           document.querySelector('button[title="Submit"]').disabled = true;
         }
       }
-      else if (method == '1'){
-        document.querySelector('button[title="Submit"]').disabled = false;
-      }
-      
     }
     else{
       document.querySelector('button[title="Next_New"]').disabled = true;
@@ -323,20 +326,108 @@ function span_paraphrase(btn, number){
     button_false.classList.remove('active');
     button_false.querySelector('input[id="tag"]').value = '';
   }
-
-
-
-  // if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == 1){
-  //   btn.classList.add('active');
-  //   btn.querySelector('input[id="tag"]').value = number;
-  //   btn.querySelector('i').classList.remove('d-none'); 
-  // }
-  // else{
-  //   btn.querySelector('i').classList.add('d-none');
-  //   btn.classList.remove('active');
-  //   btn.querySelector('input[id="tag"]').value = number;
-  // }
 }
+
+
+function span_multimodal_img(btn, number){
+
+  var button_id = btn.getAttribute('id');
+  
+  var data_id = button_id.split('_')[0];
+
+  var data_type = button_id.split('_')[1];
+  var button_number = button_id.split('_')[1];
+
+  var button_positive = document.getElementById(data_id + '_img_1');
+  var button_neutral = document.getElementById(data_id + '_img_0');
+  var button_negative = document.getElementById(data_id + '_img_-1');
+
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '1'){
+    button_positive.classList.add('active');
+    button_positive.querySelector('input[id="img_tag"]').value = 'Positive';
+    button_positive.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_positive.querySelector('i').classList.add('d-none');
+    button_positive.classList.remove('active');
+    button_positive.querySelector('input[id="img_tag"]').value = '';
+  }
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '0'){
+    button_neutral.classList.add('active');
+    button_neutral.querySelector('input[id="img_tag"]').value = 'Neutral';
+    button_neutral.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_neutral.querySelector('i').classList.add('d-none');
+    button_neutral.classList.remove('active');
+    button_neutral.querySelector('input[id="img_tag"]').value = '';
+  }
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '-1'){
+    button_negative.classList.add('active');
+    button_negative.querySelector('input[id="img_tag"]').value = 'Negative';
+    button_negative.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_negative.querySelector('i').classList.add('d-none');
+    button_negative.classList.remove('active');
+    button_negative.querySelector('input[id="img_tag"]').value = '';
+  }
+}
+
+
+function span_multimodal_text(btn, number){
+
+  var button_id = btn.getAttribute('id');
+  
+  var data_id = button_id.split('_')[0];
+
+  var data_type = button_id.split('_')[1];
+  var button_number = button_id.split('_')[1];
+
+  var button_positive = document.getElementById(data_id + '_text_1');
+  var button_neutral = document.getElementById(data_id + '_text_0');
+  var button_negative = document.getElementById(data_id + '_text_-1');
+
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '1'){
+    button_positive.classList.add('active');
+    button_positive.querySelector('input[id="text_tag"]').value = 'Positive';
+    button_positive.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_positive.querySelector('i').classList.add('d-none');
+    button_positive.classList.remove('active');
+    button_positive.querySelector('input[id="text_tag"]').value = '';
+  }
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '0'){
+    button_neutral.classList.add('active');
+    button_neutral.querySelector('input[id="text_tag"]').value = 'Neutral';
+    button_neutral.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_neutral.querySelector('i').classList.add('d-none');
+    button_neutral.classList.remove('active');
+    button_neutral.querySelector('input[id="text_tag"]').value = '';
+  }
+
+  if (btn.querySelector('i').classList.value == 'fa fa-check d-none' && number == '-1'){
+    button_negative.classList.add('active');
+    button_negative.querySelector('input[id="text_tag"]').value = 'Negative';
+    button_negative.querySelector('i').classList.remove('d-none'); 
+  }
+  else {
+    button_negative.querySelector('i').classList.add('d-none');
+    button_negative.classList.remove('active');
+    button_negative.querySelector('input[id="text_tag"]').value = '';
+  }
+}
+
+
+
 
 
 var clicks = 0;
@@ -627,9 +718,20 @@ function deleteSubmit(btn){
     url: btn.href,
     success: function(result) {
         if (result == '0') {
-            
-          location.reload();
-            
+
+          $('#deleteModal').modal('hide');
+
+          document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
+          document.getElementById('fade').innerHTML = `<strong>Success!</strong> Delete Successfully!`;
+
+          $('.alert').show();
+          setTimeout(function() { 
+            $('.alert').fadeOut(1000); 
+            location.reload();
+          }, 500);
+
+
+
         } else {
             alert("Cannot Delete!");
         }
@@ -659,6 +761,17 @@ function get_type(btn, number){
       button_json.add('d-none');
     }
   }
+}
+
+function download_success(){
+  $('#exportModal').modal('toggle');
+  document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
+  document.getElementById('fade').innerHTML = `<strong>Success!</strong> Download Successfully!`;
+
+  $('.alert').show();
+    setTimeout(function() { 
+  $('.alert').fadeOut(1000); 
+  }, 500);
 }
 
 
@@ -710,38 +823,79 @@ function mySubmitFunction(e) {
 function develop(){
     alert("Chức năng này đang phát triển!")
 }
-//    var opacity = 0;
-//    var intervalID = 0;
-//    window.onload = fadeIn;
-   
-//    function fadeIn() {
-//        setInterval(show, 50);
-//    }
-   
-//    function show() {
-//        var body = document.getElementById("fade");
-//        opacity = Number(window.getComputedStyle(body)
-//                            .getPropertyValue("opacity"));
-//        if (opacity < 1) {
-//            opacity = opacity + 0.1;
-//            body.style.opacity = opacity
-//        } else {
-//            clearInterval(intervalID);
-//        }
-//    }
-    
-//     $("#fade").fadeTo(3000, 500).slideUp(500, function(){
-//     $("#fade").slideUp(500);
-// });
-
-//     $(document).ready(function() {
-//         $("#fade").hide();
-//         $("#fade").fadeTo(3000, 500).slideUp(500, function() {
-//             $("#fade").slideUp(500);
-//         });
-//     });
 
 
+function validate(){
+
+  var username = document.getElementsByName('username')[0].value;
+  var password = document.getElementsByName('password')[0].value;
+  
+  if (window.location.toString().includes('/login')){
+    var username_url = window.location.toString().split('&')[2];
+    var password_url = window.location.toString().split('&')[3];
+    var number_url = window.location.toString().split('&')[1];
+
+
+    var username_value = username_url.split('=')[1];
+    var password_value = password_url.split('=')[1];
+    var number_value = number_url.split('=')[1];
+
+    if (username_value == username && password == password_value){
+      $.ajax({
+        type: 'POST',
+        url: `http://127.0.0.1:5000//login/username=${username}&password=${password}&number=${number_value}`,
+        success: function(result) {
+            if (result == 'True') {
+              window.location = "/user";
+              document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
+              document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+            }
+            else if (result == 'False') {
+              window.location = "/admin";
+              document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
+              document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+            } else {
+              document.getElementById('fade').classList = 'alert alert-danger alert-dismissible fade show';
+              document.getElementById('fade').innerHTML = `<strong>Error!</strong> Wrong Username or Password!`;
+            }
+        }
+      });
+    }
+    else{
+      document.getElementById('fade').classList = 'alert alert-danger alert-dismissible fade show';
+      document.getElementById('fade').innerHTML = `<strong>Error!</strong> Invalid Username or Password!`;
+    }
+  } else{
+    $.ajax({
+      type: 'POST',
+      url: location+ `/username=${username}&password=${password}`,
+      success: function(result) {
+          if (result == 'True') {
+            window.location = "/admin";
+            document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
+            document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+          }
+          else if (result == 'False') {
+            window.location = "/user";
+            document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
+            document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+          } else {
+            document.getElementById('fade').classList = 'alert alert-danger alert-dismissible fade show';
+            document.getElementById('fade').innerHTML = `<strong>Error!</strong> Invalid Username or Password!`;
+          }
+      }
+    });
+  }
+
+  
+
+  
+
+  $('.alert').show();
+    setTimeout(function() { 
+        $('.alert').fadeOut(1000); 
+  }, 3000);
+}
 
 (function ($) {
     "use strict";
