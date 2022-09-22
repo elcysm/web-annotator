@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "sent": "A court in London has remanded into custody a man charged with attempting to bomb the London transport system in July .. ",
+        "ner": [
+            {
+                "tag": "dfg",
+                "token": "has remanded into custody"
+            },
+            {
+                "tag": "dfg",
+                "token": "attempting"
+            }
+        ]
+    }
+]

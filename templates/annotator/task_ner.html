@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% block head %}
+	<link rel="shortcut icon" href="{{url_for('.static', filename='/img/favicon.ico')}}">
+    <title>Reviews | NER</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+	{% block styles %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='util.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/fonts/Linearicons-Free-v1.0.0/icon-font.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/bootstrap/css/bootstrap.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/animate/animate.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/css-hamburgers/hamburgers.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/animsition/css/animsition.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/select2/select2.min.css')}}" >
+	<link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.css')}}" >
+	{% endblock %}
+
+	{% endblock %}
+</head>
+<body >
+	{% block content %}
+	<div class="container-bottom"> 
+		<nav class="mb-4 navbar navbar-expand-lg bg-white bg-unique shadow ">
+			<a class="navbar-brand font-weight-bold" href="#">Web based Annotator</a>
+			<button class="btn navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-3" aria-controls="navbarSupportedContent-3" aria-expanded="false" aria-label="Toggle navigation">
+				<i class="fa fa-list"></i>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent-3">
+				<ul class="navbar-nav ml-auto nav-flex-icons">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<img class="my-profile-picture" style="object-fit: cover;" src="{{url_for('.static', filename='/img/user.png')}}">
+							<span class="text-primary font-weight-bold">{{username}}</span> <sup class="badge badge-secondary">Annotator</sup>
+						</a>
+						<div class="dropdown-menu dropdown-menu-right dropdown-unique" aria-labelledby="navbarDropdownMenuLink">
+							<a  href="/my_settings"><button class="dropdown-item"><i class="fa fa-user m-r-15"></i>Settings</button></a>
+							<hr class="dropdown-divider">
+							<a data-toggle="modal" data-target="#logoutModal"> <button class="dropdown-item" ><i class="fa fa-sign-out  m-r-15"></i>Logout</button></a>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+	
+
+		<div class="content">
+			<!--content inner-->
+			<div class="content__inner">
+				<div class="container">
+				<!--content title-->
+				<h1 class="text-center">Named Entity Recognition</h1>
+				<h2 class="content__title"></h2>
+				</div>
+				
+				<div class="container overflow-hidden">
+				<!--multisteps-form-->
+				<div class="multisteps-form">
+					<!--progress bar-->
+					<div class="row">
+					<div class="col-12 col-lg-12 ml-auto mr-auto mb-4">
+						<div class="multisteps-form__progress">
+						<button class="multisteps-form__progress-btn js-active" type="button" title="User Info">1</button>
+						{%for i in range(2, number+1)%}
+						<button class="multisteps-form__progress-btn" type="button" title="User Info">{{i}}</button>
+						{%endfor%}
+						</div>
+					</div>
+					</div>
+					<!--form panels-->
+					
+					<div class="row">
+					<div class="col-12 col-lg-12 m-auto">
+						<div class="card-header text-center bg-light shadow">
+							<div class="review-help">
+								<a href="#"><i class="fa fa-question-circle mr-1"></i>How to review?</a>
+							</div>
+							{%for t in tag%}
+							<span onclick="get_tag(this)" class="postag_name btn border border-success">{{t}}</span>
+							{%endfor%}
+						</div>
+						<form class="multisteps-form__form" method="POST" enctype="multipart/form-data">
+						<!--single form panel-->
+						<input class="d-none" name='number' value="{{number}}"></input> 
+						<div class="multisteps-form__panel shadow  rounded bg-white js-active card" data-animation="scaleIn">
+							<input class="d-none" name='id_0' value="{{datas[0]}}"></input> 
+							<input id="lentoken" class="d-none" value="{{lentoken[0]}}"></input> 
+							<div class="multisteps-form__content text-center">
+								<div class="card-body">
+									{%for index in range(0, lentoken[0])%}
+									<button id="0_{{index}}" onclick="span(this, '{{lentoken[0]}}')" class="btn  mt-2" type="button">
+									<span class="name_token">{{tokens[0][index]}}</span>
+									<i class="close-button d-none"></i>
+									<input class="btn review d-none" name='token_0' value="{{tokens[0][index]}}"></input> 
+									<input id="postag" class="btn d-none" name='tag_0' value=""></input> 
+									<span id="pos" class="badge btn-grad"></span>
+									</button>
+									{%endfor%}
+								</div>
+								<div class="button-row d-flex card-footer bg-transparent border-success">
+									<button class="btn btn-grad ml-auto js-btn-next  mr-4" type="button" title="Next">Next</button>
+								</div>
+							</div>
+						</div>
+
+						{%for i in range(1, number-1)%}
+						<div class="multisteps-form__panel shadow rounded bg-white" data-animation="scaleIn">
+							<input class="d-none" name='id_{{i}}' value="{{datas[i]}}"></input> 
+							<div class="multisteps-form__content text-center">
+								<div class="card-body">
+									{%for index in range(0, lentoken[i])%}
+									<button id="{{i}}_{{index}}" onclick="span(this, '{{lentoken[i]}}')" class="btn  mt-2" type="button">
+									<span class="name_token">{{tokens[i][index]}}</span>
+									<i class="close-button d-none"></i>
+									<input class="btn review d-none" name='token_{{i}}' value="{{tokens[i][index]}}"></input> 
+									<input id="postag" class="btn d-none" name='tag_{{i}}' value=""></input> 
+									<span id="pos" class="badge btn-grad"></span>
+									</button>
+									{%endfor%}
+								</div>
+								<div class="button-row d-flex card-footer bg-transparent border-success">
+									<button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
+									<button class="btn btn-grad ml-auto js-btn-next" type="button" title="Next">Next</button>
+								</div>
+							</div>
+						</div>
+						{%endfor%}
+						
+						<div class="multisteps-form__panel shadow rounded bg-white" data-animation="scaleIn">
+							<input class="d-none" name='id_{{number-1}}' value="{{datas[number-1]}}"></input> 
+							<div class="multisteps-form__content text-center">
+								<div class="card-body">
+									{%for index in range(0, lentoken[number-1])%}
+									<button id="{{number-1}}_{{index}}" onclick="span(this, '{{lentoken[number-1]}}')" class="btn  mt-2" type="button">
+									<span class="name_token">{{tokens[number-1][index]}}</span>
+									<i class="close-button d-none"></i>
+									<input class="btn review d-none" name='token_{{number-1}}' value="{{tokens[number-1][index]}}"></input> 
+									<input id="postag" class="btn d-none" name='tag_{{number-1}}' value=""></input> 
+									<span id="pos" class="badge btn-grad"></span>
+									</button>
+									{%endfor%}
+								</div>
+								<div class="button-row d-flex card-footer bg-transparent border-success">
+									<button class="btn btn-primary js-btn-prev" type="button" title="Prev">Prev</button>
+									<button class="btn btn-grad ml-auto js-btn-next" type="submit" title="Next">Finish</button>
+								</div>
+							</div>
+						</div>
+						</form>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div id="dropDownSelect1"></div>
+	{% block scripts %}
+    <script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/animsition/js/animsition.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/popper.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/bootstrap/js/bootstrap.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/select2/select2.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/daterangepicker/moment.min.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/daterangepicker/daterangepicker.js')}}"></script>
+	<script src="{{url_for('.static', filename='/vendor/countdowntime/countdowntime.js')}}"></script>
+	<script src="{{url_for('.static', filename='main.js')}}"></script>
+    {% endblock %}
+	{% endblock %}
+</body>
+</html>

@@ -243,7 +243,14 @@ def review():
                         sent = []
                         for dt in datas:
                             sent.append(select_sent_by_id(dt))
-                        return render_template('textclass.html', project=project, datas=datas, sent=sent, number=number, tag=tag, task=task, username=username)
+                        return render_template('annotator/task_textclass.html', 
+                                                project=project, 
+                                                datas=datas, 
+                                                sent=sent, 
+                                                number=number, 
+                                                tag=tag, 
+                                                task=task, 
+                                                username=username)
                     
                     if task == "pos" and method == "0":
                         datas = []
@@ -260,7 +267,14 @@ def review():
                             tokens.append(select_token_by_data_id(dt))
 
                         tag = select_tag_pos_by_project_id(project)
-                        return render_template('pos.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, username=username)
+                        return render_template('annotator/task_pos.html', 
+                                                project=project, 
+                                                tag=tag, 
+                                                datas=datas, 
+                                                tokens=tokens, 
+                                                task=task,
+                                                number=number, 
+                                                username=username)
                     
                     if task == "ner" and method == "0":
                         datas = []
@@ -281,7 +295,15 @@ def review():
                             lentoken.append(len(i))
 
                         tag = select_tag_ner_by_project_id(project)
-                        return render_template('ner.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task,number=number, lentoken=lentoken, username=username)
+                        return render_template('annotator/task_ner.html', 
+                                                project=project, 
+                                                tag=tag, 
+                                                datas=datas, 
+                                                tokens=tokens, 
+                                                task=task,
+                                                number=number, 
+                                                lentoken=lentoken, 
+                                                username=username)
 
 
                     if task == "parsing" and method == "0":
@@ -303,7 +325,15 @@ def review():
                             lentoken.append(len(i))
                             
                         tag = select_tag_parsing_by_project_id(project)
-                        return render_template('parsing.html', project=project, tag=tag, datas=datas, tokens=tokens, task=task, number=number, lentoken=lentoken, username=username)
+                        return render_template('annotator/task_parsing.html', 
+                                                project=project, 
+                                                tag=tag, 
+                                                datas=datas, 
+                                                tokens=tokens, 
+                                                task=task, 
+                                                number=number, 
+                                                lentoken=lentoken, 
+                                                username=username)
 
 
                     if task == "aspect" and method == "0":
@@ -322,15 +352,16 @@ def review():
                         sent = []
                         for dt in datas:
                             sent.append(select_sent_by_id(dt))
-                        return render_template('aspect.html', project=project, 
-                        datas=datas, 
-                        sent=sent, 
-                        number=number, 
-                        tag=tag, 
-                        tag_entity=tag_entity, 
-                        tag_attribute=tag_attribute, 
-                        task=task, 
-                        username=username)
+                        return render_template('annotator/task_aspect.html', 
+                                                project=project, 
+                                                datas=datas, 
+                                                sent=sent, 
+                                                number=number, 
+                                                tag=tag, 
+                                                tag_entity=tag_entity, 
+                                                tag_attribute=tag_attribute, 
+                                                task=task, 
+                                                username=username)
 
 
                     if task == "paraphrase" and method == "1":
@@ -350,13 +381,14 @@ def review():
                             sent1.append(temp[0])
                             sent2.append(temp[1])
 
-                        return render_template('paraphrase.html', project=project, 
-                        datas=datas, 
-                        sent1=sent1, 
-                        sent2=sent2, 
-                        number=number, 
-                        task=task, 
-                        username=username)
+                        return render_template('annotator/task_paraphrase.html', 
+                                                project=project, 
+                                                datas=datas, 
+                                                sent1=sent1, 
+                                                sent2=sent2, 
+                                                number=number, 
+                                                task=task, 
+                                                username=username)
                     
                     if task == "multimodal" and method == "0":
 
@@ -375,14 +407,14 @@ def review():
                             img_src.append(temp[0])
                             text.append(temp[1])
 
-                        print(img_src)
-                        return render_template('multimodal.html', project=project, 
-                        datas=datas, 
-                        img_src=img_src, 
-                        text=text, 
-                        number=number, 
-                        task=task, 
-                        username=username)
+                        return render_template('annotator/task_multimodal.html', 
+                                                project=project, 
+                                                datas=datas, 
+                                                img_src=img_src, 
+                                                text=text, 
+                                                number=number, 
+                                                task=task, 
+                                                username=username)
             else:
                 return redirect(url_for('admin_index'))
     else:
@@ -495,7 +527,6 @@ def review_post():
             temp = 0
             if review_aspect_tag != '' and review_aspect_tag_entity != '' and review_aspect_tag_attribute != '':
                 temp += 1
-                print(review_aspect_tag_entity, review_aspect_tag_attribute, review_aspect_tag)
                 insert_aspect(review_aspect, review_aspect_tag_entity, review_aspect_tag_attribute, review_aspect_tag, username)
                     
             if temp != 0:
@@ -525,7 +556,6 @@ def review_post():
             review_multimodal = request.form["id_{id}".format(id=str(i))]
             review_multimodal_img_tag = request.form.getlist("img_tag_{id}".format(id=str(i)))
             review_multimodal_text_tag = request.form.getlist("text_tag_{id}".format(id=str(i)))
-            print(review_multimodal_img_tag,review_multimodal_text_tag)
 
             temp = 0
             temp_img_tag = ''
@@ -550,14 +580,13 @@ def review_post():
 @app.route('/user/review/done')
 def review_done():
     username = session['username']
-    return render_template('thankyou.html', username=username)
+    return render_template('annotator/anno_review_done.html', username=username)
 
 ######################################## ADMIN #################################
 
 # admin index   ----------------------------------------------------------------
 @app.route('/admin')
 def admin_index():
-    print(session)
     if 'username' in session:
         username = session['username']
         user_role = select_role(username)
@@ -590,7 +619,7 @@ def admin_index():
                     if i[2] == "0":
                         count_notif += 1
 
-                return render_template('admin.html', username=username, num_project=num_project,
+                return render_template('admin/admin_dashboard.html', username=username, num_project=num_project,
                 num_annot= num_annot,
                 num_task = num_task,
                 tasks = tasks,
@@ -613,7 +642,7 @@ def admin_project():
         if user_role!= None:
             if check_role(user_role[0])==True:
                 project = select_all_project()
-                return render_template('projects.html', username=username, project=project)
+                return render_template('admin/project.html', username=username, project=project)
             else:
                 return render_template('403.html')
     else:
@@ -662,7 +691,7 @@ def get_new_project():
         if user_role !=None:
             if check_role(user_role[0])==True:
                 projects = select_project_name()
-                return render_template('new_project.html', username=user_admin, projects=projects)
+                return render_template('admin/new_project.html', username=user_admin, projects=projects)
             else:
                 return render_template('403.html')
 
@@ -751,7 +780,11 @@ def collaborator_index():
                     number_review.append(select_number_review_by_username(i[0], i[2]))
 
                 len_annotator = len(annotator)
-                return render_template('collaborator.html', username=username, annotator=annotator, number_review= number_review, len_annotator=len_annotator)
+                return render_template('admin/collaborator.html', 
+                username = username, 
+                annotator = annotator, 
+                number_review = number_review, 
+                len_annotator = len_annotator)
             else:
                 return render_template('403.html')
     else:
@@ -774,7 +807,7 @@ def get_invitation():
 
                 number = select_number_data_of_project(project_id)
 
-                return render_template('invitation.html',
+                return render_template('admin/invite_annotator.html',
                     username=username,
                     user_admin=user_admin,
                     password=password,
@@ -803,7 +836,7 @@ def post_invitation():
         recipients = [email],
         )
     link = ROOT_DOMAIN+'/login/project={project_id}&number={number}&username={username}&password={password}'.format(project_id=project_id, number=number, username=username, password=password)
-    msg.html = render_template('welcome.html', username=username, password=password, link=link, project_id = project_id)
+    msg.html = render_template('admin/email_content.html', username=username, password=password, link=link, project_id = project_id)
     mail.send(msg)
     
     session['email'] = email
@@ -815,7 +848,7 @@ def post_invitation():
 def register_successfully():
     email = request.args['email']
     link = request.args['link']
-    return render_template('sent_successfully.html', email=email, link=link, success="Gửi thành công")
+    return render_template('admin/sent_email_successfully.html', email=email, link=link, success="Gửi thành công")
 
 ################################### ADMIN REGISTER ############################# 
 
@@ -823,7 +856,7 @@ def register_successfully():
 @app.route('/register', methods=['GET'])
 def get_register():
     if check_account_exist():
-        return render_template('register.html', error="")
+        return render_template('admin/register.html', error="")
     else:
         return render_template('403.html')
 
@@ -836,10 +869,10 @@ def register():
         password = request.form['password']
         re_password = request.form['re_password']
         if password != re_password:
-            return render_template('register.html', error="Mật khẩu không khớp")
+            return render_template('admin/register.html', error="Mật khẩu không khớp")
         else:
             insert_data_owner(username, email, password)
-            return render_template('email_verify.html', email=email, success="Đăng kí thành công")
+            return render_template('admin/email_verify.html', email=email, success="Đăng kí thành công")
     else:
         return render_template('403.html')
 
@@ -862,7 +895,6 @@ def generate_username():
     lower = string.ascii_lowercase
     num = string.digits
     all = lower + num
-    print(len(all))
     temp = random.sample(all,length)
     username = "".join(temp)
     return 'user_' + username
@@ -1167,7 +1199,6 @@ def write_file_json(project_id):
         for dt in datas:
             id = dt[0]
             review = select_review_textclass(id)
-            print(len(review))
             # Truong hop data da co nguoi review
             if len(review) != 0:
                 uname = review[0][1]
