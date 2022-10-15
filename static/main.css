@@ -12,7 +12,7 @@
 * {
 	margin: 0px; 
 	padding: 0px; 
-	box-sizing: border-box;
+	/* box-sizing: border-box; */
 }
 .btn-grad {background-image: linear-gradient(to right, #4CB8C4 0%, #3CD3AD  51%, #4CB8C4  100%)}
 .btn-grad {
@@ -860,28 +860,6 @@ input::placeholder {
   visibility: hidden;
 }
 
-/*//////////////////////////////////////////////////////////////////
-[ Responsive ]*/
-@media (max-width: 768px) {
-  .wrap-login100 {
-    padding-left: 60px;
-    padding-right: 60px;
-  }
-
-@media (max-width: 576px) {
-  .wrap-login100 {
-    padding-left: 40px;
-    padding-right: 40px;
-    width: 430px;
-  }
-
-  .btn-face,
-  .btn-google {
-    width: 100%;
-  }
-}
-}
-
 .file-drop-area {
   position: relative;
   display: flex;
@@ -1036,7 +1014,7 @@ background-size: 50% 50%;
   border: 2px solid currentColor;
   border-radius: 50%;
   background-color: #fff;
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
   z-index: 3;
 }
   
