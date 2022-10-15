@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from flask import Flask, request
 from datetime import timedelta
 from flask import render_template, session, redirect, url_for
@@ -630,7 +629,7 @@ def admin_index():
 ################################ ADMIN / PROJECT ###############################
 
 # admin project index   --------------------------------------------------------
-@app.route('/admin/project')
+@app.route('/admin/project', methods=['GET'])
 def admin_project():
     if 'username' in session:
         username = session['username']
@@ -799,52 +798,66 @@ def get_invitation():
                 username = generate_username()
                 password = generate_password()
                 project = select_project()
-                project_id = request.args['project']
+                project_id = request.args['project_id']
 
                 number = select_number_data_of_project(project_id)
 
-                return render_template('admin/invite_annotator.html',
-                    username=username,
-                    user_admin=user_admin,
-                    password=password,
-                    project=project,
-                    project_id=project_id,
-                    number=number,
-                    len=len(project))
+                return  '{}'.format(number) 
+                # render_template('admin/invite_annotator.html',
+                #     username=username,
+                #     user_admin=user_admin,
+                #     password=password,
+                #     project=project,
+                #     project_id=project_id,
+                #     number=number,
+                #     len=len(project))
             else:
                 return render_template('403.html')
         return redirect(url_for('index'))
 
 # invitation post   ------------------------------------------------------------
-@app.route('/admin/invitation', methods=['POST'])
-def post_invitation():
-    username = request.form['username']
-    email = request.form['email']
-    password = request.form['password']
-    project_id = request.form['project']
-    number = request.form.get('number')
+@app.route('/admin/invitation/email=<email>&project_id=<project_id>&number=<number>', methods=['POST'])
+def post_invitation(email,project_id,number):
+   
+    username = generate_username()
+    password = generate_password()
 
     insert_annotator(username, email, password, project_id)
-
+    task = select_task_by_project_id(project_id)
+    task_name = ''
+    if task == "ner":
+        task_name = 'Name Entity Recognition'
+    if task == "pos":
+        task_name = 'Part Of Speech Tagging'
+    if task == "textclass":
+        task_name = 'Text Classification'
+    if task == "parsing":
+        task_name = 'Dependency Parsing'
+    if task == "aspect":
+        task_name = 'Aspect-based Sentiment'
+    if task == "paraphrase":
+        task_name = 'Paraphrase Detection'
+    if task == "multimodal":
+        task_name = 'MultiModal Sentiment'
+        
     msg = Message(
         EMAIL_SUBJECT,
         sender = MAIL_USERNAME, 
         recipients = [email],
         )
-    link = ROOT_DOMAIN+'/login/project={project_id}&number={number}&username={username}&password={password}'.format(project_id=project_id, number=number, username=username, password=password)
-    msg.html = render_template('admin/email_content.html', username=username, password=password, link=link, project_id = project_id)
-    mail.send(msg)
-    
-    session['email'] = email
-    session['link'] = link
-    return redirect(url_for('register_successfully', email=email, link=link, success="Gửi thành công")) 
 
-# invitation success    --------------------------------------------------------
-@app.route('/admin/invitation/success', methods=['GET'])
-def register_successfully():
-    email = request.args['email']
-    link = request.args['link']
-    return render_template('admin/sent_email_successfully.html', email=email, link=link, success="Gửi thành công")
+    link = ROOT_DOMAIN+'/login/project={project_id}&number={number}&username={username}&password={password}'.format(project_id=project_id, number=number, username=username, password=password)
+    msg.html = render_template('admin/email_content.html', username=username, password=password, link=link, project_id = project_id, task=task_name)
+    mail.send(msg)
+
+    return '{} {}'.format(link, email) 
+
+# # invitation success    --------------------------------------------------------
+# @app.route('/admin/invitation/success', methods=['GET'])
+# def register_successfully():
+#     link = session['link']
+#     email = session['email']
+#     return '{} {}'.format(link, email) 
 
 ################################### ADMIN REGISTER ############################# 
 

@@ -75,12 +75,6 @@
                             </div>
                         </div>  
                     </div>
-
-
-
-					
-					
-
                     <div class="text-center table-responsive">
                         <table id="example" class="table table-hover table-nowrap table-bordered">
                             <thead class="table-light font-weight-bold">
@@ -110,8 +104,8 @@
 										<!-- <a href="#" onclick="edit_modal()"><button class="btn btn-grad btn-sm btn-square"><i class="fa fa-pencil-square"></i></button></a>  -->
                                         <a data-id = "{{i[0]}}" onclick="deleteProject(this);"><button type="button" class="btn btn-danger btn-sm btn-square"><i class="fa fa-trash"></i></button></a>
 										<a data-id = "{{i[0]}}" onclick="chooseExport(this);"><button type="button" class="btn btn-primary btn-sm btn-square"><i class="fa fa-download"></i></button></a>
-                                        <a href="/admin/invitation?project={{i[0]}}"><button type="button" class="btn btn-success btn-sm btn-square"><i class="fa fa-user-plus"></i></button></a>
-										
+                                        <a data-id = "{{i[0]}}" onclick="inviteAnnotator(this);" ><button type="button" class="btn btn-success btn-sm btn-square"><i class="fa fa-user-plus"></i></button></a>
+										<!-- href="/admin/invitation?project={{i[0]}}" -->
 									</td>
                                 </tr>
 								{% endfor %}
@@ -178,7 +172,8 @@
                 <div class="modal-footer d-flex">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
 					<input id="projectid"class="type d-none" value=""></input> 
-                    <a id="link_download" class="btn btn-primary ml-auto d-none" onclick="download_success()">Download</a>
+                    <a id="link_download" class="btn btn-primary ml-auto d-none" onclick="return download_success(this);">Download</a>
+					<a id="downloadAnchorElem" style="display:none"></a>
                 </div>
             </div>
         </div>
@@ -205,6 +200,78 @@
             </div>
         </div>
     </div>
+
+	<!-- invite Modal-->
+	<form method="POST" id="form1">
+	<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"  role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Invite Annotator</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+						<div class="mb-2">
+						  <label for="recipient-name">Email:</label>
+						  <input id="invite-email" type="email" class="form-control" name="email" required placeholder="Enter email...">
+						  <input id="project_id_value" class="d-none" type="text" class="form-control" name="project_id">
+						</div>
+						<div class="mb-2">
+						  <label for="message-text">Numbers of review per person:</label>
+						  	<select class="form-control" id="number_data" name="number">
+								
+						  	</select>
+						</div>
+				</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<button id="button_link" class="btn text-white btn-success ml-auto">
+						<a id="invite_link" onclick="return inviteSubmit(this);">
+							<i class="fa fa-send mr-2"></i>
+							<i class="fa fa-spinner fa-spin mr-2 d-none"></i>Send
+						</a>
+					</button>
+                </div>
+            </div>
+        </div>
+    </div>
+	</form>
+
+	<!-- invite_success Modal-->
+	<div class="modal fade" id="invite_successModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Invite Annotator</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+				<div class="modal-body">
+					<div class="mb-2">
+						<label for="recipient-name">Email:</label>
+						<input id="email_success" type="text" class="form-control" readonly>
+					</div>
+					<div class="mb-2">
+						<label for="message-text">Link share:</label>
+						<input id="link" type="text" class="form-control" readonly data-toggle="link" data-placement="top">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-grad" onclick="copyToClipboard()">
+						<i id="icon_link" class="fa fa-link"></i>
+						<i id="check" class="fa fa-check d-none"></i>
+						<span id="copy">Copy Link To Clipboard</span>
+					</button>
+					<button class="btn text-white btn-success ml-auto" data-dismiss="modal" onclick="window.location.reload();">Done</button>
+				</div>
+            </div>
+        </div>
+    </div>
 	
 	<!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -220,7 +287,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="/logout">Logout</a>
+                    <a class="btn btn-danger" href="/logout">Logout</a>
                 </div>
             </div>
         </div>

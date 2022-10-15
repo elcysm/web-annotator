@@ -25,71 +25,81 @@
 </head>
 <body>
 	{% block content %}
-	<div class="container-center"> 
-		<div class="">
+	
 
-			<div style="display:none;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
-			</div>
-
-
-			<div class="wrap-login100 p-l-50 p-r-50 p-t-30 p-b-30">
-				<form class="login100-form validate-form flex-sb flex-w" method="post" >
-					<span class="login100-form-title">
-						LOGIN FORM
-					</span>	
-					
-					<span class="form-title">
-						Welcome to Web-based Annotator.
-					</span>
-					
-					<div class="p-t-30 p-b-10">
-						<span class="txt1">
-							Username:
-						</span>
-					</div>
-					<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
-						{% if username %}
-						<input class="input100 username" type="text" value="{{username}}" name="username" placeholder="Enter username...">
-						{% else %}
-						<input class="input100 username" type="text" name="username"  placeholder="Enter username...">
-						{% endif %}
-						<span class="focus-input100"></span>
-					</div>
-					
-					<div class="p-t-20 p-b-10">
-						<span class="txt1" >
-							Password:
-						</span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate = "Mật khẩu không được để trống">
-						{% if password %}
-						<input class="input100" type="password" value="{{password}}" name="password" placeholder="Enter password...">
-						{% else %}
-						<input class="input100" type="password" name="password" placeholder="Enter password...">
-						{% endif %}
-						<span class="focus-input100"></span>
-					</div>
-					
-					<div class="p-t-20 p-b-10">
-						<span class="txt1" >
-							<a href="/forgot_password" class="txt2 bo1 m-l-5">
-								Forgot password?
-							</a>
-						</span>
-					</div>
-					
-					<div class="container-login100-form-btn m-t-20 m-b-20 text-center">
-						<button class="btn-grad login-button" type="button" onclick="validate()">
-							Submit
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
+	<div style="display:none;" class="alert alert-success alert-dismissible show" role="alert" id="fade">
 	</div>
 	
-	<div id="dropDownSelect1"></div>
+	<div class="container d-flex justify-content-center align-items-center h-100"> 
+
+		<div class="wrap-login100 p-l-40 p-r-40 p-t-30 p-b-30">
+		<form action="/action_page.php">
+			
+			<span class="login100-form-title">
+				LOGIN FORM
+			</span>	
+			<span class="form-title">
+				Welcome to Web-based Annotator.
+			</span>
+
+			<div class="form-group">
+				<div class="p-t-20 p-b-10">
+					<span class="txt1">
+						Username:
+					</span>
+				</div>
+				<div class="wrap-input100 validate-input" data-validate = "Email không được để trống">
+					{% if username %}
+					<input class="input100 username" type="text" value="{{username}}" name="username" placeholder="Enter username...">
+					{% else %}
+					<input class="input100 username" type="text" name="username"  placeholder="Enter username...">
+					{% endif %}
+					<span class="focus-input100"></span>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="p-b-10">
+					<span class="txt1" >
+						Password:
+					</span>
+				</div>
+
+				<div class="wrap-input100 input-group validate-input" data-validate = "Mật khẩu không được để trống">
+					{% if password %}
+					<input id="password" class="input100" type="password" value="{{password}}" name="password" placeholder="Enter password...">
+					{% else %}
+					<input id="password" class="input100" type="password" name="password" placeholder="Enter password...">
+					{% endif %}
+					<span class="input-group-btn">
+						<button class="btn btn-default reveal" onclick="showPassword(this)" type="button">
+							<i id="show_pw" class="fa fa-eye d-none"></i>
+							<i id="hide_pw" class="fa fa-eye-slash"></i>
+						</button>
+					  </span>  
+					<span class="focus-input100"></span>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="p-b-10">
+					<span class="txt1" >
+						<a href="/forgot_password" class="txt2 bo1 m-l-5">
+							Forgot password?
+						</a>
+					</span>
+				</div>
+			</div>
+			<div class="container-login100-form-btn m-t-20 m-b-20 text-center">
+				<button class="btn-grad login-button" type="button" onclick="validate()">
+					Submit
+				</button>
+			</div>
+		</form>
+		</div>
+		
+	</div>
+	
 
 	{% block scripts %}
 	<script src="{{url_for('.static', filename='/vendor/jquery/jquery-3.2.1.min.js')}}"></script>

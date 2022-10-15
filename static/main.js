@@ -730,6 +730,71 @@ function deleteProject(btn){
   document.getElementById('delete_link').href = `/admin/project/delete?project_id=${projectid}`; 
 }
 
+function inviteAnnotator(btn){
+  projectid = btn.getAttribute('data-id');
+  document.getElementById('project_id_value').value = projectid;
+  var option= '';
+  $('#inviteModal').modal('toggle');
+  $.ajax({
+    type: 'GET',
+    url: `/admin/invitation?project_id=${projectid}`,
+    success: function(result) {
+        if (result != '0') {
+          var number = Number(result);
+          for (var i = 1; i < number/5+1; i++){
+            if (i <= 5){
+              option += `<option value="${i*5}">${i*5}</option>`;
+            }
+          }
+
+          document.getElementById('number_data').innerHTML = option;
+
+          $('#form1').on("mouseover", function() {
+            var email = document.getElementById('invite-email').value;
+            if (email != '' && email.includes('@') ){
+              document.getElementById('button_link').classList.remove('d-none');
+            }
+            else{
+              document.getElementById('button_link').classList.add('d-none');
+            }
+          });
+        } else {
+            alert("Cannot Delete!");
+        }
+    }
+  });
+  return false;
+}
+
+
+function inviteSubmit(btn){
+
+  var email = document.getElementById('invite-email').value;
+  var project_id = document.getElementById('project_id_value').value;
+  var number = document.getElementById('number_data').value;
+  btn.querySelector('i[class="fa fa-send mr-2"]').classList.add('d-none');
+  btn.querySelector('i[class="fa fa-spinner fa-spin mr-2 d-none"]').classList.remove('d-none');
+
+
+  $.ajax({
+    url: `/admin/invitation/email=${email}&project_id=${project_id}&number=${number}`,
+    type: 'POST',
+    success: function(result) {
+        if (result != '') {
+          $('#inviteModal').modal('hide');
+          $('#invite_successModal').modal('toggle');
+          var link = result.split(' ')[0];
+          var email = result.split(' ')[1];
+          document.getElementById('email_success').value = email;
+          document.getElementById('link').value = link;
+          document.getElementById('link').title = link; 
+        } else {
+            alert("Cannot Delete!");
+        }
+    }
+  });
+  return false;
+}
 
 var annotatorid;
 function deleteAnnotator(btn){
@@ -827,8 +892,9 @@ function copyToClipboard() {
     var copyText = document.getElementById("link").value;
     navigator.clipboard.writeText(copyText).then(() => {
         document.getElementById("copy").innerHTML = "Copied!"; 
+        document.getElementById("icon_link").classList.add('d-none');
         document.getElementById("check").classList.remove('d-none');
-        $('[data-toggle="tooltip"]').tooltip('toggle');
+        $('[data-toggle="link"]').tooltip('toggle');
     });
   }
 
@@ -853,6 +919,22 @@ function develop(){
 }
 
 
+function showPassword(btn) {
+  var x = document.getElementById("password");
+  var show = document.getElementById("show_pw");
+  var hide = document.getElementById("hide_pw");
+
+  if (hide.classList == 'fa fa-eye-slash') {
+    x.type = "text";
+    show.classList.remove('d-none');
+    hide.classList.add('d-none');
+  } else {
+    x.type = "password";
+    show.classList.add('d-none');
+    hide.classList.remove('d-none');
+  }
+}
+
 function validate(){
 
   var username = document.getElementsByName('username')[0].value;
@@ -876,12 +958,12 @@ function validate(){
             if (result == 'True') {
               window.location = "/user";
               document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
-              document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+              document.getElementById('fade').innerHTML = `<strong>Success!</strong> You are successfully logged in!!`;
             }
             else if (result == 'False') {
               window.location = "/admin";
               document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
-              document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+              document.getElementById('fade').innerHTML = `<strong>Success!</strong> You are successfully logged in!!`;
             } else {
               document.getElementById('fade').classList = 'alert alert-danger alert-dismissible fade show';
               document.getElementById('fade').innerHTML = `<strong>Error!</strong> Wrong Username or Password!`;
@@ -901,12 +983,12 @@ function validate(){
           if (result == 'True') {
             window.location = "/admin";
             document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
-            document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+            document.getElementById('fade').innerHTML = `<strong>Success!</strong> You are successfully logged in!!`;
           }
           else if (result == 'False') {
             window.location = "/user";
             document.getElementById('fade').classList = 'alert alert-success alert-dismissible fade show';
-            document.getElementById('fade').innerHTML = `<strong>Success!</strong> Đăng nhập thành công!`;
+            document.getElementById('fade').innerHTML = `<strong>Success!</strong> You are successfully logged in!!`;
           } else {
             document.getElementById('fade').classList = 'alert alert-danger alert-dismissible fade show';
             document.getElementById('fade').innerHTML = `<strong>Error!</strong> Invalid Username or Password!`;
@@ -915,7 +997,7 @@ function validate(){
     });
   }
 
-  
+
 
   
 

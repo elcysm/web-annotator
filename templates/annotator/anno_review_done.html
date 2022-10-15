@@ -25,7 +25,7 @@
 </head>
 <body>
 	{% block content %}
-	<div class="container-center" >
+	<div class="container d-flex justify-content-center align-items-center h-100">
 
 		<nav class="mb-4 navbar navbar-expand-lg bg-white bg-unique shadow fixed-top">
 			<a class="navbar-brand font-weight-bold" href="#">Web based Annotator</a>
@@ -48,23 +48,16 @@
 				</ul>
 			</div>
 		</nav>
-		<div class="container-login100">
-			
-			{% if (success ) %}
-				<div style="opacity:0;" class="alert alert-success alert-dismissible fade show" role="alert" id="fade">
-					<strong>Success!</strong> {{success}}
-				</div>
-			{% endif %}
 
-			<div class="wrap-login100 p-l-50 p-r-50 p-t-30 p-b-30">
-				<form class="login100-form validate-form flex-sb flex-w" onsubmit="return mySubmitFunction(event)" >
+
+			<div class="shadow-lg border-custom col-12 col-lg-6 col-md-12 col-sm-6"> 
+				<div class="p-l-30 p-r-30 p-t-30 p-b-30 text-center ">
 					<span class="login100-form-title text-success">
 						MANY THANKS!
 					</span>	
 					<span class="form-title">
 						Thank you for your reviews.
 					</span>
-
 					<div class="w-full text-center">
 						<span class="txt2">
 							Review more?
@@ -74,11 +67,8 @@
 							<i class="fa fa-arrow-right"></i>
 						</a>
 					</div>
-
-				</form>
+				</div>
 			</div>
-		</div>
-		
 	</div>
 
 	
@@ -96,7 +86,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="/logout">Logout</a>
+                    <a class="btn btn-danger" href="/logout">Logout</a>
                 </div>
             </div>
         </div>
