@@ -1247,6 +1247,6 @@ const DOMstrings = {
     })
   };
   
-  const newAnimationType = 'slideHorz';
+  const newAnimationType = 'slideVert';
   setAnimationType(newAnimationType);
 
