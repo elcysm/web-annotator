@@ -795,22 +795,9 @@ def get_invitation():
         user_role = select_role(user_admin)
         if user_role!= None:
             if check_role(user_role[0])==True:
-                username = generate_username()
-                password = generate_password()
-                project = select_project()
                 project_id = request.args['project_id']
-
                 number = select_number_data_of_project(project_id)
-
                 return  '{}'.format(number) 
-                # render_template('admin/invite_annotator.html',
-                #     username=username,
-                #     user_admin=user_admin,
-                #     password=password,
-                #     project=project,
-                #     project_id=project_id,
-                #     number=number,
-                #     len=len(project))
             else:
                 return render_template('403.html')
         return redirect(url_for('index'))
@@ -826,9 +813,9 @@ def post_invitation(email,project_id,number):
     task = select_task_by_project_id(project_id)
     task_name = ''
     if task == "ner":
-        task_name = 'Name Entity Recognition'
+        task_name = 'Named Entity Recognition'
     if task == "pos":
-        task_name = 'Part Of Speech Tagging'
+        task_name = 'Part-of-Speech Tagging'
     if task == "textclass":
         task_name = 'Text Classification'
     if task == "parsing":

@@ -752,10 +752,10 @@ function inviteAnnotator(btn){
           $('#form1').on("mouseover", function() {
             var email = document.getElementById('invite-email').value;
             if (email != '' && email.includes('@') ){
-              document.getElementById('button_link').classList.remove('d-none');
+              document.getElementById('invite_link').classList.remove('d-none');
             }
             else{
-              document.getElementById('button_link').classList.add('d-none');
+              document.getElementById('invite_link').classList.add('d-none');
             }
           });
         } else {

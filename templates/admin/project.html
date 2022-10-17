@@ -228,28 +228,29 @@
 				</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button id="button_link" class="btn text-white btn-success ml-auto">
-						<a id="invite_link" onclick="return inviteSubmit(this);">
-							<i class="fa fa-send mr-2"></i>
-							<i class="fa fa-spinner fa-spin mr-2 d-none"></i>Send
-						</a>
-					</button>
+					<a id="invite_link" class="btn text-white btn-success ml-auto" onclick="return inviteSubmit(this);">
+						<i class="fa fa-send mr-2"></i>
+						<i class="fa fa-spinner fa-spin mr-2 d-none"></i>Send
+					</a>
                 </div>
             </div>
         </div>
     </div>
 	</form>
 
+
+
 	<!-- invite_success Modal-->
-	<div class="modal fade" id="invite_successModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	<div class="modal fade" id="invite_successModal" data-backdrop="static"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Invite Annotator</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header text-center">
+                    <h5 class="modal-title text-success" id="exampleModalLabel">Email has been sent successfully!</h5>
+
+                    <!-- <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
-                    </button>
+                    </button> -->
                 </div>
 				<div class="modal-body">
 					<div class="mb-2">
