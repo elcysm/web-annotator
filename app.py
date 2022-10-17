@@ -25,6 +25,8 @@ MAIL_USERNAME = 'webbasedannotator@gmail.com'
 MAIL_SERVICE_PASSWORD = 'eblqqukvfjguceyp'
 ROOT_DOMAIN = 'http://127.0.0.1:5000'
 EMAIL_SUBJECT = 'REVIEW INVITATION'
+EMAIL_FORGOT_SUBJECT = 'CHANGE PASSWORD'
+
 LIFETIME_SESSION = 24
 ################################################################################
 
@@ -101,6 +103,7 @@ def index():
 #         return render_template('login.html', error="Sai tài khoản hoặc mật khẩu")
 
 
+
 # validate login with username, password ------------------------------------------------
 @app.route('/username=<username>&password=<password>', methods=['POST'])
 def validate(username, password):
@@ -114,6 +117,45 @@ def validate(username, password):
             return "False"
     else:
         return "Invalid"
+
+
+@app.route('/forgot_password', methods=['GET'])
+def forgot_password():
+    return render_template('forgot_password.html')
+
+
+@app.route('/forgot_password/username=<username>', methods=['POST'])
+def forgot_password22(username):
+    email_select = select_email_by_username(username)
+    if email_select!= None:
+        email = email_select[0]
+        msg = Message(
+            EMAIL_FORGOT_SUBJECT,
+            sender = MAIL_USERNAME, 
+            recipients = [email],
+        )
+
+        link = ROOT_DOMAIN+'/change_password?username={username}'.format(username=username)
+        msg.html = render_template('admin/email_password_content.html', email=email, username=username, link=link)
+        mail.send(msg)
+
+        return '{}'.format(link)
+    else:
+        return 'Invalid'
+
+
+@app.route('/change_password', methods=['GET'])
+def change_password():
+    username = request.args['username']
+    return render_template('change_password.html', username=username)
+
+@app.route('/change_password', methods=['POST'])
+def change_password_post():
+    username = request.args['username']
+    password = request.args['password']
+    update_password_by_username(username, password)
+    return "OK"
+
 
 # user index    ----------------------------------------------------------------
 @app.route('/user')
@@ -1330,6 +1372,15 @@ def select_role(username):
     connection.commit()
     return result
 
+# select email by username   ----------------------------------------------------
+def select_email_by_username(username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT email FROM user WHERE username = '{username}'".format(username = username)
+    cursor.execute(query)
+    result = cursor.fetchone()
+    return result
+
 # select username, role by username --------------------------------------------
 def select_role_by_username_password(username, password):
     connection = connect_to_db()
@@ -1996,6 +2047,16 @@ def delete_annotator_by_username(username):
     cursor.execute(query1)
     cursor.execute(query2)
     cursor.execute(query3)
+    connection.commit()
+
+
+############################# UPDATE DATA ###################################
+def update_password_by_username(username, password):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    passwordhash = hashlib.md5(password.encode()).hexdigest()
+    query = "UPDATE user SET password = '{passwordhash}' where username = '{username}'".format(passwordhash = passwordhash, username = username)
+    cursor.execute(query)
     connection.commit()
 
 ############################### HANDLE INPUT DATA ##############################

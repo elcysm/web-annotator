@@ -935,6 +935,59 @@ function showPassword(btn) {
   }
 }
 
+function validateForgot(btn){
+  var username = document.getElementById('username').value;
+  btn.querySelector('i[class="fa fa-send mr-2"]').classList.add('d-none');
+  btn.querySelector('i[class="fa fa-spinner fa-spin mr-2 d-none"]').classList.remove('d-none');
+  $.ajax({
+    type: 'POST',
+    url: location+`/username=${username}`,
+    success: function(result) {
+        if (result === 'Invalid' || username == '') {
+          document.getElementById('fade').classList = 'alert alert-danger alert-dismissible fade show';
+          document.getElementById('fade').innerHTML = `<strong>Error!</strong> Invalid username.`;
+          $('.alert').show();
+          setTimeout(function() { 
+              $('.alert').fadeOut(500); 
+          }, 500);
+          btn.querySelector('i[class="fa fa-send mr-2 d-none"]').classList.remove('d-none');
+          btn.querySelector('i[class="fa fa-spinner fa-spin mr-2"]').classList.add('d-none');
+        }
+        else {
+          document.getElementById('error_username').classList.add('d-none');
+          btn.querySelector('i[class="fa fa-spinner fa-spin mr-2"]').classList.add('d-none');
+          btn.querySelector('i[class="fa fa-check mr-2 d-none"]').classList.remove('d-none');
+          btn.innerText = 'Email has been successfully!';
+          btn.disabled = true;
+          document.getElementById('pre_send').classList.add('d-none');
+          document.getElementById('send_success').classList.remove('d-none');
+        }
+    }
+  });
+}
+
+function changePassword(){
+  var password = document.getElementById('password').value;
+  $.ajax({
+    type: 'POST',
+    url: location+`&password=${password}`,
+    success: function(result) {
+        if (result != 'OK' || password == '') {
+          document.getElementById('fade').classList = 'alert alert-danger alert-dismissible fade show';
+          document.getElementById('fade').innerHTML = `<strong>Error!</strong> Please fill your password`;
+          $('.alert').show();
+          setTimeout(function() { 
+              $('.alert').fadeOut(500); 
+          }, 500);
+        }
+        else {
+          document.getElementById('pre_change').classList.add('d-none');
+          document.getElementById('change_success').classList.remove('d-none');
+        }
+    }
+  });
+}
+
 function validate(){
 
   var username = document.getElementsByName('username')[0].value;
