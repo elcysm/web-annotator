@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask import send_file
 from datetime import timedelta
 from flask import render_template, session, redirect, url_for
 from flask_mail import Mail, Message
@@ -1359,6 +1360,12 @@ def connect_to_db():
 def vacuum_db():
     conn = connect_to_db()
     conn.execute('VACUUM')
+
+# export database   --------------------------------------------------------
+@app.route('/exportDatabase')
+def downloadFile ():
+    path = "data.db"
+    return send_file(path, as_attachment=True)
 
 ###################################### SELECT ##################################
 
