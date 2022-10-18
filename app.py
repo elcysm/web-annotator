@@ -21,6 +21,11 @@ app = Flask(__name__)
 app.secret_key = "lethanhdat"
 dirname = os.getcwd()
 
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.DEBUG)
+
 ##########################--- DATA OWNER CUSTOM ---#############################
 MAIL_USERNAME = 'webbasedannotator@gmail.com'
 MAIL_SERVICE_PASSWORD = 'eblqqukvfjguceyp'
@@ -72,9 +77,11 @@ def get_login():
 @app.route('/')
 def index():
     if 'username' not in session:
+        print(session)
         return render_template('login.html',
         error="",
         success="")
+
     else:
         username = session['username']
         user_role = select_role(username)
@@ -86,7 +93,7 @@ def index():
         else:
             return redirect(url_for('get_register')) 
 
-# # login with username, password ------------------------------------------------
+# login with username, password ------------------------------------------------
 # @app.route('/', methods=['POST'])
 # def login():
 #     username = request.form['username']
@@ -136,7 +143,7 @@ def forgot_password22(username):
             recipients = [email],
         )
 
-        link = ROOT_DOMAIN+'/change_password?username={username}'.format(username=username)
+        link = ROOT_DOMAIN+'/change_password?username={username}&isEmail=True'.format(username=username)
         msg.html = render_template('admin/email_password_content.html', email=email, username=username, link=link)
         mail.send(msg)
 
@@ -148,7 +155,34 @@ def forgot_password22(username):
 @app.route('/change_password', methods=['GET'])
 def change_password():
     username = request.args['username']
-    return render_template('change_password.html', username=username)
+    isEmail = request.args['isEmail']
+
+    if isEmail == 'True':
+        session['isEmail'] = 'True'
+    else: 
+        session['isEmail'] = 'False'
+
+    if session['isEmail'] == 'True' and 'username' not in session:
+        if 'changepassword' not in session:
+            session['changepassword'] = username
+        if username == session['changepassword']:
+            return render_template('change_password.html', username=username)
+        else:
+            return render_template('403.html')
+
+    elif session['isEmail'] == 'False' and 'username' in session:
+        session['changepassword'] = username
+        if 'changepassword' in session:
+            if session['username'] == session['changepassword']:
+                return render_template('change_password.html', username=username)
+            else:
+                return render_template('403.html')
+        else:
+            return render_template('403.html')
+
+    else:
+            return render_template('403.html')
+
 
 @app.route('/change_password', methods=['POST'])
 def change_password_post():
@@ -239,8 +273,7 @@ def validate_annotator(username, password, number):
 # logout    --------------------------------------------------------------------
 @app.route('/logout')
 def logout():
-   session.pop('username', None)
-   session.pop('project', None)
+   session.clear()
    return redirect(url_for('index'))
 
 ################################### USER REVIEW ################################
@@ -637,9 +670,9 @@ def admin_index():
                 tasks = []
                 for i in task:
                     if i == "ner":
-                        tasks.append('Name Entity Recognition')
+                        tasks.append('Named Entity Recognition')
                     if i == "pos":
-                        tasks.append('Part Of Speech Tagging')
+                        tasks.append('Part-Of-Speech Tagging')
                     if i == "textclass":
                        tasks.append('Text Classification')
                     if i == "parsing":
