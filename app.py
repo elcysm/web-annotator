@@ -189,6 +189,7 @@ def change_password_post():
     username = request.args['username']
     password = request.args['password']
     update_password_by_username(username, password)
+    session.clear()
     return "OK"
 
 
@@ -209,8 +210,8 @@ def user_index():
 ################################ LOGIN BY LINK #################################
 
 # login by link from data owner ------------------------------------------------
-@app.route('/login/project=<project>&number=<number>&username=<username>&password=<password>', methods=['GET'])
-def get_api_login(project, number, username, password):
+@app.route('/login/project=<project>&username=<username>&password=<password>', methods=['GET'])
+def get_api_login(project, username, password):
     if 'username' not in session:
          return render_template('login.html', username=username, password=password)
     else:
@@ -232,14 +233,13 @@ def get_api_login(project, number, username, password):
 
 # login by link from data owner ------------------------------------------------
 
-@app.route('/login/username=<username>&password=<password>&number=<number>', methods=['POST'])
-def validate_annotator(username, password, number):
+@app.route('/login/username=<username>&password=<password>', methods=['POST'])
+def validate_annotator(username, password):
     result = select_role_by_username_password(username, password)
     if result != None:
         session['username'] = username
         user_role = result[1]
         if check_role(user_role)==False:
-            session['number'] = number
             return "True"
         else:
             return "False"
@@ -286,15 +286,14 @@ def review():
         user_role = select_role(username)
         if user_role!= None:
             if check_role(user_role[0])==False:
+                number = select_number_by_annotator(username)
                 try: 
                     project = request.args['project']
                     project_temp = select_project_id_by_annotator(username)
                     if project != project_temp:
                         return redirect(url_for('review', project = project_temp))
-                    number = int(session['number'])
                 except:
                     project = select_project_id_by_annotator(username)
-                    number = 5
                     return redirect(url_for('review', project = project))
                 else:
 
@@ -849,7 +848,6 @@ def collaborator_index():
                 number_review = []
                 for i in annotator:
                     number_review.append(select_number_review_by_username(i[0], i[2]))
-
                 len_annotator = len(annotator)
                 return render_template('admin/collaborator.html', 
                 username = username, 
@@ -885,7 +883,7 @@ def post_invitation(email,project_id,number):
     username = generate_username()
     password = generate_password()
 
-    insert_annotator(username, email, password, project_id)
+    insert_annotator(username, email, password, project_id, number)
     task = select_task_by_project_id(project_id)
     task_name = ''
     if task == "ner":
@@ -909,7 +907,7 @@ def post_invitation(email,project_id,number):
         recipients = [email],
         )
 
-    link = ROOT_DOMAIN+'/login/project={project_id}&number={number}&username={username}&password={password}'.format(project_id=project_id, number=number, username=username, password=password)
+    link = ROOT_DOMAIN+'/login/project={project_id}&username={username}&password={password}'.format(project_id=project_id, username=username, password=password)
     msg.html = render_template('admin/email_content.html', username=username, password=password, link=link, project_id = project_id, task=task_name)
     mail.send(msg)
 
@@ -1701,6 +1699,15 @@ def select_project_id_by_annotator(username):
     result = cursor.fetchone()[0]
     return result
 
+# select number_of_data_by_annotator   ------------------------------------------
+def select_number_by_annotator(username):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    query = "SELECT number FROM user where username = '{username}'".format(username = username)
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    return result
+
 # select numbers of project   --------------------------------------------------
 def select_number_of_project():
     connection = connect_to_db()
@@ -1824,11 +1831,11 @@ def select_notice():
 ###################################### INSERT ##################################
 
 # insert annotator  ------------------------------------------------------------
-def insert_annotator(username, email, password, project_id):
+def insert_annotator(username, email, password, project_id, number):
     connection = connect_to_db()
     cursor = connection.cursor()
     passwordhash = hashlib.md5(password.encode()).hexdigest()
-    query1 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}')".format(name = username, mail = email, passw = passwordhash, role = ANNOTATOR_ROLE, project_id=project_id)
+    query1 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}', {number})".format(name = username, mail = email, passw = passwordhash, role = ANNOTATOR_ROLE, project_id=project_id, number=number)
     cursor.execute(query1)
     connection.commit()
 
@@ -1837,7 +1844,7 @@ def insert_data_owner(username, email, password):
     connection = connect_to_db()
     cursor = connection.cursor()
     passwordhash = hashlib.md5(password.encode()).hexdigest()
-    query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}')".format(name = username, mail = email, passw = passwordhash, role = DATA_OWNER_ROLE, project_id='')
+    query2 = "INSERT INTO user VALUES ('{name}','{passw}','{mail}', '{role}', '{project_id}', {number})".format(name = username, mail = email, passw = passwordhash, role = DATA_OWNER_ROLE, project_id='', number='')
     cursor.execute(query2)
     connection.commit()
 

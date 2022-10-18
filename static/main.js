@@ -994,19 +994,17 @@ function validate(){
   var password = document.getElementsByName('password')[0].value;
   
   if (window.location.toString().includes('/login')){
-    var username_url = window.location.toString().split('&')[2];
-    var password_url = window.location.toString().split('&')[3];
-    var number_url = window.location.toString().split('&')[1];
-
+    
+    var username_url = window.location.toString().split('&')[1];
+    var password_url = window.location.toString().split('&')[2];
 
     var username_value = username_url.split('=')[1];
     var password_value = password_url.split('=')[1];
-    var number_value = number_url.split('=')[1];
 
     if (username_value == username && password == password_value){
       $.ajax({
         type: 'POST',
-        url: `http://127.0.0.1:5000//login/username=${username}&password=${password}&number=${number_value}`,
+        url: `http://127.0.0.1:5000/login/username=${username}&password=${password}`,
         success: function(result) {
             if (result == 'True') {
               window.location = "/user";
